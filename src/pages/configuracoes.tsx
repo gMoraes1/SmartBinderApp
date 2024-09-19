@@ -1,27 +1,27 @@
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 
-export default function Configurations() {
-  const navigation = useNavigation();
 
+export default function Configurations({navigation}) {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
 
         <Text style={styles.title}>Configurações</Text>
-    
+
         <View style={styles.topButtonsContainer}>
-          <TouchableOpacity style={styles.topButton}   
-          // onPress={() => navigation.navigate('PrivacyConfiguration')}
+          <TouchableOpacity style={styles.topButton}
+            onPress={() => navigation.navigate('Privacidade')}
           >
             <Text style={styles.topButtonText}>Configurações de privacidade</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.topButton}
-          //  onPress={() => navigation.navigate('ThemeSettings')}
-           >
+            onPress={() => navigation.navigate('Tema')} // Agora está correto
+          >
             <Text style={styles.topButtonText}>Tema</Text>
           </TouchableOpacity>
+
         </View>
 
         <View style={styles.bottomButtonContainer}>
@@ -55,10 +55,10 @@ const styles = StyleSheet.create({
     alignItems: 'center', // Centraliza os botões horizontalmente
   },
   topButton: {
-    borderBottomColor:'gray',
-    borderBottomWidth:3,
-    borderColor:'gray',
-    borderWidth:0.8,
+    borderBottomColor: 'gray',
+    borderBottomWidth: 3,
+    borderColor: 'gray',
+    borderWidth: 0.8,
     backgroundColor: '#FFFFFF', // Cor de fundo dos botões
     borderRadius: 5,
     paddingVertical: 15, // Aumenta o padding vertical
@@ -75,9 +75,9 @@ const styles = StyleSheet.create({
   bottomButtonContainer: {
     justifyContent: 'flex-end', // Faz o botão ficar na parte inferior do container
     alignItems: 'center', // Centraliza o botão horizontalmente
-    display:'flex',
-    bottom:90,
-    alignContent:'center',
+    display: 'flex',
+    bottom: 90,
+    alignContent: 'center',
     paddingTop: 100, // Ajusta a posição vertical do botão "Sair" (ajuste conforme necessário)
   },
   bottomButton: {
@@ -86,13 +86,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, // Reduz o padding horizontal
     alignItems: 'center',
     width: 90, // Largura menor do botão
-    verticalAlign:'middle',
+    verticalAlign: 'middle',
     height: 40, // Altura do botão
   },
   bottomButtonText: {
     color: '#FFFFFF', // Cor do texto do botão
     fontSize: 16, // Tamanho da fonte do botão
-    padding:6,
+    padding: 6,
     fontWeight: '500',
   },
 });

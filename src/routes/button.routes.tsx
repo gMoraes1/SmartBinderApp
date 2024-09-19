@@ -1,27 +1,18 @@
-// AppNavigator.js (ou onde você configura suas rotas)
+import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer } from '@react-navigation/native';
-import Configurations from '../pages/configuracoes';
-import PrivacySettings from '../pages/PrivacySettings';
-import ThemeSettings from '../pages/tema';
+import Configurations from "../pages/configuracoes";
+import ThemeSettings from "../pages/tema";
+import PrivacyConfiguration from "../pages/PrivacySettings";
 
 const Stack = createNativeStackNavigator();
 
-function AppButtonNavigator() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="Configurations" component={Configurations} />
-      <Stack.Screen name="PrivacySettings" component={PrivacySettings} />
-      <Stack.Screen name="ThemeSettings" component={ThemeSettings} />
-    </Stack.Navigator>
-  );
-}
-
-export default function App() {
-  return (
-    <NavigationContainer>
-      <AppButtonNavigator />
-    </NavigationContainer>
-  );
+export default function Rotas() {
+    return (
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+            <Stack.Screen name="configurações" component={Configurations} />
+            <Stack.Screen name="Tema" component={ThemeSettings} />
+            <Stack.Screen name="Privacidade" component={PrivacyConfiguration} />
+        </Stack.Navigator>
+    );
 }

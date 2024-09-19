@@ -1,13 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
 
-export default function ThemeSettings() {
+const ThemeSettings = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tema</Text>
+    <View>
+      <Text style={styles.title}>Configurações de Tema</Text>
     </View>
   );
-}
+};
+
+export default ThemeSettings;
 
 const styles = StyleSheet.create({
   container: {
