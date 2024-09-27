@@ -6,7 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import PrivacyConfiguration from '../pages/PrivacySettings';
 import Home from '../pages/home';
-import Register from '../pages/cadastro';
+import Register from '../pages/turmas';
 import Calendar from '../pages/calendario';
 import Configuration from '../pages/configuracoes';
 import Profile from '../pages/perfil';

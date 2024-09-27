@@ -9,9 +9,10 @@ import Home from "./src/pages/home";
 import Calendar from "./src/pages/calendario";
 import Configurations from "./src/pages/configuracoes";
 import Profile from "./src/pages/perfil";
-import Register from "./src/pages/cadastro";
+import Register from "./src/pages/turmas";
 import ThemeSettings from "./src/pages/tema";
 import PrivacyConfiguration from "./src/pages/PrivacySettings";
+import RegisterClass from "./src/pages/cadastrarTurmas";
 
 const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -22,12 +23,25 @@ function StackNavigator() {
       screenOptions={{
         headerShown: false,
       }} >
-      <Stack.Screen name="Configurações" component={Configurations} />
+      <Stack.Screen name="settings" component={Configurations} />
       <Stack.Screen name="Tema" component={ThemeSettings} />
       <Stack.Screen name="Privacidade" component={PrivacyConfiguration} />
     </Stack.Navigator>
   );
 }
+
+function StackRegister() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }} >
+        <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen name="NovaTurma" component={RegisterClass} />
+    </Stack.Navigator>
+  );
+}
+
 
 function TabNavigator() {
   return (
@@ -85,7 +99,7 @@ function TabNavigator() {
 
       <Tab.Screen
         name="Turmas"
-        component={Register}
+        component={StackRegister}
         options={{
 
           tabBarIcon: ({ color, size, focused }) => {
@@ -98,7 +112,7 @@ function TabNavigator() {
       />
 
       <Tab.Screen
-        name="Configurações"
+        name="configurações"
         component={StackNavigator}
         options={{
           tabBarIcon: ({ color, size, focused }) => {
