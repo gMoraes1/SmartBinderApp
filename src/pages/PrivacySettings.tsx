@@ -1,15 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
 
-const ThemeSettings = () => {
+const PrivacySettings = () => {
   return (
-    <View>
+    <View style={styles.container}>
        <Text style={styles.title}>Configurações de Privacidade</Text>
     </View>
   );
 };
 
-export default ThemeSettings;
+export default PrivacySettings;
 
 const styles = StyleSheet.create({
   container: {

@@ -1,13 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
+import { useNavigation } from '@react-navigation/native';
 import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from 'react-native';
 
-export default function Register() {
+export default function Register({navigation}) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Turmas</Text>
 
       <View style={styles.ViewBtnAdd}>
-        <TouchableOpacity style={styles.BtnAdd}>
+        <TouchableOpacity  onPress={() => navigation.navigate('NovaTurma')} style={styles.BtnAdd}>
             <Text style={styles.TxtBtn1}>+</Text>
 
             <Text style={styles.TxtBtn2}>Nova Turma</Text>
@@ -26,8 +27,8 @@ const styles = StyleSheet.create({
   },
 
   BtnAdd: {
-    width: 180,
-    height: 150,
+    width: 150,
+    height: 130,
   },
 
   TxtBtn1: {
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
     height:'25%',
     textAlign:'center',
     width: '100%',
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '900',
     backgroundColor: '#6939E9',
     verticalAlign: 'bottom',
@@ -70,8 +71,8 @@ const styles = StyleSheet.create({
   ViewBtnAdd: {
     borderRadius:70,
     position:'relative',
-    top:10,
-    left:50,
+    top:20,
+    left:40,
   },
 
   title: {

@@ -4,15 +4,7 @@ import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from 'rea
 export default function RegisterClass(navigation) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Turmas</Text>
-
-      <View style={styles.ViewBtnAdd}>
-        <TouchableOpacity style={styles.BtnAdd} onPress={() => navigation.navigate('NovaTurma')}>
-            <Text style={styles.TxtBtn1}>+</Text>
-
-            <Text style={styles.TxtBtn2}>Nova Turma</Text>
-        </TouchableOpacity>
-      </View>
+      <Text style={styles.title}>Cadastrar Turma</Text>
 
 
     </View>
