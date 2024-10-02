@@ -1,19 +1,28 @@
 import "react-native-gesture-handler";
-import { createStackNavigator } from "@react-navigation/stack";
-import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, ImageBackground, TouchableOpacity } from 'react-native';
 
-export default function Inicio() {
+export default function Inicio({ navigation }) {
     return (
-        <View style={styles.container}>
-            <View style={styles.circulosView}>
-                <View style={styles.circulo3}></View>
-
-                <View style={styles.circulo2}></View>
-
-                <View style={styles.circulo1}></View>
+        <ImageBackground style={styles.fundo} source={require('../../assets/inicio.png')}>
+            <View style={styles.container}>
+                <View style={styles.viewAlign}>
+                    <Image source={require('../../assets/imagemInicio.png')} style={styles.imagem} />
+                    <Text style={styles.title}>
+                        Seja bem vindo(a) ao melhor 
+                        aplicativo para professores.
+                    </Text>
+                    <TouchableOpacity 
+                        style={styles.btnInicio} 
+                        onPress={() => navigation.navigate('InicioRegister')}
+                    >
+                        <Text style={styles.txtBtn}>
+                            Começar
+                        </Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-        </View>
-    )
+        </ImageBackground>
+    );
 };
 
 const styles = StyleSheet.create({
@@ -21,29 +30,43 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
     },
-
+    viewAlign: {
+        top: '30%',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     title: {
-        fontSize: 32,
+        fontSize: 20,
+        width: 300,
+        color: "#fff",
         fontWeight: "600",
         justifyContent: "center",
         textAlign: "center",
-        paddingTop: 18,
+        paddingTop: 46,
     },
-
-    circulo1: {
-        backgroundColor: '#2E1966',
+    fundo: {
+        width: '100%',
+        height: '100%',
     },
-
-    circulo2: {
-        backgroundColor: '#946CFF',
+    imagem: {},
+    btnInicio: {
+        textAlign: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 20,
+        width: 170,
+        height: 50,
+        top: 58,
+        backgroundColor: '#FFDE00',
+        borderColor: 'rgba(0,0,0,0.5)',
+        borderBottomWidth: 2.2,
+        borderRightWidth: 1,
+        borderLeftWidth: 1,
     },
-
-    circulo3: {
-        backgroundColor: '#6939E9',
-    },
-
-    circulosView: {
-        display: 'flex',
-        flexDirection: 'column',
+    txtBtn: {
+        color: '#000',
+        fontWeight: '800',
+        fontSize: 18,
     },
 });
