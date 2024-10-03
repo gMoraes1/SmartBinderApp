@@ -1,8 +1,8 @@
 import "react-native-gesture-handler";
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from "@react-navigation/stack";
-import Inicio from "../pages/inicio"; // Ajuste o caminho conforme necessário
-import InicioRegister from "../pages/inicioRegister";
+import Inicio from "../pages/(public)"; // Ajuste o caminho conforme necessário
+import InicioRegister from "../pages/(public)/inicioRegister";
 import TabNavigator from "./tab.routes";
 
 const Stack = createStackNavigator();

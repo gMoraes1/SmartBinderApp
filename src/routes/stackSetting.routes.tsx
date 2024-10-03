@@ -2,11 +2,11 @@ import "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
 
-import Configurations from "../pages/configuracoes";
-import Register from "../pages/turmas"; 
-import ThemeSettings from "../pages/tema";
-import PrivacySettings from "../pages/PrivacySettings";
-import RegisterClass from "../pages/cadastrarTurmas";
+import Configurations from "../pages/(auth)/configuracoes";
+import Register from "../pages/(auth)/turmas"; 
+import ThemeSettings from "../pages/(auth)/tema";
+import PrivacySettings from "../pages/(auth)/PrivacySettings";
+import RegisterClass from "../pages/(auth)/cadastrarTurmas";
 
 const Stack = createStackNavigator();
 
