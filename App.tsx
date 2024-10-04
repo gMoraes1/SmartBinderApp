@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import StackLogin from "./src/routes/stackLogin.routes";
 import { ClerkProvider } from "@clerk/clerk-expo";
 import { tokenCache } from './src/storage/tokenCache';
+import TabNavigator from "./src/routes/tab.routes";
 
 // Verificar o ambiente e usar a chave correspondente
 const PUBLIC_CLERK_PUBLISHABLE_KEY = process.env.NODE_ENV === 'production'
@@ -14,10 +15,8 @@ const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <ClerkProvider publishableKey={PUBLIC_CLERK_PUBLISHABLE_KEY} tokenCache={tokenCache}>
       <NavigationContainer>
-        <StackLogin />
+        <TabNavigator />
       </NavigationContainer>
-    </ClerkProvider>
   );
 }
