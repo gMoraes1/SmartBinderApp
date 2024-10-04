@@ -1,12 +1,12 @@
 import "react-native-gesture-handler";
 import { StyleSheet, Text, View, Image, ImageBackground, TouchableOpacity } from 'react-native';
 
-export default function Inicio({ navigation }) {
+export default function Sign({ navigation }) {
     return (
-        <ImageBackground style={styles.fundo} source={require('../../../assets/inicio.png')}>
+        <ImageBackground style={styles.fundo} source={require('../../assets/inicio.png')}>
             <View style={styles.container}>
                 <View style={styles.viewAlign}>
-                    <Image source={require('../../../assets/imagemInicio.png')} style={styles.imagem} />
+                    <Image source={require('../../assets/imagemInicio.png')} style={styles.imagem} />
                     <Text style={styles.title}>
                         Seja bem vindo(a) ao melhor 
                         aplicativo para professores.

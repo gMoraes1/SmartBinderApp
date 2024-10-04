@@ -5,12 +5,13 @@ import { createMaterialBottomTabNavigator } from "@react-navigation/material-bot
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
 
-import Home from "../pages/(auth)";
-import Calendar from "../pages/(auth)/calendario";
-import Profile from "../pages/(auth)/perfil";
+
 
 import StackRegister from "./stackRegister.routes";
 import StackSettings from "./stackSetting.routes";
+import Home from "../pages/home";
+import Calendar from "../pages/calendario";
+import Profile from "../pages/perfil";
 
 const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();

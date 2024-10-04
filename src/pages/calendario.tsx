@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
 export default function Calendar() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Calendario</Text>
+      <Text style={styles.title}>Calendário</Text>
     </View>
   );
 }

@@ -2,8 +2,8 @@ import "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
 
-import Register from "../pages/(auth)/turmas"; 
-import RegisterClass from "../pages/(auth)/cadastrarTurmas";
+import Register from "../pages/turmas";
+import RegisterClass from "../pages/cadastrarTurmas";
 
 const Stack = createStackNavigator();
 
