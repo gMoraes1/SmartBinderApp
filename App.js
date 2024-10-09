@@ -9,7 +9,7 @@ import TabNavigator from "./src/routes/tab.routes";
 const Stack = createStackNavigator();
 
 export default function App() {
-  const auth = false;
+  const auth = true;
   return (
       <NavigationContainer>
         {auth ? <TabNavigator/> : <StackLogin/>}
