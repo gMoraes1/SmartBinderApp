@@ -1,9 +1,27 @@
+import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Cadastrar from "../components/Buttons/Cadastrar";
 import Input from "../components/Input/Input";
 import Voltar from "../components/Buttons/Voltar";
 
 export default function RegisterClass({ navigation }) {
+  const [className, setClassName] = useState("");
+  const [period, setPeriod] = useState("");
+  const [educationLevel, setEducationLevel] = useState("");
+  const [school, setSchool] = useState("");
+
+  const handleAddClass = () => {
+    // Navegar de volta e passar os dados da turma
+    navigation.navigate("Register", {
+      classData: {
+        name: className,
+        period,
+        educationLevel,
+        school,
+      },
+    });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -12,13 +30,13 @@ export default function RegisterClass({ navigation }) {
       </View>
 
       <View style={styles.inputContainer}>
-        <Input text="Nome da turma" />
-        <Input text="Período" />
-        <Input text="Nível de escolaridade" />
-        <Input text="Escola" />
+        <Input text="Nome da turma" onChangeText={setClassName} />
+        <Input text="Período" onChangeText={setPeriod} />
+        <Input text="Nível de escolaridade" onChangeText={setEducationLevel} />
+        <Input text="Escola" onChangeText={setSchool} />
       </View>
 
-      <Cadastrar onPress={() => navigation.navigate("Register")} />
+      <Cadastrar onPress={handleAddClass} />
     </View>
   );
 }
