@@ -1,9 +1,9 @@
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { StyleSheet, Text } from "react-native";
 
-const Cadastrar = () => {
+const Cadastrar = ({ onPress }) => {
   return (
-    <TouchableOpacity style={styles.button}>
+    <TouchableOpacity onPress={onPress} style={styles.button}>
       <Text style={styles.textButton}>Cadastrar</Text>
     </TouchableOpacity>
   );

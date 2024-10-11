@@ -1,44 +1,70 @@
+import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Cadastrar from "../components/Buttons/Cadastrar";
 import Input from "../components/Input/Input";
 import Voltar from "../components/Buttons/Voltar";
 
-export default function RegisterClass() {
+export default function RegisterClass({ navigation }) {
+  const [className, setClassName] = useState("");
+  const [period, setPeriod] = useState("");
+  const [educationLevel, setEducationLevel] = useState("");
+  const [school, setSchool] = useState("");
+
+  const handleAddClass = () => {
+    // Navegar de volta e passar os dados da turma
+    navigation.navigate("Register", {
+      classData: {
+        name: className,
+        period,
+        educationLevel,
+        school,
+      },
+    });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Voltar />
+        <Voltar onPress={() => navigation.navigate("Register")} />
         <Text style={styles.title}>Cadastrar Turma</Text>
       </View>
 
-      <View>
-        <Input text="Nome da turma" />
-        <Input text="Período" />
-        <Input text="Nível de escolaridade" />
-        <Input text="Escola" />
+      <View style={styles.inputContainer}>
+        <Input text="Nome da turma" onChangeText={setClassName} />
+        <Input text="Período" onChangeText={setPeriod} />
+        <Input text="Nível de escolaridade" onChangeText={setEducationLevel} />
+        <Input text="Escola" onChangeText={setSchool} />
       </View>
 
-      <Cadastrar />
+      <Cadastrar onPress={handleAddClass} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
-    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 70,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     height: 120,
-    paddingHorizontal: 16, // Espaçamento lateral
+    paddingHorizontal: 16,
+  },
+  inputContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
   },
   title: {
-    flex: 1, // Faz o texto ocupar o espaço restante
+    flex: 1,
     fontSize: 32,
     fontWeight: "600",
-    textAlign: "center", // Centraliza o texto
+    textAlign: "center",
     paddingTop: 18,
   },
 });
