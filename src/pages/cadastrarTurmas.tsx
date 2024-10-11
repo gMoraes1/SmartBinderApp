@@ -11,7 +11,7 @@ export default function RegisterClass() {
         <Text style={styles.title}>Cadastrar Turma</Text>
       </View>
 
-      <View>
+      <View style={styles.inputContainer}>
         <Input text="Nome da turma" />
         <Input text="Período" />
         <Input text="Nível de escolaridade" />
@@ -25,20 +25,29 @@ export default function RegisterClass() {
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
-    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 70,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     height: 120,
-    paddingHorizontal: 16, // Espaçamento lateral
+    paddingHorizontal: 16, 
+  },
+  inputContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+
   },
   title: {
-    flex: 1, // Faz o texto ocupar o espaço restante
+    flex: 1, 
     fontSize: 32,
     fontWeight: "600",
-    textAlign: "center", // Centraliza o texto
+    textAlign: "center",
     paddingTop: 18,
   },
 });
