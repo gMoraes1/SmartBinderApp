@@ -3,11 +3,11 @@ import Cadastrar from "../components/Buttons/Cadastrar";
 import Input from "../components/Input/Input";
 import Voltar from "../components/Buttons/Voltar";
 
-export default function RegisterClass() {
+export default function RegisterClass({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Voltar />
+        <Voltar onPress={() => navigation.navigate("Register")} />
         <Text style={styles.title}>Cadastrar Turma</Text>
       </View>
 
@@ -18,7 +18,7 @@ export default function RegisterClass() {
         <Input text="Escola" />
       </View>
 
-      <Cadastrar />
+      <Cadastrar onPress={() => navigation.navigate("Register")} />
     </View>
   );
 }
@@ -35,16 +35,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     height: 120,
-    paddingHorizontal: 16, 
+    paddingHorizontal: 16,
   },
   inputContainer: {
     display: "flex",
     flexDirection: "column",
     gap: 10,
-
   },
   title: {
-    flex: 1, 
+    flex: 1,
     fontSize: 32,
     fontWeight: "600",
     textAlign: "center",

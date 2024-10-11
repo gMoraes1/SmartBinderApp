@@ -1,8 +1,8 @@
 import { TouchableOpacity, Image } from "react-native";
 
-const Voltar = () => {
+const Voltar = ({ onPress }) => {
   return (
-    <TouchableOpacity>
+    <TouchableOpacity onPress={onPress}>
       <Image source={require("../../../assets/voltar.png")} />
     </TouchableOpacity>
   );
