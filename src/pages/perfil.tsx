@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     justifyContent: "center",
     textAlign: "center",
-    paddingTop: 18,
+    paddingTop: "12%",
   },
 
   image: {

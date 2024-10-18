@@ -92,6 +92,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: '800',
         fontSize: 18,
+
     },
 
     btnSign:{
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         textAlign:'center',
         padding:20,
-        top:'36%',
+        top:'25%',
         display:'flex',
         flexDirection:'row',
     },
