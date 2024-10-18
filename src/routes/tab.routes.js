@@ -12,22 +12,30 @@ import StackSettings from "./stackSetting.routes";
 import Home from "../pages/home";
 import Calendar from "../pages/calendario";
 import Profile from "../pages/perfil";
+import styled from 'styled-components/native'; // Importar styled-components
 
 const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
 
 
+const Container = styled.View`
+  background-color: ${props => props.theme.background};
+  width: 100%;
+  height: 100%;
+`;
+
 export default function TabNavigator() {
     return (
+      <Container>
       <Tab.Navigator screenOptions={{
         headerShown: false,
         tabBarLabel: false,
         tabBarStyle: {
           position: 'absolute',
-          height: 64,
+          height: 90,
           borderTopWidth: 1,
         },
-      }} >
+      }}>
   
   
         <Tab.Screen
@@ -97,6 +105,7 @@ export default function TabNavigator() {
           }}
         />
       </Tab.Navigator>
+      </Container>
     );
   }
   

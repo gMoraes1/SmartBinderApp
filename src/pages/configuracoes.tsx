@@ -46,13 +46,13 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '600',
     textAlign: 'center',
-    marginTop: 50, // Espaço do topo
-    marginBottom: 20, // Espaço abaixo do título
+    top:'8 %',
   },
   topButtonsContainer: {
     flex: 1, // Faz com que o container ocupe o espaço restante acima do botão "Sair"
     justifyContent: 'flex-start', // Alinha os botões no topo da área restante
     alignItems: 'center', // Centraliza os botões horizontalmente
+    top:'26%'
   },
   topButton: {
     borderBottomColor: 'gray',

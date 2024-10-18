@@ -19,8 +19,8 @@ export default function Calendars() {
         style={styles.calendar}
         headerStyle={{
           borderBottomWidth: 2,
-          paddingBottom: 10,
-          marginBottom: 10,
+          paddingBottom: 13,
+          marginBottom: 13,
         }}
 
 
@@ -28,9 +28,10 @@ export default function Calendars() {
         theme={{
           textMonthFontWeight: '700',
           textMonthFontSize: 22,
-          textDayFontSize: 16,
+          textDayFontSize: 17,
           textDayFontWeight: '800',
           todayTextColor: '#6636E6',
+          todayButtonFontSize:19,
           selectedDayBackgroundColor: '#6939E9',
           selectedDayTextColor: 'white',
           calendarBackground: 'transparent',
@@ -53,31 +54,10 @@ export default function Calendars() {
         }
         }
 
-        dayComponent={({ date, state }: { date: DateData, state: DayState }) => {
-          return (
-            <TouchableOpacity style={[
-              styles.day,
-              date.dateString === day?.dateString && styles.selected
-            ]}
-            onPress={() => setDay(date)}
-            >
-
-              <Text style={[
-                styles.dayText,
-                (state === 'inactive' || state === "disabled") && styles.disabledDayText,
-                state === "today" && styles.today,
-                date.dateString === day?.dateString && styles.selected
-              ]}>
-                {date.day}
-              </Text>
-
-
-            </TouchableOpacity>
-          )
-        }}
+       
         />
 
-        <Text style={styles.title}>{day.dateString}</Text>
+        {/* <Text style={styles.title}>{day?.dateString}</Text> */}
     </View>
   );
 }
@@ -92,7 +72,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     justifyContent: "center",
     textAlign: "center",
-    paddingTop: 18,
+    top: 40,
   },
 
   calendar: {
