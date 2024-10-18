@@ -25,7 +25,6 @@ export default function Register() {
   const route = useRoute();
   const [classes, setClasses] = useState<ClassData[]>([]);
 
-  // Se houver dados da turma passada, adicione à lista
   useEffect(() => {
     const params = route.params as RouteParams | undefined;
     if (params?.classData) {
@@ -33,10 +32,23 @@ export default function Register() {
     }
   }, [route.params]);
 
-  const renderItem = ({ item }: { item: ClassData }) => (
+  const handleDelete = (index: number) => {
+    setClasses((prevClasses) => prevClasses.filter((_, i) => i !== index));
+  };
+
+  const renderItem = ({ item, index }: { item: ClassData; index: number }) => (
     <View style={styles.classItem}>
-      <Text style={styles.className}>{item.name}</Text>
-      <Text style={styles.studentCount}>{0} alunos</Text>
+      <View>
+        <Text style={styles.className}>{item.name}</Text>
+        <Text style={styles.studentCount}>{0} alunos</Text>
+      </View>
+
+      <TouchableOpacity
+        onPress={() => handleDelete(index)}
+        style={styles.BtnDelete}
+      >
+        <Text style={styles.TxtDelete}>Deletar</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -51,14 +63,12 @@ export default function Register() {
         style={styles.list}
       />
 
-      <View style={styles.ViewBtnAdd}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("NewClass")}
-          style={styles.BtnAdd}
-        >
-          <Text style={styles.TxtBtn1}>+</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("NewClass")}
+        style={styles.BtnAdd}
+      >
+        <Text style={styles.TxtBtn1}>+</Text>
+      </TouchableOpacity>
 
       <StatusBar style="auto" />
     </View>
@@ -84,12 +94,17 @@ const styles = StyleSheet.create({
   },
 
   classItem: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 15,
     marginVertical: 8,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: "#ccc",
     borderRadius: 8,
     backgroundColor: "#f9f9f9",
+    elevation: 5,
   },
 
   className: {
@@ -99,45 +114,40 @@ const styles = StyleSheet.create({
 
   studentCount: {
     fontSize: 16,
-    color: "gray",
+    color: "#6939E9",
   },
 
-  ViewBtnAdd: {},
+  BtnDelete: {
+    marginTop: 10,
+    backgroundColor: "#ff4d4d",
+    padding: 10,
+    borderRadius: 5,
+  },
+
+  TxtDelete: {
+    color: "white",
+    textAlign: "center",
+    fontWeight: "bold",
+  },
 
   BtnAdd: {
-    width: 150,
-    height: 130,
+    width: 60,
+    height: 60,
+    backgroundColor: "#6939E9",
+    borderRadius: 30,
+    position: "absolute",
+    bottom: 30,
+    right: 30,
     alignItems: "center",
+    justifyContent: "center",
+    elevation: 5, // Sombra para Android
   },
 
   TxtBtn1: {
     fontSize: 40,
     fontWeight: "900",
+    color: "white",
     textAlign: "center",
-    width: 60,
-    backgroundColor: "#6939E9",
-    borderRadius: 100,
-    height: 60,
-    position: "absolute",
-    bottom: 30,
-    left: 280,
-    alignItems: "center",
-    justifyContent: "center",
-    color: 'white'
-  },
-
-  TxtBtn2: {
-    borderBottomColor: "gray",
-    borderBottomWidth: 3,
-    borderColor: "#999999",
-    borderWidth: 0.8,
-    borderBottomRightRadius: 70,
-    borderBottomLeftRadius: 70,
-    height: "25%",
-    textAlign: "center",
-    width: "100%",
-    fontSize: 18,
-    fontWeight: "900",
-    backgroundColor: "#6939E9",
+    lineHeight: 60, // Centraliza verticalmente
   },
 });
