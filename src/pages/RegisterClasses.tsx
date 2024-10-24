@@ -4,7 +4,7 @@ import Cadastrar from "../components/Buttons/Cadastrar";
 import Input from "../components/Input/Input";
 import Voltar from "../components/Buttons/Voltar";
 
-export default function RegisterClass({ navigation }) {
+export default function RegisterClasses({ navigation }) {
   const [className, setClassName] = useState("");
   const [period, setPeriod] = useState("");
   const [educationLevel, setEducationLevel] = useState("");
@@ -12,7 +12,7 @@ export default function RegisterClass({ navigation }) {
 
   const handleAddClass = () => {
     // Navegar de volta e passar os dados da turma
-    navigation.navigate("Register", {
+    navigation.navigate("Classes", {
       classData: {
         name: className,
         period,
@@ -25,7 +25,7 @@ export default function RegisterClass({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Voltar onPress={() => navigation.navigate("Register")} />
+        <Voltar onPress={() => navigation.navigate("Classes")} />
         <Text style={styles.title}>Cadastrar Turma</Text>
       </View>
 
