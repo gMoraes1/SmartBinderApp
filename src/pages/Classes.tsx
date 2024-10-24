@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import { NavigationProp } from '@react-navigation/native';
 import {
   StyleSheet,
   Text,
@@ -8,6 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState } from "react";
+import { RootStackParamList } from '../navigation/types'; // Ajuste o caminho conforme necessário
 
 interface ClassData {
   name: string;
@@ -16,19 +18,17 @@ interface ClassData {
   school: string;
 }
 
-interface RouteParams {
-  classData?: ClassData;
-}
+type RegisterRouteProp = RouteProp<RootStackParamList, 'Classes'>;
 
-export default function Register() {
-  const navigation = useNavigation();
-  const route = useRoute();
+export default function Classes() {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const route = useRoute<RegisterRouteProp>();
   const [classes, setClasses] = useState<ClassData[]>([]);
 
   useEffect(() => {
-    const params = route.params as RouteParams | undefined;
-    if (params?.classData) {
-      setClasses((prevClasses) => [...prevClasses, params.classData]);
+    // Verifique se route.params existe antes de acessá-lo
+    if (route.params && route.params.classData) {
+      setClasses((prevClasses) => [...prevClasses, route.params.classData]);
     }
   }, [route.params]);
 
@@ -37,7 +37,10 @@ export default function Register() {
   };
 
   const renderItem = ({ item, index }: { item: ClassData; index: number }) => (
-    <View style={styles.classItem}>
+    <TouchableOpacity
+      onPress={() => navigation.navigate("RegisterClasses")}
+      style={styles.classItem}
+    >
       <View>
         <Text style={styles.className}>{item.name}</Text>
         <Text style={styles.studentCount}>{0} alunos</Text>
@@ -49,7 +52,7 @@ export default function Register() {
       >
         <Text style={styles.TxtDelete}>Deletar</Text>
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -64,7 +67,7 @@ export default function Register() {
       />
 
       <TouchableOpacity
-        onPress={() => navigation.navigate("NewClass")}
+        onPress={() => navigation.navigate("RegisterClasses")}
         style={styles.BtnAdd}
       >
         <Text style={styles.TxtBtn1}>+</Text>
@@ -140,7 +143,7 @@ const styles = StyleSheet.create({
     right: 30,
     alignItems: "center",
     justifyContent: "center",
-    elevation: 5, // Sombra para Android
+    elevation: 5,
   },
 
   TxtBtn1: {
@@ -148,6 +151,6 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     color: "white",
     textAlign: "center",
-    lineHeight: 60, // Centraliza verticalmente
+    lineHeight: 60,
   },
 });

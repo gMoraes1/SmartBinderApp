@@ -1,8 +1,8 @@
 import "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 
-import Register from "../pages/turmas";
-import RegisterClass from "../pages/cadastrarTurmas";
+import Classes from "../pages/Classes";
+import RegisterClasses from "../pages/RegisterClasses";
 
 const Stack = createStackNavigator();
 
@@ -12,8 +12,8 @@ function StackRegister() {
         screenOptions={{
           headerShown: false,
         }} >
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="NewClass" component={RegisterClass} />
+        <Stack.Screen name="Classes" component={Classes} />
+        <Stack.Screen name="RegisterClasses" component={RegisterClasses} />
       </Stack.Navigator>
     );
   }
