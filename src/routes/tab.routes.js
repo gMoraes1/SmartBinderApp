@@ -13,6 +13,7 @@ import Home from "../pages/home";
 import Calendar from "../pages/calendario";
 import Profile from "../pages/perfil";
 import styled from 'styled-components/native'; // Importar styled-components
+import StackProfile from "./stackProfile.routes";
 
 const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -67,7 +68,7 @@ export default function TabNavigator() {
   
         <Tab.Screen
           name="profile"
-          component={Profile}
+          component={StackProfile}
           options={{
             tabBarIcon: ({ color, size, focused }) => {
               if (focused) {

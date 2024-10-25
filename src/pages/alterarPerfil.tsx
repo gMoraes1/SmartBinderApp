@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from 'react-native';
 
-export default function Profile() {
+export default function EditProfile() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Perfil</Text>
