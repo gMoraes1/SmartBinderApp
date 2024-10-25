@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Cadastrar from "../components/Buttons/Cadastrar";
 import Input from "../components/Input/Input";
-import Voltar from "../components/Buttons/Voltar";
+import BackBtn from "../components/Buttons/BackBtn";
 
 export default function RegisterClasses({ navigation }) {
   const [className, setClassName] = useState("");
@@ -25,7 +25,7 @@ export default function RegisterClasses({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Voltar onPress={() => navigation.navigate("Classes")} />
+        <BackBtn onPress={() => navigation.navigate("Classes")} />
         <Text style={styles.title}>Cadastrar Turma</Text>
       </View>
 

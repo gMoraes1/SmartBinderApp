@@ -1,6 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
-import { NavigationProp } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp, NavigationProp } from "@react-navigation/native";
 import {
   StyleSheet,
   Text,
@@ -38,7 +37,7 @@ export default function Classes() {
 
   const renderItem = ({ item, index }: { item: ClassData; index: number }) => (
     <TouchableOpacity
-      onPress={() => navigation.navigate("RegisterClasses")}
+      onPress={() => navigation.navigate("ClassDetails")}
       style={styles.classItem}
     >
       <View>
