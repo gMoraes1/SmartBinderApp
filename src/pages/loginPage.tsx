@@ -2,6 +2,7 @@ import "react-native-gesture-handler";
 import { StyleSheet, Text, View, Image, ImageBackground, TouchableOpacity, TextInput } from 'react-native';
 import { useState } from "react";
 
+
 export default function Login({ navigation }) {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
