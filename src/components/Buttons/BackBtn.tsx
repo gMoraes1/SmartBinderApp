@@ -1,6 +1,6 @@
 import { TouchableOpacity, Image } from "react-native";
 
-const Voltar = ({ onPress }) => {
+const BackBtn = ({ onPress }) => {
   return (
     <TouchableOpacity onPress={onPress}>
       <Image source={require("../../../assets/voltar.png")} />
@@ -8,4 +8,4 @@ const Voltar = ({ onPress }) => {
   );
 };
 
-export default Voltar;
+export default BackBtn;
