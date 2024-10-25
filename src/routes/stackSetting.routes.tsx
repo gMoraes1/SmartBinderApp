@@ -4,8 +4,8 @@ import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
 import Configurations from "../pages/configuracoes";
 import ThemeSettings from "../pages/tema";
 import PrivacySettings from "../pages/PrivacySettings";
-import Register from "../pages/turmas";
-import RegisterClass from "../pages/cadastrarTurmas";
+import Register from "../pages/Classes";
+import RegisterClass from "../pages/RegisterClasses";
 
 
 
