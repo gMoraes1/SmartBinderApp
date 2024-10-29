@@ -9,5 +9,5 @@ export type ClassData = {
 export type RootStackParamList = {
   Classes: { classData?: ClassData }; // Adicione a propriedade classData
   RegisterClasses: undefined;
-  // Outras telas
+  ClassDetails: undefined;
 };
