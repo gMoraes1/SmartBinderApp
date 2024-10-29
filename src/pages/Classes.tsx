@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { RootStackParamList } from '../navigation/types'; // Ajuste o caminho conforme necessário
+import styled from "styled-components/native";
 
 interface ClassData {
   name: string;
@@ -19,6 +20,34 @@ interface ClassData {
 }
 
 type RegisterRouteProp = RouteProp<RootStackParamList, 'Classes'>;
+
+const Container = styled.View`
+  background-color: ${(props) => props.theme.background};
+  width: 100%;
+  padding: 16px;
+  height: 100%;
+`;
+
+const Title = styled.Text`
+  font-size: 32px;
+  font-weight: 600;
+  text-align: center;
+  padding-top: 12%;
+  color: ${(props) => props.theme.color};
+`;
+
+const ItemButton = styled.TouchableOpacity`
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin-vertical: 8px;
+    border-radius: 8px;
+    border: solid #ccc 2px;
+    background-color: ${(props) => props.theme.backgroundList};
+    elevation: 5;
+`;
 
 export default function Classes() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -37,9 +66,9 @@ export default function Classes() {
   };
 
   const renderItem = ({ item, index }: { item: ClassData; index: number }) => (
-    <TouchableOpacity
+    <ItemButton
       onPress={() => navigation.navigate("RegisterClasses")}
-      style={styles.classItem}
+      
     >
       <View>
         <Text style={styles.className}>{item.name}</Text>
@@ -52,12 +81,12 @@ export default function Classes() {
       >
         <Text style={styles.TxtDelete}>Deletar</Text>
       </TouchableOpacity>
-    </TouchableOpacity>
+    </ItemButton>
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Turmas</Text>
+    <Container>
+      <Title style={styles.title}>Turmas</Title>
 
       <FlatList
         data={classes}
@@ -74,7 +103,7 @@ export default function Classes() {
       </TouchableOpacity>
 
       <StatusBar style="auto" />
-    </View>
+    </Container>
   );
 }
 
