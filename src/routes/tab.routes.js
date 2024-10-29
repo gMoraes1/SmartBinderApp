@@ -13,7 +13,7 @@ import Home from "../pages/home";
 import Calendar from "../pages/calendario";
 import Profile from "../pages/perfil";
 import styled from 'styled-components/native'; // Importar styled-components
-import StackProfile from "./stackProfile.routes";
+import StackProfile from "./stackProfile";
 
 const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();

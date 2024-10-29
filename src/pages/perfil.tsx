@@ -35,22 +35,27 @@ const TextProfile = styled.Text`
 
 const ProfileView = styled.View`
   background-color: ${(props) => props.theme.backgroundProfile};
-  padding: 8% 10%;
+  width:90%;
+  height:82%;
+  position: relative;
+  top:2%;
   border-radius: 20px;
   border: solid gray 0.5px;
   align-items: center;
+  justify-content: center;
+  text-align: center;
 `;
 
 const IconPencil = styled.TouchableOpacity`
   position: relative;
-  top: 53%;
-  left: 42%;
+  top: 51%;
+  left: 38%;
   background-color: ${(props) => props.theme.backgroundIconStyle};
   border-radius: 100px;
   padding: 14px;
 `;
 
-export default function Profile(navigation) {
+export default function Profile({navigation}) {
   const theme = useTheme(); // Get the current theme
 
   return (
@@ -62,7 +67,7 @@ export default function Profile(navigation) {
             style={styles.image}
             source={require("../../assets/Perfil.jpg")}
           />
-          <IconPencil  onPress={() => navigation.navigate("")}>
+          <IconPencil  onPress={() => navigation.navigate("EditProfile")}>
             <Ionicons name="pencil" size={29} color={theme.colorIconStyle} /> 
           </IconPencil>
         </View>

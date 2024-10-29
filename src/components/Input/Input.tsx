@@ -1,11 +1,23 @@
 import React from "react";
 import { TextInput, StyleSheet } from "react-native";
+import styled from "styled-components/native";
+
+const StyleInput = styled.TextInput`
+  background-color: ${(props) => props.theme.inputBackground}; 
+  color: ${(props) => props.theme.color};
+  width: 300px;
+  height: 55px;
+  margin: 6px;
+  font-size: 18px;
+  padding-left: 20px;
+  border-radius: 10px;
+  elevation: 5;
+  `;
 
 const Input = ({ text, onChangeText }) => {
   return (
-    <TextInput
+    <StyleInput
       placeholder={text}
-      style={styles.input}
       onChangeText={onChangeText}
     />
   );
@@ -21,5 +33,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     paddingLeft: 20,
     borderRadius: 10,
+    margin: 6,
   },
 });
