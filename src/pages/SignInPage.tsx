@@ -11,10 +11,11 @@ import { TextInput } from "react-native-gesture-handler";
 import { useState } from "react";
 import { Feather, Ionicons } from "@expo/vector-icons";
 
-export default function Login({ navigation }) {
+export default function Sign({ navigation }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [date, setDate] = useState("");
   return (
     <ImageBackground
       style={styles.fundo}
@@ -32,6 +33,13 @@ export default function Login({ navigation }) {
             value={username}
             onChangeText={setUsername}
             placeholder="Nome de usuário"
+            placeholderTextColor={"rgba(255,255,255,0.6)"}
+          />
+          <TextInput
+            style={styles.input}
+            value={date}
+            onChangeText={setDate}
+            placeholder="Data de Nascimento"
             placeholderTextColor={"rgba(255,255,255,0.6)"}
           />
           <TextInput
@@ -98,7 +106,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    top: 60,
+    top: 50,
   },
 
   viewAlign: {
@@ -130,7 +138,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: 170,
     height: 50,
-    top: 30,
+    top: 10,
     backgroundColor: "#FFDE00",
     borderColor: "rgba(0,0,0,0.5)",
     borderBottomWidth: 2.2,
@@ -148,7 +156,7 @@ const styles = StyleSheet.create({
   },
 
   inputView: {
-    top: 0,
+    bottom:20,
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center",
