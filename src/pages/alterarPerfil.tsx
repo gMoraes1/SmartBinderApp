@@ -8,7 +8,7 @@ import {
 import styled, { useTheme } from "styled-components/native";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import Voltar from "../components/Buttons/Voltar";
+import BackBtn from "../components/Buttons/BackBtn";
 import Input from "../components/Input/Input";
 import { useState } from "react";
 
@@ -66,7 +66,7 @@ export default function EditProfile({ navigation }) {
   return (
     <Container>
       <View style={styles.header}>
-        <Voltar onPress={() => navigation.navigate("Profile")} />
+        <BackBtn onPress={() => navigation.navigate("Profile")} />
       </View>
       <ProfileView>
         <Title>Perfil</Title>
