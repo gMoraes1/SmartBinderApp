@@ -44,7 +44,7 @@ const ItemButton = styled.TouchableOpacity`
     padding: 15px;
     margin-vertical: 8px;
     border-radius: 8px;
-    border: solid #ccc 2px;
+    border: solid ${(props) => props.theme.borderColor} 2px;
     background-color: ${(props) => props.theme.backgroundList};
     elevation: 5;
 `;

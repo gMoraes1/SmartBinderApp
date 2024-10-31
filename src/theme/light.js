@@ -5,6 +5,8 @@ export default {
     backgroundList: "#fff",
     backgroundIconStyle: "#6939E9",
     colorIconStyle: "#fff",
-    inputBackground: '#fff'
+    inputBackground: '#fff',
+    borderColor: '#ccc',
+
   };
   

@@ -1,12 +1,48 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Switch, useColorScheme } from 'react-native';
+import { isEnabled } from 'react-native/Libraries/Performance/Systrace';
+import styled from 'styled-components/native';
+
+const Container = styled.View`
+  background-color: ${(props) => props.theme.background};
+  width: 100%;
+  padding: 16px;
+  height: 100%;
+`;
+
+const Title = styled.Text`
+  font-size: 32px;
+  width:100%;
+  font-weight: 600;
+  text-align: center;
+  padding: 12%;
+  color: ${(props) => props.theme.color};
+`;
+
+const Theme = styled.View`
+flexDirection: row;
+alignItems: center;
+justifyContent: space-between;
+width: 100%;
+paddingHorizontal: 20px;
+backgroundColor: ${(props) => props.theme.inputBackground};
+borderRadius: 10px;
+padding: 10px;
+elevation: 2;
+`;
+
+const ThemeText = styled.Text`   
+fontSize: 18px;
+fontWeight: 500;
+marginRight: 10px;
+color: ${(props) => props.theme.color}
+`;
 
 export default function ThemeSettings() {
   const [isEnabled, setIsEnabled] = useState(false);
   const [themeText, setThemeText] = useState('');
   const deviceTheme = useColorScheme(); // Get the device theme
-
   // Set the initial state based on device theme
   useEffect(() => {
     if (deviceTheme === "dark") {
@@ -24,10 +60,10 @@ export default function ThemeSettings() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Configurações de Tema</Text>
-      <View style={styles.switchContainer}>
-        <Text style={styles.themeText}>Modo: {themeText}</Text>
+    <Container>
+      <Title>Configurações de Tema</Title>
+      <Theme>
+        <ThemeText>Modo: {themeText}</ThemeText>
         <Switch
           trackColor={{ false: '#767577', true: '#363636' }}
           thumbColor={isEnabled ? '#7343F3' : '#f4f3f4'}
@@ -35,8 +71,8 @@ export default function ThemeSettings() {
           onValueChange={toggleSwitch}
           value={isEnabled}
         />
-      </View>
-    </View>
+      </Theme>
+    </Container>
   );
 }
 
@@ -47,13 +83,6 @@ const styles = StyleSheet.create({
     padding: '5%',
     backgroundColor: '#f5f5f5', // Light background color
   },
-  title: {
-    fontSize: 32,
-    fontWeight: "600",
-    textAlign: "center",
-    marginBottom: 30,
-    top:'10%',
-  },
   switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -63,13 +92,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff', // White background for the switch area
     borderRadius: 10,
     padding: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     elevation: 2, // For Android shadow
   },
   themeText: {
@@ -78,3 +100,4 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
 });
+

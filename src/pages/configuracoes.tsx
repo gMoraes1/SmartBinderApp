@@ -1,26 +1,52 @@
 import { useNavigation } from '@react-navigation/native';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
 
+const Container = styled.View`
+  background-color: ${(props) => props.theme.background};
+  width: 100%;
+  height: 100%;
+`;
+
+const Title = styled.Text`
+  font-size: 32px;
+  width:100%;
+  font-weight: 600;
+  text-align: center;
+  padding: 12%;
+  color: ${(props) => props.theme.color};
+`;
+
+const Button = styled.TouchableOpacity`
+elevation: 2;
+background-color: ${(props) => props.theme.inputBackground};
+color: ${(props) => props.theme.color};
+border-radius: 5px;
+padding: 15px;
+margin-vertical: 10px; 
+width: 88%; 
+align-items: center;
+`;
 
 export default function Configurations({navigation}) {
   return (
-    <View style={styles.container}>
+    <Container>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
 
-        <Text style={styles.title}>Configurações</Text>
+        <Title style={styles.title}>Configurações</Title>
 
         <View style={styles.topButtonsContainer}>
-          <TouchableOpacity style={styles.topButton}
+          <Button
             onPress={() => navigation.navigate('Privacidade')}
           >
             <Text style={styles.topButtonText}>Configurações de privacidade</Text>
-          </TouchableOpacity>
+          </Button>
 
-          <TouchableOpacity style={styles.topButton}
+          <Button
             onPress={() => navigation.navigate('Tema')} // Agora está correto
           >
             <Text style={styles.topButtonText}>Tema</Text>
-          </TouchableOpacity>
+          </Button>
 
         </View>
 
@@ -30,7 +56,7 @@ export default function Configurations({navigation}) {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </Container>
   );
 }
 
