@@ -5,7 +5,7 @@ import styled from "styled-components/native";
 const StyleInput = styled.TextInput`
   background-color: ${(props) => props.theme.inputBackground}; 
   color: ${(props) => props.theme.color};
-  width: 300px;
+  width: 200px;
   height: 55px;
   margin: 6px;
   font-size: 18px;
