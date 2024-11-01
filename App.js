@@ -10,7 +10,7 @@ import themes from "./src/theme";
 const Stack = createStackNavigator();
 
 export default function App() {
-  const auth = true; // Simulação de autenticação
+  const auth = false; // Simulação de autenticação
   const deviceTheme = useColorScheme(); // Obtém o tema do dispositivo
   const theme = themes[deviceTheme] || themes.dark; // Define o tema
 

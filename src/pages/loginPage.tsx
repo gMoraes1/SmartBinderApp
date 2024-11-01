@@ -18,7 +18,7 @@ export default function Login({ navigation }) {
                     <TextInput style={styles.input} value={password} onChangeText={setPassword} secureTextEntry placeholder="Senha" placeholderTextColor={'rgba(255,255,255,0.6)'} />
                 </View>
 
-                <TouchableOpacity style={styles.btnInicio} onPress={() => navigation.navigate('')}>
+                <TouchableOpacity style={styles.btnInicio} onPress={() => navigation.navigate('Tabs')}>
                     <Text style={styles.txtBtn}>
                         Login
                     </Text>

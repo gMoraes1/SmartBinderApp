@@ -6,15 +6,31 @@ import { DayState } from 'react-native-calendars/src/types';
 import { Feather, Ionicons } from "@expo/vector-icons";
 
 import { ptBR } from '../utils/localecalendarConfig';
+import styled from 'styled-components/native';
 
 LocaleConfig.locales["pt-br"] = ptBR
 LocaleConfig.defaultLocale = "pt-br"
+
+const Container = styled.View`
+  background-color: ${(props) => props.theme.background};
+  width: 100%;
+  height: 100%;
+`;
+
+const Title = styled.Text`
+  font-size: 32px;
+  width:100%;
+  font-weight: 600;
+  text-align: center;
+  padding: 12%;
+  color: ${(props) => props.theme.color};
+`;
 
 export default function Calendars() {
 
   const [day, setDay] = useState<DateData>()
   return (
-    <View style={styles.container}>
+    <Container>
       <Calendar
         style={styles.calendar}
         headerStyle={{
@@ -22,8 +38,6 @@ export default function Calendars() {
           paddingBottom: 13,
           marginBottom: 13,
         }}
-
-
 
         theme={{
           textMonthFontWeight: '700',
@@ -58,7 +72,7 @@ export default function Calendars() {
         />
 
         {/* <Text style={styles.title}>{day?.dateString}</Text> */}
-    </View>
+    </Container>
   );
 }
 

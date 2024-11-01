@@ -61,7 +61,7 @@ export default function Sign({ navigation }) {
 
         <TouchableOpacity
           style={styles.btnInicio}
-          onPress={() => navigation.navigate("")}
+          onPress={() => navigation.navigate("Tabs")}
         >
           <Text style={styles.txtBtn}>Login</Text>
         </TouchableOpacity>
