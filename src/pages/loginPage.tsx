@@ -4,7 +4,6 @@ import { useState } from "react";
 
 
 export default function Login({ navigation }) {
-    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     return (
@@ -13,7 +12,6 @@ export default function Login({ navigation }) {
                 <Image source={require('../../assets/logoApp.png')} style={styles.imagem} />
 
                 <View style={styles.inputView}>
-                    <TextInput style={styles.input} value={username} onChangeText={setUsername} placeholder="Nome de usuário" placeholderTextColor={'rgba(255,255,255,0.6)'} />
                     <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="E-mail" placeholderTextColor={'rgba(255,255,255,0.6)'} />
                     <TextInput style={styles.input} value={password} onChangeText={setPassword} secureTextEntry placeholder="Senha" placeholderTextColor={'rgba(255,255,255,0.6)'} />
                 </View>

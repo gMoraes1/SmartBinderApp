@@ -14,6 +14,7 @@ import Calendar from "../pages/calendario";
 import Profile from "../pages/perfil";
 import styled from 'styled-components/native'; // Importar styled-components
 import StackProfile from "./stackProfile";
+import StackCalendar from "./stackCalendar.routes";
 
 const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -55,7 +56,7 @@ export default function TabNavigator() {
   
         <Tab.Screen
           name="calendar"
-          component={Calendar}
+          component={StackCalendar}
           options={{
             tabBarIcon: ({ color, size, focused }) => {
               if (focused) {
