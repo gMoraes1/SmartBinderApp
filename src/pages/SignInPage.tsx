@@ -6,16 +6,33 @@ import {
   Image,
   ImageBackground,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { useState } from "react";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Sign({ navigation }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [date, setDate] = useState("");
+
+  const handleSignUp = () => {
+    // Aqui você pode adicionar sua lógica de cadastro (por exemplo, API)
+    Alert.alert(
+      "Sucesso",
+      "Cadastro efetuado com sucesso!",
+      [
+        {
+          text: "OK",
+          onPress: () => navigation.navigate("Login"), // Navega para a página de Login
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
   return (
     <ImageBackground
       style={styles.fundo}
@@ -51,19 +68,34 @@ export default function Sign({ navigation }) {
           />
           <TextInput
             style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Confirme seu E-mail"
+            placeholderTextColor={"rgba(255,255,255,0.6)"}
+          />
+          <TextInput
+            style={styles.input}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
             placeholder="Senha"
             placeholderTextColor={"rgba(255,255,255,0.6)"}
           />
+          <TextInput
+            style={styles.input}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            placeholder="Confirme sua Senha"
+            placeholderTextColor={"rgba(255,255,255,0.6)"}
+          />
         </View>
 
         <TouchableOpacity
           style={styles.btnInicio}
-          onPress={() => navigation.navigate("Tabs")}
+          onPress={handleSignUp}
         >
-          <Text style={styles.txtBtn}>Login</Text>
+          <Text style={styles.txtBtn}>Cadastrar</Text>
         </TouchableOpacity>
 
         <View style={styles.logoAlignView}>
@@ -115,6 +147,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  
   title: {
     fontSize: 20,
     width: 300,
@@ -124,6 +157,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingTop: 46,
   },
+  
   fundo: {
     width: "100%",
     height: "100%",
@@ -156,7 +190,7 @@ const styles = StyleSheet.create({
   },
 
   inputView: {
-    bottom:20,
+    bottom: 20,
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center",
