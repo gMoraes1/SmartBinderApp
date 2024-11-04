@@ -8,6 +8,7 @@ import styled from 'styled-components/native';
 import { firestore } from '../../firebase';
 import { deleteDoc, doc, collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
+
 // Configuração do calendário para Português do Brasil
 LocaleConfig.locales["pt-br"] = ptBR;
 LocaleConfig.defaultLocale = "pt-br";
