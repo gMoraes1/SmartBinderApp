@@ -6,7 +6,7 @@ import { Feather } from "@expo/vector-icons";
 import { ptBR } from '../utils/localecalendarConfig';
 import styled from 'styled-components/native';
 import { firestore } from '../../firebase';
-import { deleteDoc, doc, collection, onSnapshot } from 'firebase/firestore';
+import { deleteDoc, doc, collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 // Configuração do calendário para Português do Brasil
 LocaleConfig.locales["pt-br"] = ptBR;
@@ -28,7 +28,12 @@ export default function Calendars({ navigation }) {
   const dataCompleta = day ? `${diaTratado}/${mesTratado}/${ano}` : null;
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(firestore, 'tblCalendario'), (querySnapshot) => {
+    // Adiciona o `orderBy` na consulta para ordenar por `dataCalendario` 
+    // em ordem ascendente(datas mais recentes primeiro e a mais distantes embaixo)
+    const eventosRef = collection(firestore, 'tblCalendario');
+    const q = query(eventosRef, orderBy('dataCalendario', 'asc'));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const eventosList = [];
       querySnapshot.forEach(doc => {
         eventosList.push({
@@ -39,9 +44,8 @@ export default function Calendars({ navigation }) {
       setEventos(eventosList);
     });
 
-    // Cleanup function to unsubscribe from the listener when the component unmounts
     return () => unsubscribe();
-  }, []); // Apenas ao montar o componente
+  }, []);
 
   async function deleteEvento(id) {
     try {
