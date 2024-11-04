@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 8,
-    margin: 9,
+    margin: 8,
     marginHorizontal:'5%',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -112,8 +112,7 @@ const styles = StyleSheet.create({
   avisosrecentesText:{
     fontSize: 22,
     fontWeight: '700',
-    color: "black",
-    margin:3,
+    margin:1,
     textAlign:'center'
   },
   eventDetails: {
@@ -122,21 +121,18 @@ const styles = StyleSheet.create({
   eventDate: {
     fontSize: 16,
     fontWeight: '700',
-    color: "black",
     margin: -2,
   },
   eventDescription: {
     fontSize: 16,
     margin: 8,
     fontWeight: '400',
-    color: "black",
   },
 
   noEventsText: {
     textAlign: 'center',
-    color: 'white',
     marginTop: 20,
     fontSize: 16,
-    color: '#666',
+    color: '#111',
   },
 });

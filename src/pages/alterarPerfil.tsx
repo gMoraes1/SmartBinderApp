@@ -4,6 +4,7 @@ import {
   Text,
   View,
   Image,
+  SafeAreaView,
 } from "react-native";
 import styled, { useTheme } from "styled-components/native";
 import { Ionicons } from "@expo/vector-icons";
@@ -36,10 +37,10 @@ const TextProfile = styled.Text`
   bottom: 45%;
 `;
 
-const ProfileView = styled.View`
+const ProfileView = styled.SafeAreaView`
   background-color: ${(props) => props.theme.backgroundProfile};
   width:90%;
-  height:300px;
+  height:82%;
   position: relative;
   top:0%;
   border-radius: 20px;
