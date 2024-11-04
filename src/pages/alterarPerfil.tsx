@@ -39,7 +39,7 @@ const TextProfile = styled.Text`
 const ProfileView = styled.View`
   background-color: ${(props) => props.theme.backgroundProfile};
   width:90%;
-  height:82%;
+  height:300px;
   position: relative;
   top:0%;
   border-radius: 20px;

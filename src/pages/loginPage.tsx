@@ -69,6 +69,7 @@ export default function Login({ navigation }) {
                 <Image source={require('../../assets/logoApp.png')} style={styles.imagem} />
 
                 <View style={styles.inputView}>
+
                     <TextInput 
                         style={styles.input} 
                         value={email} 

@@ -1,15 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Alert, FlatList } from 'react-native';
 import { Calendar, DateData, LocaleConfig } from 'react-native-calendars';
-import { DayState } from 'react-native-calendars/src/types';
-import { Feather, Ionicons } from "@expo/vector-icons";
-
+import { Feather } from "@expo/vector-icons";
 import { ptBR } from '../utils/localecalendarConfig';
 import styled from 'styled-components/native';
+import { firestore } from '../../firebase';
+import { deleteDoc, doc, collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
-LocaleConfig.locales["pt-br"] = ptBR
-LocaleConfig.defaultLocale = "pt-br"
+
+// Configuração do calendário para Português do Brasil
+LocaleConfig.locales["pt-br"] = ptBR;
+LocaleConfig.defaultLocale = "pt-br";
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -17,78 +19,78 @@ const Container = styled.View`
   height: 100%;
 `;
 
-const Title = styled.Text`
-  font-size: 32px;
-  width:100%;
-  font-weight: 600;
-  text-align: center;
-  padding: 12%;
-  color: ${(props) => props.theme.color};
-`;
+export default function Calendars({ navigation }) {
+  const [day, setDay] = useState<DateData>();
+  const [eventos, setEventos] = useState([]);
 
-export default function Calendars() {
+  const diaTratado = day?.day < 10 ? `0${day.day}` : day?.day;
+  const mesTratado = day?.month < 10 ? `0${day.month}` : day?.month;
+  const ano = day?.year;
+  const dataCompleta = day ? `${diaTratado}/${mesTratado}/${ano}` : null;
 
-  const [day, setDay] = useState<DateData>()
+  useEffect(() => {
+    // Adiciona o `orderBy` na consulta para ordenar por `dataCalendario` 
+    // em ordem ascendente(datas mais recentes primeiro e a mais distantes embaixo)
+    const eventosRef = collection(firestore, 'tblCalendario');
+    const q = query(eventosRef, orderBy('dataCalendario', 'asc'));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const eventosList = [];
+      querySnapshot.forEach(doc => {
+        eventosList.push({
+          id: doc.id,
+          ...doc.data(),
+        });
+      });
+      setEventos(eventosList);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  async function deleteEvento(id) {
+    try {
+      await deleteDoc(doc(firestore, 'tblCalendario', id));
+    } catch (error) {
+      console.error("Erro ao deletar:", error);
+    }
+  }
+
   return (
     <Container>
-      <Calendar
-        style={styles.calendar}
-        headerStyle={{
-          borderBottomWidth: 2,
-          paddingBottom: 13,
-          marginBottom: 13,
-        }}
+      <View style={styles.itensView}>
+        {eventos.length > 0 ? (
+          <FlatList
+            data={eventos}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View style={styles.itemContainer}>
+                <View style={styles.eventDetails}>
+                  <Text style={styles.eventDate}>{item.dataCalendario}</Text>
+                  <Text style={styles.eventDescription}>{item.descricaoCalendario}</Text>
+                </View>
+                <TouchableOpacity onPress={() => deleteEvento(item.id)} style={styles.deleteButton}>
+                  <Text style={styles.deleteText}>X</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          />
+        ) : (
+          <Text style={styles.noEventsText}>Nenhum evento encontrado.</Text>
+        )}
+      </View>
 
-        theme={{
-          textMonthFontWeight: '700',
-          textMonthFontSize: 22,
-          textDayFontSize: 17,
-          textDayFontWeight: '800',
-          todayTextColor: '#6636E6',
-          todayButtonFontSize:19,
-          selectedDayBackgroundColor: '#6939E9',
-          selectedDayTextColor: 'white',
-          calendarBackground: 'transparent',
-          arrowColor: '#6636E6',
-          textDisabledColor: 'rgba(105,57,233,0.3)',
-          textDayHeaderFontWeight: '900',
-          textDayHeaderFontSize: 13
-        }}
-
-        minDate={new Date().toDateString()}
-
-        hideExtraDays={true}
-
-        onDayPress={setDay}
-
-        renderArrow={(direction: "right" | "left") => <Feather size={38} name={`chevron-${direction}`} color={"#6939E9"} />}
-
-        markedDates={day && {
-          [day.dateString]: { selected: true }
-        }
-        }
-
-       
-        />
-
-        {/* <Text style={styles.title}>{day?.dateString}</Text> */}
+      <TouchableOpacity
+        onPress={() => navigation.navigate("CreateDateNote")}
+        style={[styles.BtnAdd]}
+      >
+        <Text style={styles.TxtBtn1}>+</Text>
+      </TouchableOpacity>
     </Container>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-
-  },
-
-  title: {
-    fontSize: 32,
-    fontWeight: "600",
-    justifyContent: "center",
-    textAlign: "center",
-    top: 40,
-  },
-
   calendar: {
     borderWidth: 0.5,
     borderBottomWidth: 0.8,
@@ -97,34 +99,78 @@ const styles = StyleSheet.create({
     top: 45,
     backgroundColor: 'transparent',
   },
-
-  dayText: {
-    fontWeight: '600',
-    fontSize: 18,
+  BtnAdd: {
+    width: 60,
+    height: 60,
+    backgroundColor: "#6939E9",
+    borderRadius: 30,
+    position: "absolute",
+    bottom: 30,
+    right: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 5,
   },
-  
-  disabledDayText: {
-    fontWeight: '600',
-    fontSize: 18,
-    color: 'rgba(105,57,233,0.3)',
+  TxtBtn1: {
+    fontSize: 40,
+    fontWeight: "900",
+    color: "white",
+    textAlign: "center",
+    lineHeight: 60,
   },
-  
-  day: {
-    width: 38,
-    height: 38,
+  itensView: {
+    flex: 1,
+    margin: '3%',
+    top: '6%',
+    paddingHorizontal: 10,
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 15,
+    marginVertical: 8,
     alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius:13,
+    justifyContent: 'space-between',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  
-  today: {
+  eventDetails: {
+    marginRight: 10,
+  },
+  eventDate: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: "black",
+    margin: -8,
+  },
+  eventDescription: {
+    fontSize: 16,
+    margin: 16,
+    fontWeight: '400',
+    color: "black",
+  },
+  deleteButton: {
+    backgroundColor: '#FF5050',
+    borderRadius: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  deleteText: {
+    color: 'white',
+    fontSize: 16,
     fontWeight: '800',
-    fontSize: 17,
-    color: '#6636E6',
   },
-  
-  selected: {
-    color:'#fff',
-    backgroundColor: '#6939E9',
+  noEventsText: {
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+    color: '#666',
   },
 });
