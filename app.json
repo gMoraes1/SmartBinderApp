@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
+    "platforms": ["ios", "android", "web"],
     "scheme": "myapp",
     "splash": {
       "image": "./assets/splash.png",
@@ -15,28 +16,29 @@
     "ios": {
       "supportsTablet": true
     },
-  "android": {
-  "package": "com.mycompany.myapp",
-  "intentFilters": [
-    {
-      "action": "VIEW",
-      "data": [
+    "android": {
+      "jsEngine": "hermes",
+      "package": "com.mycompany.myapp",
+      "intentFilters": [
         {
-          "scheme": "https",
-          "host": "myapp.com",
-          "pathPrefix": "/"
-        },
-        {
-          "scheme": "myapp"
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "https",
+              "host": "myapp.com",
+              "pathPrefix": "/"
+            },
+            {
+              "scheme": "myapp"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
-      ],
-      "category": [
-        "BROWSABLE",
-        "DEFAULT"
       ]
-    }
-  ]
-},
+    },
     "web": {
       "favicon": "./assets/favicon.png"
     },

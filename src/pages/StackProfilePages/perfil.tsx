@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
@@ -7,7 +6,7 @@ import {
 } from "react-native";
 import styled, { useTheme } from "styled-components/native";
 import { Ionicons } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import React from "react";
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -65,7 +64,7 @@ export default function Profile({navigation}) {
         <View style={styles.imageBlock}>
           <Image
             style={styles.image}
-            source={require("../../assets/Perfil.jpg")}
+            source={require("../../../assets/Perfil.jpg")}
           />
           <IconPencil  onPress={() => navigation.navigate("EditProfile")}>
             <Ionicons name="pencil" size={29} color={theme.colorIconStyle} /> 

@@ -1,10 +1,12 @@
 import "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
-import Inicio from "../pages/inicio";
-import InicioRegister from "../pages/inicioRegister";
-import Login from "../pages/loginPage";
-import Sign from "../pages/SignInPage";
+import React from "react";
+
 import TabNavigator from "./tab.routes";
+import Inicio from "../pages/LoginAndSignPages/inicio";
+import InicioRegister from "../pages/LoginAndSignPages/inicioRegister";
+import Login from "../pages/LoginAndSignPages/loginPage";
+import Sign from "../pages/LoginAndSignPages/SignInPage";
 
 const Stack = createStackNavigator();
 

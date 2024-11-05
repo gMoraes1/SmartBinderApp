@@ -1,10 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
+import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, FlatList, ScrollView } from 'react-native';
 import styled from 'styled-components/native'; // Importar styled-components
 import { LinearGradient } from 'expo-linear-gradient'
 import { useEffect, useState } from 'react';
 import { collection, onSnapshot, orderBy, query, limit } from 'firebase/firestore';
-import { firestore } from '../../firebase';
+import { db } from '../../../firebase';
 
 const Container = styled.View`
   background-color: ${props => props.theme.background};
@@ -36,7 +37,7 @@ export default function Home() {
   const [eventos, setEventos] = useState([]);
 
   useEffect(() => {
-    const eventosRef = collection(firestore, 'tblCalendario');
+    const eventosRef = collection(db, 'tblCalendario');
     const q = query(eventosRef, orderBy('dataCalendario', 'asc'), limit(3));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {

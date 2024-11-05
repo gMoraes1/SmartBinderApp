@@ -1,25 +1,29 @@
 import { StatusBar } from "expo-status-bar";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
-import { NavigationProp } from '@react-navigation/native';
+import { NavigationProp } from "@react-navigation/native";
 import {
   StyleSheet,
   Text,
   View,
   FlatList,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { RootStackParamList } from '../navigation/types'; // Ajuste o caminho conforme necessário
+import { RootStackParamList } from "../../navigation/types"; // Ajuste o caminho conforme necessário
 import styled from "styled-components/native";
+import { collection, onSnapshot, deleteDoc, doc } from "firebase/firestore";
+import { db } from "../../../firebase";
 
 interface ClassData {
+  id: string;
   name: string;
   period: string;
   educationLevel: string;
   school: string;
 }
 
-type RegisterRouteProp = RouteProp<RootStackParamList, 'Classes'>;
+type RegisterRouteProp = RouteProp<RootStackParamList, "Classes">;
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -37,62 +41,73 @@ const Title = styled.Text`
 `;
 
 const ItemButton = styled.TouchableOpacity`
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    margin-vertical: 8px;
-    border-radius: 8px;
-    border: solid ${(props) => props.theme.borderColor} 2px;
-    background-color: ${(props) => props.theme.backgroundList};
-    elevation: 5;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  margin-vertical: 8px;
+  border-radius: 8px;
+  border: solid ${(props) => props.theme.borderColor} 2px;
+  background-color: ${(props) => props.theme.backgroundList};
+  elevation: 5;
 `;
 
 export default function Classes() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<RegisterRouteProp>();
-  const [classes, setClasses] = useState<ClassData[]>([]);
+  const [turma, setTurma] = useState([]); // Alterei para que o tipo corresponda à estrutura de dados que você está usando
+
+  async function deleteTurma(id: string) {
+    try {
+      await deleteDoc(doc(db, "tblTurma", id));
+      Alert.alert("Turma deletada.");
+    } catch (error) {
+      console.error("Erro ao deletar.", error);
+    }
+  }
 
   useEffect(() => {
-    // Verifique se route.params existe antes de acessá-lo
-    if (route.params && route.params.classData) {
-      setClasses((prevClasses) => [...prevClasses, route.params.classData]);
-    }
-  }, [route.params]);
-
-  const handleDelete = (index: number) => {
-    setClasses((prevClasses) => prevClasses.filter((_, i) => i !== index));
-  };
-
-  const renderItem = ({ item, index }: { item: ClassData; index: number }) => (
-    <ItemButton
-      onPress={() => navigation.navigate("RegisterClasses")}
-      
-    >
-      <View>
-        <Text style={styles.className}>{item.name}</Text>
-        <Text style={styles.studentCount}>{0} alunos</Text>
-      </View>
-
-      <TouchableOpacity
-        onPress={() => handleDelete(index)}
-        style={styles.BtnDelete}
-      >
-        <Text style={styles.TxtDelete}>Deletar</Text>
-      </TouchableOpacity>
-    </ItemButton>
-  );
+    const unsubscribe = onSnapshot(
+      collection(db, "tblTurma"),
+      (querySnapshot) => {
+        const lista = [];
+        querySnapshot.forEach(doc => {
+          lista.push({
+            id: doc.id,
+            ...doc.data(),
+          }); // A id do Firestore é adicionada aos dados
+        });
+        setTurma(lista); // Atualiza o estado com os dados
+      });
+    return () => unsubscribe(); // Limpa o listener quando o componente for desmontado
+  }, []);
 
   return (
     <Container>
       <Title style={styles.title}>Turmas</Title>
 
       <FlatList
-        data={classes}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
+        data={turma} // Mudança aqui: usei a variável turma para renderizar as turmas
+        keyExtractor={(item) => item.id}
         style={styles.list}
+        renderItem={({ item }) => (
+          <View style={styles.classItem}>
+            <View style={styles.classItem}>
+              <Text style={styles.studentCount}>0</Text>
+              <Text style={styles.className}>{item.name}</Text>
+              <Text style={styles.TxtBtn1}>{item.school}</Text>
+              <Text style={styles.TxtBtn1}>{item.period}</Text>
+              <Text style={styles.TxtBtn1}>{item.educationLevel}</Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => deleteTurma(item.id)}
+              style={styles.BtnDelete}
+            >
+              <Text style={styles.TxtDelete}>X</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       />
 
       <TouchableOpacity
