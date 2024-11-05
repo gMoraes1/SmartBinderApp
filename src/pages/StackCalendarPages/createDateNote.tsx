@@ -1,15 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Alert, FlatList } from 'react-native';
+import styled from 'styled-components/native';
 import { Calendar, DateData, LocaleConfig } from 'react-native-calendars';
 import { Feather } from "@expo/vector-icons";
-import { ptBR } from '../utils/localecalendarConfig';
-import styled from 'styled-components/native';
-import { firestore } from '../../firebase';
+
+import { ptBR } from '../../utils/localecalendarConfig';
+
+import { db } from '../../../firebase';
 import { deleteDoc, doc, collection, getDocs, addDoc } from 'firebase/firestore';
-import BackBtn from '../components/Buttons/BackBtn';
-import Input from '../components/Input/Input';
-import Cadastrar from '../components/Buttons/Cadastrar';
+import BackBtn from '../../components/Buttons/BackBtn';
+import Input from '../../components/Input/Input';
+import Cadastrar from '../../components/Buttons/Cadastrar';
 
 // Configuração do calendário para Português do Brasil
 LocaleConfig.locales["pt-br"] = ptBR;
@@ -30,7 +33,7 @@ const Title = styled.Text`
   color: ${(props) => props.theme.color};
 `;
 
-export default function Calendars({ navigation }) {
+export default function CreateDateNote({ navigation }) {
     const [day, setDay] = useState<DateData>();
     const [description, setDescription] = useState("");
 
@@ -41,10 +44,10 @@ export default function Calendars({ navigation }) {
 
     const isDisabled = !dataCompleta || !description; // Desativa o botão se algum campo estiver vazio
 
-    // Função para salvar o evento no Firestore
+    // Função para salvar o evento no db
     async function addEvento() {
         try {
-            const docRef = await addDoc(collection(firestore, 'tblCalendario'), {
+            const docRef = await addDoc(collection(db, 'tblCalendario'), {
                 dataCalendario: dataCompleta,
                 descricaoCalendario: description
             });

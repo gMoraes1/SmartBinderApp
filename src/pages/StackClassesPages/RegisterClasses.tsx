@@ -1,11 +1,16 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import Cadastrar from "../components/Buttons/Cadastrar";
-import Input from "../components/Input/Input";
-import BackBtn from "../components/Buttons/BackBtn";
-import styled from "styled-components/native";
 
-const Container = styled.View`
+import Cadastrar from "../../components/Buttons/Cadastrar";
+import Input from "../../components/Input/Input";
+import BackBtn from "../../components/Buttons/BackBtn";
+
+import styled from 'styled-components/native';
+
+import { db } from '../../../firebase.js'; // Importe a instância do Firestore
+import { collection, addDoc } from 'firebase/firestore'; // Importe funções do Firestore
+
+const Container = styled.View`  
   background-color: ${(props) => props.theme.background};
   width: 100%;
   height: 100%;
@@ -27,16 +32,28 @@ export default function RegisterClasses({ navigation }) {
   const [educationLevel, setEducationLevel] = useState("");
   const [school, setSchool] = useState("");
 
-  const handleAddClass = () => {
-    // Navegar de volta e passar os dados da turma
-    navigation.navigate("Classes", {
-      classData: {
-        name: className,
-        period,
-        educationLevel,
-        school,
-      },
-    });
+  const handleAddClass = async () => {
+    try {
+      // Adiciona os dados da turma no Firestore
+      await addDoc(collection(db, 'tblTurma'), {
+        nomeTurma: className,
+        periodoTurma: period,
+        educationLevel: educationLevel,
+        school: school,
+      });
+
+      // Navegar de volta e passar os dados da turma
+      navigation.navigate("Classes", {
+        classData: {
+          name: className,
+          period,
+          educationLevel,
+          school,
+        },
+      });
+    } catch (error) {
+      console.error("Erro ao adicionar documento: ", error);
+    }
   };
 
   return (
@@ -59,13 +76,6 @@ export default function RegisterClasses({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 70,
-  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -76,12 +86,5 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     gap: 10,
-  },
-  title: {
-    flex: 1,
-    fontSize: 32,
-    fontWeight: "600",
-    textAlign: "center",
-    paddingTop: 18,
   },
 });

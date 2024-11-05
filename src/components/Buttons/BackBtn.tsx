@@ -1,4 +1,5 @@
 import { TouchableOpacity, Image } from "react-native";
+import React from "react";
 
 const BackBtn = ({ onPress }) => {
   return (

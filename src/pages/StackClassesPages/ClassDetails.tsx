@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
@@ -6,9 +5,9 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList } from "../navigation/types";
-import BackBtn from "../components/Buttons/BackBtn";
-
+import { RootStackParamList } from "../../navigation/types";
+import BackBtn from "../../components/Buttons/BackBtn";
+import React from "react";
 
 function ClassDetails() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();

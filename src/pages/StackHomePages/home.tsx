@@ -1,10 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
+import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, FlatList, ScrollView } from 'react-native';
 import styled from 'styled-components/native'; // Importar styled-components
 import { LinearGradient } from 'expo-linear-gradient'
 import { useEffect, useState } from 'react';
 import { collection, onSnapshot, orderBy, query, limit } from 'firebase/firestore';
-import { firestore } from '../../firebase';
+import { db } from '../../../firebase';
 
 const Container = styled.View`
   background-color: ${props => props.theme.background};
@@ -36,7 +37,7 @@ export default function Home() {
   const [eventos, setEventos] = useState([]);
 
   useEffect(() => {
-    const eventosRef = collection(firestore, 'tblCalendario');
+    const eventosRef = collection(db, 'tblCalendario');
     const q = query(eventosRef, orderBy('dataCalendario', 'asc'), limit(3));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 8,
-    margin: 9,
+    margin: 8,
     marginHorizontal:'5%',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -112,8 +113,7 @@ const styles = StyleSheet.create({
   avisosrecentesText:{
     fontSize: 22,
     fontWeight: '700',
-    color: "black",
-    margin:3,
+    margin:1,
     textAlign:'center'
   },
   eventDetails: {
@@ -122,21 +122,18 @@ const styles = StyleSheet.create({
   eventDate: {
     fontSize: 16,
     fontWeight: '700',
-    color: "black",
     margin: -2,
   },
   eventDescription: {
     fontSize: 16,
     margin: 8,
     fontWeight: '400',
-    color: "black",
   },
 
   noEventsText: {
     textAlign: 'center',
-    color: 'white',
     marginTop: 20,
     fontSize: 16,
-    color: '#666',
+    color: '#111',
   },
 });

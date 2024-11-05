@@ -1,7 +1,8 @@
 import "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
-import Profile from "../pages/perfil";
-import EditProfile from "../pages/alterarPerfil";
+import Profile from "../pages/StackProfilePages/perfil";
+import EditProfile from "../pages/StackProfilePages/alterarPerfil";
+import React from "react";
 
 const Stack = createStackNavigator();
 

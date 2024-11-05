@@ -5,11 +5,11 @@ import { StyleSheet, Text, View, ScrollView, Image, ImageBackground, ViewBase, T
 
 export default function InicioRegister({ navigation }) {
     return (
-        <ImageBackground style={styles.fundo} source={require('../../assets/inicio.png')}>
+        <ImageBackground style={styles.fundo} source={require('../../../assets/inicio.png')}>
             <View style={styles.container}>
 
                 <View style={styles.viewAlign}>
-                    <Image source={require('../../assets/logoApp.png')} style={styles.imagem} />
+                    <Image source={require('../../../assets/logoApp.png')} style={styles.imagem} />
 
                     <Text style={styles.title}>
                         Organize de forma inteligente.
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         textAlign:'center',
         padding:20,
-        top:'34%',
+        top:'24%',
         display:'flex',
         flexDirection:'row',
     },
