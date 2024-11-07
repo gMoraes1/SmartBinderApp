@@ -3,18 +3,19 @@ import { StyleSheet, Text, View, Image, ImageBackground, TouchableOpacity, TextI
 import { useState, useEffect } from "react";
 import { auth } from "../../../../firebase"; // Certifique-se de importar auth corretamente
 import { signInWithEmailAndPassword } from "firebase/auth"; // Importar a função
-
+import React from "react";
+ 
 export default function Login({ navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [initializing, setInitializing] = useState(true);
     const [user, setUser] = useState();
-
+ 
     function dados(user) {
         setUser(user);
         if (initializing) setInitializing(false);
     }
-
+ 
     function logar() {
         // Verifica se o email está no formato correto
         if (!email) {
@@ -25,7 +26,7 @@ export default function Login({ navigation }) {
             alert('Por favor, insira uma senha.');
             return;
         }
-
+ 
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 const user = userCredential.user; // Obter o usuário logado
@@ -36,7 +37,7 @@ export default function Login({ navigation }) {
             .catch((error) => {
                 console.log('Código de erro:', error.code); // Log do código de erro
                 console.log('Mensagem de erro:', error.message); // Log da mensagem de erro
-
+ 
                 let errorMessage;
                 switch (error.code) {
                     case 'auth/wrong-password':
@@ -51,42 +52,41 @@ export default function Login({ navigation }) {
                     default:
                         errorMessage = 'Ocorreu um erro Email ou senha invalidos. Tente novamente.';
                 }
-                
+               
                 alert(errorMessage); // Exibir a mensagem de erro específica
             });
     }
-
+ 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {
             dados(user);
         });
         return () => unsubscribe();
     }, []);
-
+ 
     return (
         <ImageBackground style={styles.fundo} source={require('../../../../assets/inicio.png')}>
             <View style={styles.container}>
                 <Image source={require('../../../../assets/logoApp.png')} style={styles.imagem} />
-
+ 
                 <View style={styles.inputView}>
-
-                    <TextInput 
-                        style={styles.input} 
-                        value={email} 
-                        onChangeText={text => setEmail(text)} 
-                        placeholder="E-mail" 
-                        placeholderTextColor={'rgba(255,255,255,0.6)'} 
+                    <TextInput
+                        style={styles.input}
+                        value={email}
+                        onChangeText={text => setEmail(text)}
+                        placeholder="E-mail"
+                        placeholderTextColor={'rgba(255,255,255,0.6)'}
                     />
-                    <TextInput 
-                        style={styles.input} 
-                        value={password} 
-                        onChangeText={text => setPassword(text)} 
-                        secureTextEntry 
-                        placeholder="Senha" 
-                        placeholderTextColor={'rgba(255,255,255,0.6)'} 
+                    <TextInput
+                        style={styles.input}
+                        value={password}
+                        onChangeText={text => setPassword(text)}
+                        secureTextEntry
+                        placeholder="Senha"
+                        placeholderTextColor={'rgba(255,255,255,0.6)'}
                     />
                 </View>
-
+ 
                 <TouchableOpacity style={styles.btnInicio} onPress={logar}>
                     <Text style={styles.txtBtn}>
                         Login
@@ -96,7 +96,7 @@ export default function Login({ navigation }) {
         </ImageBackground>
     );
 };
-
+ 
 const styles = StyleSheet.create({
     container: {
         width: '100%',
