@@ -1,14 +1,17 @@
 import "react-native-gesture-handler";
+import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
-import { Ionicons } from "@expo/vector-icons";
-import styled from 'styled-components/native';  
-
-import StackProfile from "./stackProfile";
-import StackRegister from "./stackClasses.routes";
-import StackSettings from "./stackSetting.routes";
-import Home from "../pages/StackHomePages/home";
+import { Feather, Ionicons } from "@expo/vector-icons";
+import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
+import styled from "styled-components/native";
+import Home from "../pages/(authenticated)/stackHomePages/home";
 import StackCalendar from "./stackCalendar.routes";
+import StackProfile from "./stackProfile";
+import StackRegister from "./stackRegister.routes";
+import StackSettings from "./stackSetting.routes";
+
+
 
 
 const Tab = createMaterialBottomTabNavigator();

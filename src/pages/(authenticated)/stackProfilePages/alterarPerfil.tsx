@@ -1,5 +1,4 @@
 import { StatusBar } from "expo-status-bar";
-import React from "react";
 import {
   StyleSheet,
   Text,
@@ -10,8 +9,8 @@ import {
 import styled, { useTheme } from "styled-components/native";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import BackBtn from "../../components/Buttons/BackBtn";
-import Input from "../../components/Input/Input";
+import BackBtn from "../../../components/Buttons/BackBtn";
+import Input from "../../../components/Input/Input";
 import { useState } from "react";
 
 const Container = styled.View`
@@ -75,7 +74,7 @@ export default function EditProfile({ navigation }) {
         <View style={styles.imageBlock}>
           <Image
             style={styles.image}
-            source={require("../../../assets/Perfil.jpg")}
+            source={require("../../assets/Perfil.jpg")}
           />
           <IconPencil onPress={() => navigation.navigate("EditProfile")}>
             <Ionicons name="camera" size={26} color={theme.colorIconStyle} />

@@ -1,5 +1,4 @@
 import "react-native-gesture-handler";
-import React from "react";
 import { StyleSheet, Text, View, Image, ImageBackground, TouchableOpacity } from 'react-native';
 
 export default function Inicio({ navigation }) {

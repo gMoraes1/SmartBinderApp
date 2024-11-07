@@ -1,13 +1,13 @@
-import React from 'react';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-
 import { StyleSheet, Text, View, TouchableOpacity, Alert, FlatList } from 'react-native';
-import { DateData, LocaleConfig } from 'react-native-calendars';
+import { Calendar, DateData, LocaleConfig } from 'react-native-calendars';
+import { Feather } from "@expo/vector-icons";
+import { ptBR } from '../../../utils/localecalendarConfig';
 import styled from 'styled-components/native';
-
-import { ptBR } from '../../utils/localecalendarConfig';
-import { db } from '../../../firebase'; 
+import { firestore } from '../../../../firebase';
 import { deleteDoc, doc, collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+
 
 // Configuração do calendário para Português do Brasil
 LocaleConfig.locales["pt-br"] = ptBR;
@@ -31,7 +31,7 @@ export default function Calendars({ navigation }) {
   useEffect(() => {
     // Adiciona o `orderBy` na consulta para ordenar por `dataCalendario` 
     // em ordem ascendente(datas mais recentes primeiro e a mais distantes embaixo)
-    const eventosRef = collection(db, 'tblCalendario');
+    const eventosRef = collection(firestore, 'tblCalendario');
     const q = query(eventosRef, orderBy('dataCalendario', 'asc'));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -44,12 +44,13 @@ export default function Calendars({ navigation }) {
       });
       setEventos(eventosList);
     });
+
     return () => unsubscribe();
   }, []);
 
   async function deleteEvento(id) {
     try {
-      await deleteDoc(doc(db, 'tblCalendario', id));
+      await deleteDoc(doc(firestore, 'tblCalendario', id));
     } catch (error) {
       console.error("Erro ao deletar:", error);
     }
