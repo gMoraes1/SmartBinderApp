@@ -64,9 +64,9 @@ export default function Login({ navigation }) {
     }, []);
 
     return (
-        <ImageBackground style={styles.fundo} source={require('../../assets/inicio.png')}>
+        <ImageBackground style={styles.fundo} source={require('../../../../assets/inicio.png')}>
             <View style={styles.container}>
-                <Image source={require('../../assets/logoApp.png')} style={styles.imagem} />
+                <Image source={require('../../../../assets/logoApp.png')} style={styles.imagem} />
 
                 <View style={styles.inputView}>
 

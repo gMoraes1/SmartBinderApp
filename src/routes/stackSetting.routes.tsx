@@ -4,8 +4,7 @@ import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
 import Configurations from "../pages/(authenticated)/stackSettingsPages/configuracoes";
 import ThemeSettings from "../pages/(authenticated)/stackSettingsPages/tema";
 import PrivacySettings from "../pages/(authenticated)/stackSettingsPages/PrivacySettings";
-import Register from "../pages/Classes";
-import RegisterClass from "../pages/RegisterClasses";
+
 
 
 
@@ -20,8 +19,6 @@ function StackSettings() {
         <Stack.Screen name="settings" component={Configurations} />
         <Stack.Screen name="Tema" component={ThemeSettings} />
         <Stack.Screen name="Privacidade" component={PrivacySettings} />
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="NovaTurma" component={RegisterClass} />
       </Stack.Navigator>
     );
   }

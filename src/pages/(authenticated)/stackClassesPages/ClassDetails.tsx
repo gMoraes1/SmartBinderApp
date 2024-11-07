@@ -5,8 +5,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList } from "../../navigation/types";
-import BackBtn from "../../components/Buttons/BackBtn";
+import { RootStackParamList } from "../../../navigation/types";
+import BackBtn from "../../../components/Buttons/BackBtn"; 
 import React from "react";
 
 function ClassDetails() {

@@ -10,10 +10,10 @@ import {
   Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { RootStackParamList } from "../../navigation/types"; // Ajuste o caminho conforme necessário
+import { RootStackParamList } from "../../../navigation/types"; // Ajuste o caminho conforme necessário
 import styled from "styled-components/native";
 import { collection, onSnapshot, deleteDoc, doc } from "firebase/firestore";
-import { db } from "../../../firebase";
+import { db } from "../../../../firebase";
 
 interface ClassData {
   id: string;

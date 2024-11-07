@@ -36,11 +36,11 @@ export default function Sign({ navigation }) {
   return (
     <ImageBackground
       style={styles.fundo}
-      source={require("../../assets/inicio.png")}
+      source={require("../../../../assets/inicio.png")}
     >
       <View style={styles.container}>
         <Image
-          source={require("../../assets/logoApp.png")}
+          source={require("../../../../assets/logoApp.png")}
           style={styles.imagem}
         />
 

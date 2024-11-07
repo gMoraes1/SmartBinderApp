@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import Cadastrar from "../../components/Buttons/Cadastrar";
-import Input from "../../components/Input/Input";
-import BackBtn from "../../components/Buttons/BackBtn";
+
 
 import styled from 'styled-components/native';
 
-import { db } from '../../../firebase.js'; // Importe a instância do Firestore
+import { db } from "../../../../firebase"; // Importe a instância do Firestore
 import { collection, addDoc } from 'firebase/firestore'; // Importe funções do Firestore
+import BackBtn from "../../../components/Buttons/BackBtn";
+import Input from "../../../components/Input/Input";
+import Cadastrar from "../../../components/Buttons/Cadastrar";
 
 const Container = styled.View`  
   background-color: ${(props) => props.theme.background};

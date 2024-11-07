@@ -65,7 +65,7 @@ export default function Profile({navigation}) {
         <View style={styles.imageBlock}>
           <Image
             style={styles.image}
-            source={require("../../assets/Perfil.jpg")}
+            source={require("../../../../assets/Perfil.jpg")}
           />
           <IconPencil  onPress={() => navigation.navigate("EditProfile")}>
             <Ionicons name="pencil" size={29} color={theme.colorIconStyle} /> 

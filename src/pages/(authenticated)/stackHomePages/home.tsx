@@ -5,7 +5,7 @@ import styled from 'styled-components/native'; // Importar styled-components
 import { LinearGradient } from 'expo-linear-gradient'
 import { useEffect, useState } from 'react';
 import { collection, onSnapshot, orderBy, query, limit } from 'firebase/firestore';
-import { db } from '../../../firebase';
+import { db } from '../../../../firebase';
 
 const Container = styled.View`
   background-color: ${props => props.theme.background};

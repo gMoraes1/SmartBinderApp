@@ -3,10 +3,10 @@ import { StyleSheet, Text, View, Image, ImageBackground, TouchableOpacity } from
 
 export default function Inicio({ navigation }) {
     return (
-        <ImageBackground style={styles.fundo} source={require('../../../assets/inicio.png')}>
+        <ImageBackground style={styles.fundo} source={require('../../../../assets/inicio.png')}>
             <View style={styles.container}>
                 <View style={styles.viewAlign}>
-                    <Image source={require('../../../assets/imagemInicio.png')} style={styles.imagem} />
+                    <Image source={require('../../../../assets/imagemInicio.png')} style={styles.imagem} />
                     <Text style={styles.title}>
                         Seja bem vindo(a) ao melhor 
                         aplicativo para professores.
