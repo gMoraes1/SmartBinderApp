@@ -5,7 +5,7 @@ import { Calendar, DateData, LocaleConfig } from 'react-native-calendars';
 import { Feather } from "@expo/vector-icons";
 import { ptBR } from '../../../utils/localecalendarConfig';
 import styled from 'styled-components/native';
-import { firestore } from '../../../../firebase';
+import { db } from '../../../../firebase';
 import { deleteDoc, doc, collection, getDocs, addDoc } from 'firebase/firestore';
 import BackBtn from '../../../components/Buttons/BackBtn';
 import Input from '../../../components/Input/Input';
@@ -44,7 +44,7 @@ export default function Calendars({ navigation }) {
     // Função para salvar o evento no Firestore
     async function addEvento() {
         try {
-            const docRef = await addDoc(collection(firestore, 'tblCalendario'), {
+            const docRef = await addDoc(collection(db, 'tblCalendario'), {
                 dataCalendario: dataCompleta,
                 descricaoCalendario: description
             });

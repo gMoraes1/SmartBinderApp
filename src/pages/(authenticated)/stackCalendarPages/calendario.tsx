@@ -5,7 +5,7 @@ import { Calendar, DateData, LocaleConfig } from 'react-native-calendars';
 import { Feather } from "@expo/vector-icons";
 import { ptBR } from '../../../utils/localecalendarConfig';
 import styled from 'styled-components/native';
-import { firestore } from '../../../../firebase';
+import { db } from '../../../../firebase';
 import { deleteDoc, doc, collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 
@@ -31,7 +31,7 @@ export default function Calendars({ navigation }) {
   useEffect(() => {
     // Adiciona o `orderBy` na consulta para ordenar por `dataCalendario` 
     // em ordem ascendente(datas mais recentes primeiro e a mais distantes embaixo)
-    const eventosRef = collection(firestore, 'tblCalendario');
+    const eventosRef = collection(db, 'tblCalendario');
     const q = query(eventosRef, orderBy('dataCalendario', 'asc'));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -50,7 +50,7 @@ export default function Calendars({ navigation }) {
 
   async function deleteEvento(id) {
     try {
-      await deleteDoc(doc(firestore, 'tblCalendario', id));
+      await deleteDoc(doc(db, 'tblCalendario', id));
     } catch (error) {
       console.error("Erro ao deletar:", error);
     }

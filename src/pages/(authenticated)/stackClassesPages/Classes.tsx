@@ -94,7 +94,6 @@ export default function Classes() {
         renderItem={({ item }) => (
           <View style={styles.classItem}>
             <View style={styles.classItem}>
-              <Text style={styles.studentCount}>0</Text>
               <Text style={styles.className}>{item.name}</Text>
               <Text style={styles.TxtBtn1}>{item.school}</Text>
               <Text style={styles.TxtBtn1}>{item.period}</Text>
