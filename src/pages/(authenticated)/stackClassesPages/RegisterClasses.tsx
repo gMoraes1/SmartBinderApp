@@ -1,17 +1,15 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-
-
-
+import { StyleSheet, View, Alert } from "react-native";
 import styled from 'styled-components/native';
 
-import { db } from "../../../../firebase"; // Importe a instância do Firestore
-import { collection, addDoc } from 'firebase/firestore'; // Importe funções do Firestore
+import { db, auth } from "../../../../firebase"; // Importando a instância do Firestore e auth
+import { collection, addDoc, doc,setDoc } from 'firebase/firestore'; // Funções do Firestore
 import BackBtn from "../../../components/Buttons/BackBtn";
 import Input from "../../../components/Input/Input";
 import Cadastrar from "../../../components/Buttons/Cadastrar";
 
-const Container = styled.View`  
+// Definindo o estilo para os componentes
+const Container = styled.View`
   background-color: ${(props) => props.theme.background};
   width: 100%;
   height: 100%;
@@ -33,17 +31,33 @@ export default function RegisterClasses({ navigation }) {
   const [educationLevel, setEducationLevel] = useState("");
   const [school, setSchool] = useState("");
 
+  // Função para adicionar a turma ao Firestore
   const handleAddClass = async () => {
     try {
-      // Adiciona os dados da turma no Firestore
-      await addDoc(collection(db, 'tblTurma'), {
+      // Verificando se o usuário está autenticado
+      const user = auth.currentUser;
+      if (!user) {
+        console.error("Usuário não autenticado!");
+        Alert.alert("Erro", "Você precisa estar logado para criar uma turma.");
+        return;
+      }
+
+      // Referência do usuário na coleção 'users' (a referência ao documento do usuário)
+      const userRef = doc(db, 'users', user.uid);  // Criação da referência ao documento do usuário
+
+      // Obtendo a referência da coleção 'tblTurma' para adicionar uma nova turma
+      const classCollectionRef = collection(db, 'tblTurma');
+
+      // Adicionando os dados da turma à coleção 'tblTurma', associando o documento do usuário ao campo 'userRef'
+      await addDoc(classCollectionRef, {
         nomeTurma: className,
         periodoTurma: period,
         educationLevel: educationLevel,
         school: school,
+        userRef: userRef,  // A referência ao documento do usuário
       });
 
-      // Navegar de volta e passar os dados da turma
+      // Navegar de volta para a lista de turmas, passando os dados da turma
       navigation.navigate("Classes", {
         classData: {
           name: className,
@@ -53,7 +67,8 @@ export default function RegisterClasses({ navigation }) {
         },
       });
     } catch (error) {
-      console.error("Erro ao adicionar documento: ", error);
+      console.error("Erro ao adicionar turma: ", error);
+      Alert.alert("Erro", "Ocorreu um erro ao adicionar a turma. Tente novamente.");
     }
   };
 
@@ -89,3 +104,4 @@ const styles = StyleSheet.create({
     gap: 10,
   },
 });
+

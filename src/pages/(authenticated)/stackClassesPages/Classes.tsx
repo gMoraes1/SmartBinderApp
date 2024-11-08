@@ -12,8 +12,8 @@ import {
 import React, { useEffect, useState } from "react";
 import { RootStackParamList } from "../../../navigation/types"; // Ajuste o caminho conforme necessário
 import styled from "styled-components/native";
-import { collection, onSnapshot, deleteDoc, doc } from "firebase/firestore";
-import { db } from "../../../../firebase";
+import { collection, onSnapshot, deleteDoc, query, where, doc } from "firebase/firestore";
+import { db, auth } from "../../../../firebase"; // Importando o Firebase
 
 interface ClassData {
   id: string;
@@ -56,8 +56,9 @@ const ItemButton = styled.TouchableOpacity`
 export default function Classes() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<RegisterRouteProp>();
-  const [turma, setTurma] = useState([]); // Alterei para que o tipo corresponda à estrutura de dados que você está usando
+  const [turma, setTurma] = useState<ClassData[]>([]); // Alterado para o tipo ClassData
 
+  // Função para deletar turma
   async function deleteTurma(id: string) {
     try {
       await deleteDoc(doc(db, "tblTurma", id));
@@ -69,17 +70,24 @@ export default function Classes() {
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      collection(db, "tblTurma"),
+      query(collection(db, "tblTurma"), where("userRef", "==", doc(db, "users", auth.currentUser?.uid))),
       (querySnapshot) => {
-        const lista = [];
-        querySnapshot.forEach(doc => {
+        const lista: ClassData[] = [];
+        querySnapshot.forEach((docSnap) => {
+          // Garantir que os dados estão sendo mapeados corretamente para ClassData
+          const data = docSnap.data();
           lista.push({
-            id: doc.id,
-            ...doc.data(),
-          }); // A id do Firestore é adicionada aos dados
+            id: docSnap.id, // A id do Firestore
+            name: data.name,
+            period: data.period,
+            educationLevel: data.educationLevel,
+            school: data.school,
+          });
         });
         setTurma(lista); // Atualiza o estado com os dados
-      });
+      }
+    );
+
     return () => unsubscribe(); // Limpa o listener quando o componente for desmontado
   }, []);
 
@@ -88,7 +96,7 @@ export default function Classes() {
       <Title style={styles.title}>Turmas</Title>
 
       <FlatList
-        data={turma} // Mudança aqui: usei a variável turma para renderizar as turmas
+        data={turma}
         keyExtractor={(item) => item.id}
         style={styles.list}
         renderItem={({ item }) => (
