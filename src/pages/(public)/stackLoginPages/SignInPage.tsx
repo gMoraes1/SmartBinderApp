@@ -198,12 +198,11 @@ export default function Sign({ navigation }) {
               withDDD: true,
               dddMask: '(99) '
             }}
-            value={this.state.telefone}
-            onChangeText={text => {
-              this.setState({
-                telefone: text
-              })
-            }}
+            style={styles.input}
+            value={telefone}
+            onChangeText={setTelefone}
+            placeholder="Número de Celular"
+            placeholderTextColor={"rgba(255,255,255,0.6)"}
           />
           <TextInput
             style={styles.input}
