@@ -2,10 +2,10 @@ import "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import React from "react";
-import Classes from "../pages/Classes";
-import RegisterClasses from "../pages/RegisterClasses";
-import ClassDetails from "../pages/ClassDetails";
 
+import Classes from "../pages/(authenticated)/stackClassesPages/Classes";
+import RegisterClasses from "../pages/(authenticated)/stackClassesPages/RegisterClasses";
+import ClassDetails from "../pages/(authenticated)/stackClassesPages/ClassDetails";
 
 const Stack = createStackNavigator();
 

@@ -42,6 +42,7 @@ const Title = styled.Text`
 
 export default function Classes() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
   const [turma, setTurma] = useState<ClassData[]>([]); // Alterado para o tipo ClassData
 
   // Função para deletar turma
@@ -52,6 +53,7 @@ export default function Classes() {
     } catch (error) {
       console.error("Erro ao deletar.", error);
     }
+
   }
 
   useEffect(() => {
@@ -60,19 +62,23 @@ export default function Classes() {
       (querySnapshot) => {
         const lista: ClassData[] = [];
         querySnapshot.forEach((docSnap) => {
+
           const data = docSnap.data();
           lista.push({
             id: docSnap.id,
             nomeTurma: data.nomeTurma,
             periodoTurma: data.periodoTurma,
+
             educationLevel: data.educationLevel,
             school: data.school,
           });
         });
+
         setTurma(lista);
       });
 
     return () => unsubscribe();
+
   }, []);
 
   return (
@@ -82,6 +88,7 @@ export default function Classes() {
       <FlatList
         data={turma}
         keyExtractor={(item) => item.id}
+
         style={styles.list}
         renderItem={({ item }) => (
           <View style={styles.classItem}>
@@ -90,15 +97,18 @@ export default function Classes() {
               <Text style={styles.textData}>Período: {item.periodoTurma}</Text>
               <Text style={styles.textData}>Nível escolar: {item.educationLevel}</Text>
               <Text style={styles.textData}>Escola: {item.school}</Text>
+
             </View>
 
             <TouchableOpacity
               onPress={() => deleteTurma(item.id)}
               style={styles.BtnDelete}
             >
+
               <Text style={styles.TxtDelete}>Deletar</Text>
             </TouchableOpacity>
           </View>
+
         )}
       />
 
@@ -133,9 +143,11 @@ const styles = StyleSheet.create({
   },
 
   classItem: {
+
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "flex-start", // Alinha o conteúdo à esquerda
+
     padding: 15,
     marginVertical: 8,
     borderWidth: 2,
@@ -143,20 +155,24 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#f9f9f9",
     elevation: 5,
+
   },
 
   classInfo: {
     alignItems: "flex-start", // Garante que os textos fiquem à esquerda
     marginBottom: 10, // Espaço entre os dados da turma e o botão
+
   },
 
   BtnDelete: {
     marginTop: 10,
     backgroundColor: "#ff4d4d",
     padding: 10,
+
     borderRadius: 10,
     width: 100,
     alignSelf: "center", // Centraliza o botão no item
+
   },
 
   TxtDelete: {
@@ -189,6 +205,8 @@ const styles = StyleSheet.create({
   textData: {
     color: "black",
     fontSize: 15,
+
     fontWeight: "bold",
   },
+
 });
