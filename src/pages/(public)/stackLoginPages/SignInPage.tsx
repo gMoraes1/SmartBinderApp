@@ -45,6 +45,16 @@ export default function Sign({ navigation }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [isValidCpf, setIsValidCpf] = useState(true); // Estado para validar o CPF
 
+  const formatUsername = (text) => {
+    return text
+      .toUpperCase() // Garante que todo o texto estará em minúsculas
+  };
+
+  const formatEmail = (text) => {
+    return text
+      .toLowerCase() // Garante que todo o texto estará em minúsculas
+  };
+
   const firestore = getFirestore(); // Obtendo a instância do Firestore
 
   // Função para validar CPF
@@ -160,7 +170,7 @@ export default function Sign({ navigation }) {
           <TextInput
             style={styles.input}
             value={username}
-            onChangeText={setUsername}
+            onChangeText={(text) => setUsername(formatUsername(text))}
             placeholder="Nome de usuário"
             placeholderTextColor={"rgba(255,255,255,0.6)"}
           />
@@ -207,14 +217,14 @@ export default function Sign({ navigation }) {
           <TextInput
             style={styles.input}
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(text) => setEmail(formatEmail(text))}
             placeholder="E-mail"
             placeholderTextColor={"rgba(255,255,255,0.6)"}
           />
           <TextInput
             style={styles.input}
             value={confirmEmail}
-            onChangeText={setConfirmEmail}
+            onChangeText={(text) => setConfirmEmail(formatEmail(text))}
             placeholder="Confirme seu E-mail"
             placeholderTextColor={"rgba(255,255,255,0.6)"}
           />
