@@ -17,8 +17,8 @@ import { db, auth } from "../../../../firebase"; // Importando o Firebase
 
 interface ClassData {
   id: string;
-  name: string;
-  period: string;
+  nomeTurma: string;
+  periodoTurma: string;
   educationLevel: string;
   school: string;
 }
@@ -40,19 +40,6 @@ const Title = styled.Text`
   color: ${(props) => props.theme.color};
 `;
 
-const ItemButton = styled.TouchableOpacity`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  margin-vertical: 8px;
-  border-radius: 8px;
-  border: solid ${(props) => props.theme.borderColor} 2px;
-  background-color: ${(props) => props.theme.backgroundList};
-  elevation: 5;
-`;
-
 export default function Classes() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<RegisterRouteProp>();
@@ -66,6 +53,7 @@ export default function Classes() {
     } catch (error) {
       console.error("Erro ao deletar.", error);
     }
+
   }
 
   useEffect(() => {
@@ -85,10 +73,12 @@ export default function Classes() {
           });
         });
         setTurma(lista); // Atualiza o estado com os dados
-      }
-    );
+
+        console.log(lista)
+      });
 
     return () => unsubscribe(); // Limpa o listener quando o componente for desmontado
+
   }, []);
 
   return (
@@ -98,22 +88,25 @@ export default function Classes() {
       <FlatList
         data={turma}
         keyExtractor={(item) => item.id}
+        
         style={styles.list}
         renderItem={({ item }) => (
-          <View style={styles.classItem}>
-            <View style={styles.classItem}>
-              <Text style={styles.className}>{item.name}</Text>
-              <Text style={styles.TxtBtn1}>{item.school}</Text>
-              <Text style={styles.TxtBtn1}>{item.period}</Text>
-              <Text style={styles.TxtBtn1}>{item.educationLevel}</Text>
+        
+          <TouchableOpacity style={styles.classItem} onPress={() => navigation.navigate("ClassDetails")}>
+            <View>
+              <Text style={styles.textData}>{item.periodoTurma}</Text>
+              <Text style={styles.textData}>{item.nomeTurma}</Text>
+              <Text style={styles.textData}>{item.educationLevel}</Text>
+              <Text style={styles.textData}>{item.school}</Text>
             </View>
+
             <TouchableOpacity
               onPress={() => deleteTurma(item.id)}
               style={styles.BtnDelete}
             >
               <Text style={styles.TxtDelete}>X</Text>
             </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         )}
       />
 
@@ -159,11 +152,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#f9f9f9",
     elevation: 5,
-  },
-
-  className: {
-    fontSize: 20,
-    fontWeight: "600",
+    
   },
 
   studentCount: {
@@ -204,4 +193,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 60,
   },
+
+  textData: {
+    color: "black",
+    fontSize: 15,
+    
+  }
 });
