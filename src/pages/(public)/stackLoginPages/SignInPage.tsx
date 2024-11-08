@@ -45,8 +45,6 @@ export default function Sign({ navigation }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [isValidCpf, setIsValidCpf] = useState(true); // Estado para validar o CPF
 
-
-
   const formatUsername = (text) => {
     return text
       .toUpperCase() // Garante que todo o texto estará em minúsculas
@@ -102,8 +100,8 @@ export default function Sign({ navigation }) {
   const handleSignUp = async () => {
     try {
       if (password === "" || confirmPassword === "" || email === "" || confirmEmail === "") {
-        setErrorMessage('Preencha todos os campos');
-        Alert.alert('Preencha todos os campos');
+        setErrorMessage('Preencha os campos de email e senha');
+        Alert.alert('Preencha os campos de email e senha');
         return;
       }
 
@@ -254,12 +252,24 @@ export default function Sign({ navigation }) {
             placeholderTextColor={"rgba(255,255,255,0.6)"}
           />
         </View>
+        {email == "" || password == "" || confirmEmail == "" || confirmPassword == "" || !isValidCpf
+        ? 
         <TouchableOpacity
-          style={styles.btnInicio}
+          disabled={true}
+          style={styles.btnInicioOff}
           onPress={handleSignUp}
         >
           <Text style={styles.txtBtn}>Cadastrar</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> 
+        :
+        <TouchableOpacity
+        style={styles.btnInicioOn}
+        onPress={handleSignUp}
+      >
+        <Text style={styles.txtBtn}>Cadastrar</Text>
+      </TouchableOpacity> 
+        
+      }
       </View>
     </ImageBackground>
   );
@@ -310,7 +320,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  btnInicio: {
+  btnInicioOn: {
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center",
@@ -318,7 +328,22 @@ const styles = StyleSheet.create({
     width: 170,
     height: 50,
     bottom: '4%',
-    backgroundColor: "#FFDE00",
+    backgroundColor: "rgb(255,222,0)",
+    borderColor: "rgba(0,0,0,0.5)",
+    borderBottomWidth: 2.2,
+    borderRightWidth: 1,
+    borderLeftWidth: 1,
+  },
+
+  btnInicioOff: {
+    textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+    width: 170,
+    height: 50,
+    bottom: '4%',
+    backgroundColor: "rgba(255,222,0,0.6)",
     borderColor: "rgba(0,0,0,0.5)",
     borderBottomWidth: 2.2,
     borderRightWidth: 1,
@@ -340,3 +365,4 @@ const styles = StyleSheet.create({
     marginTop: 5,
   }
 });
+

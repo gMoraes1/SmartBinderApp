@@ -11,6 +11,11 @@ export default function Login({ navigation }) {
     const [initializing, setInitializing] = useState(true);
     const [user, setUser] = useState();
  
+    const formatInput = (text) => {
+        return text
+          .toLowerCase() // Garante que todo o texto estará em minúsculas
+      };
+
     function dados(user) {
         setUser(user);
         if (initializing) setInitializing(false);
@@ -73,7 +78,7 @@ export default function Login({ navigation }) {
                     <TextInput
                         style={styles.input}
                         value={email}
-                        onChangeText={text => setEmail(text)}
+                        onChangeText={(text) => setEmail(formatInput(text))}
                         placeholder="E-mail"
                         placeholderTextColor={'rgba(255,255,255,0.6)'}
                     />
