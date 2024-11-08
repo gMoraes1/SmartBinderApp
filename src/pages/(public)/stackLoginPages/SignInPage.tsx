@@ -6,11 +6,12 @@ import {
   View,
   Image,
   ImageBackground,
+  TextInput,
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { TextInput } from "react-native-gesture-handler";
-import { Ionicons } from "@expo/vector-icons";
+import { TextInputMask } from "react-native-masked-text"; // Importando o TextInputMask
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { createUserWithEmailAndPassword } from "firebase/auth"; // Importando a função de Auth
 import { auth } from '../../../../firebase'; // Importando a configuração do auth
 import { getFirestore, doc, setDoc } from "firebase/firestore"; // Importando funções do Firestore
@@ -42,8 +43,48 @@ export default function Sign({ navigation }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [isValidCpf, setIsValidCpf] = useState(true); // Estado para validar o CPF
 
   const firestore = getFirestore(); // Obtendo a instância do Firestore
+
+  // Função para validar CPF
+  const validateCpf = (cpf) => {
+    // Remove tudo o que não for número
+    const cleanedCpf = cpf.replace(/\D/g, '');
+
+    // Verifica se o CPF tem 11 dígitos
+    if (cleanedCpf.length !== 11) return false;
+
+    // Verificação dos dois últimos dígitos
+    let sum = 0;
+    let remainder;
+
+    // Validação do primeiro dígito verificador
+    for (let i = 0; i < 9; i++) {
+      sum += parseInt(cleanedCpf.charAt(i)) * (10 - i);
+    }
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cleanedCpf.charAt(9))) return false;
+
+    sum = 0;
+    // Validação do segundo dígito verificador
+    for (let i = 0; i < 10; i++) {
+      sum += parseInt(cleanedCpf.charAt(i)) * (11 - i);
+    }
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cleanedCpf.charAt(10))) return false;
+
+    return true;
+  };
+
+  // Função para lidar com mudanças no CPF
+  const handleCpfChange = (text) => {
+    setCpf(text);
+    const isValid = validateCpf(text); // Valida o CPF enquanto o usuário digita
+    setIsValidCpf(isValid); // Atualiza o estado de validade do CPF
+  };
 
   // Função de cadastro
   const handleSignUp = async () => {
@@ -115,7 +156,6 @@ export default function Sign({ navigation }) {
           source={require("../../../../assets/logoApp.png")}
           style={styles.imagem}
         />
-
         <View style={styles.inputView}>
           <TextInput
             style={styles.input}
@@ -125,15 +165,25 @@ export default function Sign({ navigation }) {
             placeholderTextColor={"rgba(255,255,255,0.6)"}
           />
 
-          <TextInput
-            style={styles.input}
+          {/* Aqui vamos usar o TextInputMask para formatar o CPF */}
+          <TextInputMask
+            type={'cpf'} // Aplica a máscara de CPF
+            style={[styles.input, !isValidCpf && styles.invalidInput]} // Estilo para CPF inválido
             value={cpf}
-            onChangeText={setCpf}
+            onChangeText={handleCpfChange}
             placeholder="CPF do usuário"
             placeholderTextColor={"rgba(255,255,255,0.6)"}
           />
 
-          <TextInput
+          {/* Mensagem de erro para CPF inválido */}
+          {!isValidCpf && <Feather style={styles.icon} name="x-circle" color={'#ff0000'} size={26} />}
+
+          {/* Máscara de Data de Nascimento (corrigida) */}
+          <TextInputMask
+            type={'datetime'}
+            options={{
+              format: 'DD/MM/YYYY'
+            }}
             style={styles.input}
             value={date}
             onChangeText={setDate}
@@ -141,12 +191,19 @@ export default function Sign({ navigation }) {
             placeholderTextColor={"rgba(255,255,255,0.6)"}
           />
 
-          <TextInput
-            style={styles.input}
-            value={telefone}
-            onChangeText={setTelefone}
-            placeholder="Telefone"
-            placeholderTextColor={"rgba(255,255,255,0.6)"}
+          <TextInputMask
+            type={'cel-phone'}
+            options={{
+              maskType: 'BRL',
+              withDDD: true,
+              dddMask: '(99) '
+            }}
+            value={this.state.telefone}
+            onChangeText={text => {
+              this.setState({
+                telefone: text
+              })
+            }}
           />
           <TextInput
             style={styles.input}
@@ -179,15 +236,12 @@ export default function Sign({ navigation }) {
             placeholderTextColor={"rgba(255,255,255,0.6)"}
           />
         </View>
-
         <TouchableOpacity
           style={styles.btnInicio}
           onPress={handleSignUp}
         >
           <Text style={styles.txtBtn}>Cadastrar</Text>
         </TouchableOpacity>
-
-
       </View>
     </ImageBackground>
   );
@@ -202,27 +256,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  logoAlignView: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-
-  viewAlign: {
-    top: "30%",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  title: {
-    fontSize: 20,
-    width: 300,
-    color: "#fff",
-    fontWeight: "600",
-    justifyContent: "center",
-    textAlign: "center",
-    paddingTop: 46,
+  icon: {
+    position: 'absolute',
+    bottom: '78.3%',
+    right: 20,
   },
 
   fundo: {
@@ -231,22 +268,7 @@ const styles = StyleSheet.create({
   },
 
   imagem: {
-    bottom:'2%',
-  },
-
-  btnInicio: {
-    textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 20,
-    width: 170,
-    height: 50,
-    bottom:'4%',
-    backgroundColor: "#FFDE00",
-    borderColor: "rgba(0,0,0,0.5)",
-    borderBottomWidth: 2.2,
-    borderRightWidth: 1,
-    borderLeftWidth: 1,
+    bottom: '2%',
   },
 
   input: {
@@ -258,11 +280,31 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.2)",
   },
 
+  invalidInput: {
+    borderColor: 'red',
+    borderWidth: 2,
+  },
+
   inputView: {
     bottom: '8%',
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center",
+  },
+
+  btnInicio: {
+    textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+    width: 170,
+    height: 50,
+    bottom: '4%',
+    backgroundColor: "#FFDE00",
+    borderColor: "rgba(0,0,0,0.5)",
+    borderBottomWidth: 2.2,
+    borderRightWidth: 1,
+    borderLeftWidth: 1,
   },
 
   txtBtn: {
@@ -273,4 +315,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     fontSize: 18,
   },
+
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginTop: 5,
+  }
 });
