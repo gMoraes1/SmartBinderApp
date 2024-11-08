@@ -42,7 +42,7 @@ const Title = styled.Text`
 
 export default function Classes() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const route = useRoute<RegisterRouteProp>();
+
   const [turma, setTurma] = useState<ClassData[]>([]); // Alterado para o tipo ClassData
 
   // Função para deletar turma
@@ -62,22 +62,22 @@ export default function Classes() {
       (querySnapshot) => {
         const lista: ClassData[] = [];
         querySnapshot.forEach((docSnap) => {
-          // Garantir que os dados estão sendo mapeados corretamente para ClassData
+
           const data = docSnap.data();
           lista.push({
-            id: docSnap.id, // A id do Firestore
-            name: data.name,
-            period: data.period,
+            id: docSnap.id,
+            nomeTurma: data.nomeTurma,
+            periodoTurma: data.periodoTurma,
+
             educationLevel: data.educationLevel,
             school: data.school,
           });
         });
-        setTurma(lista); // Atualiza o estado com os dados
 
-        console.log(lista)
+        setTurma(lista);
       });
 
-    return () => unsubscribe(); // Limpa o listener quando o componente for desmontado
+    return () => unsubscribe();
 
   }, []);
 
@@ -88,25 +88,27 @@ export default function Classes() {
       <FlatList
         data={turma}
         keyExtractor={(item) => item.id}
-        
+
         style={styles.list}
         renderItem={({ item }) => (
-        
-          <TouchableOpacity style={styles.classItem} onPress={() => navigation.navigate("ClassDetails")}>
-            <View>
-              <Text style={styles.textData}>{item.periodoTurma}</Text>
-              <Text style={styles.textData}>{item.nomeTurma}</Text>
-              <Text style={styles.textData}>{item.educationLevel}</Text>
-              <Text style={styles.textData}>{item.school}</Text>
+          <View style={styles.classItem}>
+            <View style={styles.classInfo}>
+              <Text style={styles.textData}>Nome da turma: {item.nomeTurma}</Text>
+              <Text style={styles.textData}>Período: {item.periodoTurma}</Text>
+              <Text style={styles.textData}>Nível escolar: {item.educationLevel}</Text>
+              <Text style={styles.textData}>Escola: {item.school}</Text>
+
             </View>
 
             <TouchableOpacity
               onPress={() => deleteTurma(item.id)}
               style={styles.BtnDelete}
             >
-              <Text style={styles.TxtDelete}>X</Text>
+
+              <Text style={styles.TxtDelete}>Deletar</Text>
             </TouchableOpacity>
-          </TouchableOpacity>
+          </View>
+
         )}
       />
 
@@ -141,10 +143,11 @@ const styles = StyleSheet.create({
   },
 
   classItem: {
-    display: "flex",
-    flexDirection: "row",
+
+    flexDirection: "column",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start", // Alinha o conteúdo à esquerda
+
     padding: 15,
     marginVertical: 8,
     borderWidth: 2,
@@ -152,19 +155,24 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#f9f9f9",
     elevation: 5,
-    
+
   },
 
-  studentCount: {
-    fontSize: 16,
-    color: "#6939E9",
+  classInfo: {
+    alignItems: "flex-start", // Garante que os textos fiquem à esquerda
+    marginBottom: 10, // Espaço entre os dados da turma e o botão
+
   },
 
   BtnDelete: {
     marginTop: 10,
     backgroundColor: "#ff4d4d",
     padding: 10,
-    borderRadius: 5,
+
+    borderRadius: 10,
+    width: 100,
+    alignSelf: "center", // Centraliza o botão no item
+
   },
 
   TxtDelete: {
@@ -197,6 +205,8 @@ const styles = StyleSheet.create({
   textData: {
     color: "black",
     fontSize: 15,
-    
-  }
+
+    fontWeight: "bold",
+  },
+
 });
