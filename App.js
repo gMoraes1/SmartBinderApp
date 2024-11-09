@@ -7,7 +7,7 @@ import { ThemeProvider } from "styled-components/native"; // Certifique-se de us
 import { useColorScheme } from "react-native";
 import themes from "./src/theme";
 //Vitor aqui
-const Stack = createStackNavigator();
+const Stack12 = createStackNavigator();
 
 export default function App() {
   const auth = false; // Simulação de autenticação
