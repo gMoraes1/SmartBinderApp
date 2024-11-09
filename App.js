@@ -6,7 +6,7 @@ import TabNavigator from "./src/routes/tab.routes";
 import { ThemeProvider } from "styled-components/native"; // Certifique-se de usar 'native'
 import { useColorScheme } from "react-native";
 import themes from "./src/theme";
-
+//Vitor aqui
 const Stack = createStackNavigator();
 //olar eus so o fernando....
 export default function App() {
