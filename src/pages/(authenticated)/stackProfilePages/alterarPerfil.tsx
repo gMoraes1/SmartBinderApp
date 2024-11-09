@@ -29,7 +29,7 @@ const Title = styled.Text`
   padding-top: 12%;
   color: ${(props) => props.theme.color};
   position:relative;
-  bottom:12px;
+  bottom:20px;
 `;
 
 const TextProfile = styled.Text`
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   },
 
   alignInput: {
-    bottom: '25%',
+    bottom: '16%',
   },
 
   header: {
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     position:'relative',
-    bottom:30,
+    bottom:10,
   },
 
   textBlock: {
