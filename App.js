@@ -7,8 +7,9 @@ import { ThemeProvider } from "styled-components/native"; // Certifique-se de us
 import { useColorScheme } from "react-native";
 import themes from "./src/theme";
 //Vitor aqui
-const Stack12 = createStackNavigator();
 
+const Stack = createStackNavigator();
+//olar eus so o fernando....
 export default function App() {
   const auth = false; // Simulação de autenticação
   const deviceTheme = useColorScheme(); // Obtém o tema do dispositivo
