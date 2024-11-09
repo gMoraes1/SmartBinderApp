@@ -57,44 +57,44 @@ export default function Sign({ navigation }) {
 
   const firestore = getFirestore(); // Obtendo a instância do Firestore
 
-  // Função para validar CPF
-  const validateCpf = (cpf) => {
-    // Remove tudo o que não for número
-    const cleanedCpf = cpf.replace(/\D/g, '');
+  // // Função para validar CPF
+  // const validateCpf = (cpf) => {
+  //   // Remove tudo o que não for número
+  //   const cleanedCpf = cpf.replace(/\D/g, '');
 
-    // Verifica se o CPF tem 11 dígitos
-    if (cleanedCpf.length !== 11) return false;
+  //   // Verifica se o CPF tem 11 dígitos
+  //   if (cleanedCpf.length !== 11) return false;
 
-    // Verificação dos dois últimos dígitos
-    let sum = 0;
-    let remainder;
+  //   // Verificação dos dois últimos dígitos
+  //   let sum = 0;
+  //   let remainder;
 
-    // Validação do primeiro dígito verificador
-    for (let i = 0; i < 9; i++) {
-      sum += parseInt(cleanedCpf.charAt(i)) * (10 - i);
-    }
-    remainder = (sum * 10) % 11;
-    if (remainder === 10 || remainder === 11) remainder = 0;
-    if (remainder !== parseInt(cleanedCpf.charAt(9))) return false;
+  //   // Validação do primeiro dígito verificador
+  //   for (let i = 0; i < 9; i++) {
+  //     sum += parseInt(cleanedCpf.charAt(i)) * (10 - i);
+  //   }
+  //   remainder = (sum * 10) % 11;
+  //   if (remainder === 10 || remainder === 11) remainder = 0;
+  //   if (remainder !== parseInt(cleanedCpf.charAt(9))) return false;
 
-    sum = 0;
-    // Validação do segundo dígito verificador
-    for (let i = 0; i < 10; i++) {
-      sum += parseInt(cleanedCpf.charAt(i)) * (11 - i);
-    }
-    remainder = (sum * 10) % 11;
-    if (remainder === 10 || remainder === 11) remainder = 0;
-    if (remainder !== parseInt(cleanedCpf.charAt(10))) return false;
+  //   sum = 0;
+  //   // Validação do segundo dígito verificador
+  //   for (let i = 0; i < 10; i++) {
+  //     sum += parseInt(cleanedCpf.charAt(i)) * (11 - i);
+  //   }
+  //   remainder = (sum * 10) % 11;
+  //   if (remainder === 10 || remainder === 11) remainder = 0;
+  //   if (remainder !== parseInt(cleanedCpf.charAt(10))) return false;
 
-    return true;
-  };
+  //   return true;
+  // };
 
-  // Função para lidar com mudanças no CPF
-  const handleCpfChange = (text) => {
-    setCpf(text);
-    const isValid = validateCpf(text); // Valida o CPF enquanto o usuário digita
-    setIsValidCpf(isValid); // Atualiza o estado de validade do CPF
-  };
+  // // Função para lidar com mudanças no CPF
+  // const handleCpfChange = (text) => {
+  //   setCpf(text);
+  //   const isValid = validateCpf(text); // Valida o CPF enquanto o usuário digita
+  //   setIsValidCpf(isValid); // Atualiza o estado de validade do CPF
+  // };
 
   // Função de cadastro
   const handleSignUp = async () => {
@@ -170,28 +170,27 @@ export default function Sign({ navigation }) {
           <TextInput
             style={styles.input}
             value={username}
-          
+
             onChangeText={(text) => setUsername(formatUsername(text))}
 
             placeholder="Nome de usuário"
             placeholderTextColor={"rgba(255,255,255,0.6)"}
           />
 
-          {/* Aqui vamos usar o TextInputMask para formatar o CPF */}
-          <TextInputMask
+          {/* <TextInputMask
             type={'cpf'} // Aplica a máscara de CPF
             style={[styles.input, !isValidCpf && styles.invalidInput]} // Estilo para CPF inválido
             value={cpf}
             onChangeText={handleCpfChange}
             placeholder="CPF do usuário"
             placeholderTextColor={"rgba(255,255,255,0.6)"}
-          />
+          /> */}
 
           {/* Mensagem de erro para CPF inválido */}
-          {!isValidCpf && <Feather style={styles.icon} name="x-circle" color={'#ff0000'} size={26} />}
+          {/* {!isValidCpf && <Feather style={styles.icon} name="x-circle" color={'#ff0000'} size={26} />} */}
 
           {/* Máscara de Data de Nascimento (corrigida) */}
-          <TextInputMask
+          {/* <TextInputMask
             type={'datetime'}
             options={{
               format: 'DD/MM/YYYY'
@@ -201,23 +200,22 @@ export default function Sign({ navigation }) {
             onChangeText={setDate}
             placeholder="Data de Nascimento"
             placeholderTextColor={"rgba(255,255,255,0.6)"}
-          />
+          /> */}
 
-          <TextInputMask
+          {/* <TextInputMask
             type={'cel-phone'}
             options={{
               maskType: 'BRL',
               withDDD: true,
               dddMask: '(99) '
             }}
-
             style={styles.input}
             value={telefone}
             onChangeText={setTelefone}
             placeholder="Número de Celular"
             placeholderTextColor={"rgba(255,255,255,0.6)"}
+          /> */}
 
-          />
           <TextInput
             style={styles.input}
             value={email}
@@ -252,24 +250,22 @@ export default function Sign({ navigation }) {
             placeholderTextColor={"rgba(255,255,255,0.6)"}
           />
         </View>
-        {email == "" || password == "" || confirmEmail == "" || confirmPassword == "" || !isValidCpf
-        ? 
-        <TouchableOpacity
-          disabled={true}
-          style={styles.btnInicioOff}
-          onPress={handleSignUp}
-        >
-          <Text style={styles.txtBtn}>Cadastrar</Text>
-        </TouchableOpacity> 
-        :
-        <TouchableOpacity
-        style={styles.btnInicioOn}
-        onPress={handleSignUp}
-      >
-        <Text style={styles.txtBtn}>Cadastrar</Text>
-      </TouchableOpacity> 
-        
-      }
+        {email == "" || password == "" || confirmEmail == "" || confirmPassword == "" || username == ""
+          ?
+          <TouchableOpacity
+            style={styles.btnInicioOff}
+            onPress={() => { Alert.alert('Preencha todos os campos') }}
+          >
+            <Text style={styles.txtBtn}>Cadastrar</Text>
+          </TouchableOpacity>
+          :
+          <TouchableOpacity
+            style={styles.btnInicioOn}
+            onPress={handleSignUp}
+          >
+            <Text style={styles.txtBtn}>Cadastrar</Text>
+          </TouchableOpacity>
+        }
       </View>
     </ImageBackground>
   );
@@ -314,7 +310,7 @@ const styles = StyleSheet.create({
   },
 
   inputView: {
-    bottom: '8%',
+    bottom: '5%',
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center",
@@ -327,7 +323,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: 170,
     height: 50,
-    bottom: '4%',
     backgroundColor: "rgb(255,222,0)",
     borderColor: "rgba(0,0,0,0.5)",
     borderBottomWidth: 2.2,
@@ -342,7 +337,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: 170,
     height: 50,
-    bottom: '4%',
     backgroundColor: "rgba(255,222,0,0.6)",
     borderColor: "rgba(0,0,0,0.5)",
     borderBottomWidth: 2.2,

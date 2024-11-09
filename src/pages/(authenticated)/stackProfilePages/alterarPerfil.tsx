@@ -19,6 +19,7 @@ const Container = styled.View`
   height: 100%;
   justify-content: center;
   align-items: center;
+
 `;
 
 const Title = styled.Text`
@@ -27,6 +28,8 @@ const Title = styled.Text`
   text-align: center;
   padding-top: 12%;
   color: ${(props) => props.theme.color};
+  position:relative;
+  bottom:12px;
 `;
 
 const TextProfile = styled.Text`
@@ -40,9 +43,7 @@ const TextProfile = styled.Text`
 const ProfileView = styled.SafeAreaView`
   background-color: ${(props) => props.theme.backgroundProfile};
   width:90%;
-  height:82%;
-  position: relative;
-  top:0%;
+  height:80vh;
   border-radius: 20px;
   border: solid gray 0.5px;
   align-items: center;
@@ -56,14 +57,18 @@ const IconPencil = styled.TouchableOpacity`
   left: 20%;
   background-color: ${(props) => props.theme.backgroundIconStyle};
   border-radius: 100px;
-  padding: 14px;
+  padding: 12px;
 `;
 
 export default function EditProfile({ navigation }) {
   const theme = useTheme(); // Get the current theme
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
   const [date, setDate] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [email, setEmail] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isValidCpf, setIsValidCpf] = useState(true); // Estado para validar o CPF
   return (
     <Container>
       <View style={styles.header}>
@@ -83,9 +88,10 @@ export default function EditProfile({ navigation }) {
 
         <View style={styles.textBlock}>
           <View style={styles.alignInput}>
-            <Input text="Nome" onChangeText={setUsername} />
-            <Input text="Email" onChangeText={setEmail} />
-            <Input text="Data de Nascimento" onChangeText={setDate} />
+            <Input text="Nome" onChangeText={setUsername}/>
+            <Input text="Data de Nascimento" onChangeText={setDate}/>
+            <Input text="CPF" onChangeText={setCpf}/>
+            <Input text="Número de celular" onChangeText={setTelefone}/>
           </View>
         </View>
       </ProfileView>
@@ -95,14 +101,14 @@ export default function EditProfile({ navigation }) {
 
 const styles = StyleSheet.create({
   image: {
-    width: 230,
-    height: 230,
+    width: 200,
+    height: 200,
     borderRadius: 115, // Ensure it's a perfect circle
     justifyContent: "center",
   },
 
   alignInput: {
-    bottom: '25%'
+    bottom: '25%',
   },
 
   header: {
@@ -111,10 +117,10 @@ const styles = StyleSheet.create({
   },
 
   imageBlock: {
-    marginTop: 18,
-    marginBottom: 18,
     alignItems: "center",
     justifyContent: "center",
+    position:'relative',
+    bottom:30,
   },
 
   textBlock: {
