@@ -1,8 +1,6 @@
 import {
   StyleSheet,
-  Text,
   View,
-  TouchableOpacity,
 } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../../navigation/types";

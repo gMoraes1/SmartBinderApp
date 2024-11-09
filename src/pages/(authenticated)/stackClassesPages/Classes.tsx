@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { NavigationProp } from "@react-navigation/native";
 import {
   StyleSheet,
@@ -22,8 +22,6 @@ interface ClassData {
   educationLevel: string;
   school: string;
 }
-
-type RegisterRouteProp = RouteProp<RootStackParamList, "Classes">;
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -53,7 +51,6 @@ export default function Classes() {
     } catch (error) {
       console.error("Erro ao deletar.", error);
     }
-
   }
 
   useEffect(() => {
@@ -91,7 +88,7 @@ export default function Classes() {
 
         style={styles.list}
         renderItem={({ item }) => (
-          <View style={styles.classItem}>
+          <TouchableOpacity style={styles.classItem}  >
             <View style={styles.classInfo}>
               <Text style={styles.textData}>Nome da turma: {item.nomeTurma}</Text>
               <Text style={styles.textData}>Período: {item.periodoTurma}</Text>
@@ -107,7 +104,7 @@ export default function Classes() {
 
               <Text style={styles.TxtDelete}>Deletar</Text>
             </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
 
         )}
       />
