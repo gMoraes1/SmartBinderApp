@@ -40,7 +40,7 @@ const TextProfile = styled.Text`
 const ProfileView = styled.SafeAreaView`
   background-color: ${(props) => props.theme.backgroundProfile};
   width:90%;
-  height:82%;
+  height:90vh;
   position: relative;
   top:0%;
   border-radius: 20px;
@@ -62,8 +62,12 @@ const IconPencil = styled.TouchableOpacity`
 export default function EditProfile({ navigation }) {
   const theme = useTheme(); // Get the current theme
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
   const [date, setDate] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [email, setEmail] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isValidCpf, setIsValidCpf] = useState(true); // Estado para validar o CPF
   return (
     <Container>
       <View style={styles.header}>
@@ -83,9 +87,10 @@ export default function EditProfile({ navigation }) {
 
         <View style={styles.textBlock}>
           <View style={styles.alignInput}>
-            <Input text="Nome" onChangeText={setUsername} />
-            <Input text="Email" onChangeText={setEmail} />
-            <Input text="Data de Nascimento" onChangeText={setDate} />
+            <Input text="Nome" onChangeText={setUsername}/>
+            <Input text="Data de Nascimento" onChangeText={setDate}/>
+            <Input text="CPF" onChangeText={setCpf}/>
+            <Input text="Número de celular" onChangeText={setTelefone}/>
           </View>
         </View>
       </ProfileView>
@@ -95,8 +100,8 @@ export default function EditProfile({ navigation }) {
 
 const styles = StyleSheet.create({
   image: {
-    width: 230,
-    height: 230,
+    width: 130,
+    height: 130,
     borderRadius: 115, // Ensure it's a perfect circle
     justifyContent: "center",
   },
