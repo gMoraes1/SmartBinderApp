@@ -43,7 +43,8 @@ const TextProfile = styled.Text`
 const ProfileView = styled.SafeAreaView`
   background-color: ${(props) => props.theme.backgroundProfile};
   width:90%;
-  height:80vh;
+  height:90vh;
+  position: relative;
   border-radius: 20px;
   border: solid gray 0.5px;
   align-items: center;
@@ -101,8 +102,8 @@ export default function EditProfile({ navigation }) {
 
 const styles = StyleSheet.create({
   image: {
-    width: 200,
-    height: 200,
+    width: 160,
+    height: 160,
     borderRadius: 115, // Ensure it's a perfect circle
     justifyContent: "center",
   },
