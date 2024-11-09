@@ -19,6 +19,7 @@ const Container = styled.View`
   height: 100%;
   justify-content: center;
   align-items: center;
+
 `;
 
 const Title = styled.Text`
@@ -27,6 +28,8 @@ const Title = styled.Text`
   text-align: center;
   padding-top: 12%;
   color: ${(props) => props.theme.color};
+  position:relative;
+  bottom:12px;
 `;
 
 const TextProfile = styled.Text`
@@ -42,7 +45,6 @@ const ProfileView = styled.SafeAreaView`
   width:90%;
   height:90vh;
   position: relative;
-  top:0%;
   border-radius: 20px;
   border: solid gray 0.5px;
   align-items: center;
@@ -56,7 +58,7 @@ const IconPencil = styled.TouchableOpacity`
   left: 20%;
   background-color: ${(props) => props.theme.backgroundIconStyle};
   border-radius: 100px;
-  padding: 14px;
+  padding: 12px;
 `;
 
 export default function EditProfile({ navigation }) {
@@ -100,14 +102,14 @@ export default function EditProfile({ navigation }) {
 
 const styles = StyleSheet.create({
   image: {
-    width: 130,
-    height: 130,
+    width: 160,
+    height: 160,
     borderRadius: 115, // Ensure it's a perfect circle
     justifyContent: "center",
   },
 
   alignInput: {
-    bottom: '25%'
+    bottom: '25%',
   },
 
   header: {
@@ -116,10 +118,10 @@ const styles = StyleSheet.create({
   },
 
   imageBlock: {
-    marginTop: 18,
-    marginBottom: 18,
     alignItems: "center",
     justifyContent: "center",
+    position:'relative',
+    bottom:30,
   },
 
   textBlock: {
