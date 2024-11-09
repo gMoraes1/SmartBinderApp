@@ -6,8 +6,8 @@ import TabNavigator from "./src/routes/tab.routes";
 import { ThemeProvider } from "styled-components/native"; // Certifique-se de usar 'native'
 import { useColorScheme } from "react-native";
 import themes from "./src/theme";
-//Vitor aqui
-const Stack12 = createStackNavigator();
+
+const Stack = createStackNavigator();
 
 export default function App() {
   const auth = false; // Simulação de autenticação

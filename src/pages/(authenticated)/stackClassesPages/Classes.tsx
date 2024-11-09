@@ -12,7 +12,14 @@ import {
 import React, { useEffect, useState } from "react";
 import { RootStackParamList } from "../../../navigation/types"; // Ajuste o caminho conforme necessário
 import styled from "styled-components/native";
-import { collection, onSnapshot, deleteDoc, query, where, doc } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  deleteDoc,
+  query,
+  where,
+  doc,
+} from "firebase/firestore";
 import { db, auth } from "../../../../firebase"; // Importando o Firebase
 
 interface ClassData {
@@ -55,11 +62,13 @@ export default function Classes() {
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      query(collection(db, "tblTurma"), where("userRef", "==", doc(db, "users", auth.currentUser?.uid))),
+      query(
+        collection(db, "tblTurma"),
+        where("userRef", "==", doc(db, "users", auth.currentUser?.uid))
+      ),
       (querySnapshot) => {
         const lista: ClassData[] = [];
         querySnapshot.forEach((docSnap) => {
-
           const data = docSnap.data();
           lista.push({
             id: docSnap.id,
@@ -72,10 +81,10 @@ export default function Classes() {
         });
 
         setTurma(lista);
-      });
+      }
+    );
 
     return () => unsubscribe();
-
   }, []);
 
   return (
@@ -85,27 +94,30 @@ export default function Classes() {
       <FlatList
         data={turma}
         keyExtractor={(item) => item.id}
-
         style={styles.list}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.classItem}  >
+          <TouchableOpacity
+            style={styles.classItem}
+            onPress={() => navigation.navigate("ClassDetails")}
+          >
             <View style={styles.classInfo}>
-              <Text style={styles.textData}>Nome da turma: {item.nomeTurma}</Text>
+              <Text style={styles.textData}>
+                Nome da turma: {item.nomeTurma}
+              </Text>
               <Text style={styles.textData}>Período: {item.periodoTurma}</Text>
-              <Text style={styles.textData}>Nível escolar: {item.educationLevel}</Text>
+              <Text style={styles.textData}>
+                Nível escolar: {item.educationLevel}
+              </Text>
               <Text style={styles.textData}>Escola: {item.school}</Text>
-
             </View>
 
             <TouchableOpacity
               onPress={() => deleteTurma(item.id)}
               style={styles.BtnDelete}
             >
-
               <Text style={styles.TxtDelete}>Deletar</Text>
             </TouchableOpacity>
           </TouchableOpacity>
-
         )}
       />
 
@@ -140,7 +152,6 @@ const styles = StyleSheet.create({
   },
 
   classItem: {
-
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "flex-start", // Alinha o conteúdo à esquerda
@@ -152,13 +163,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#f9f9f9",
     elevation: 5,
-
   },
 
   classInfo: {
     alignItems: "flex-start", // Garante que os textos fiquem à esquerda
     marginBottom: 10, // Espaço entre os dados da turma e o botão
-
   },
 
   BtnDelete: {
@@ -169,7 +178,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 100,
     alignSelf: "center", // Centraliza o botão no item
-
   },
 
   TxtDelete: {
@@ -205,5 +213,4 @@ const styles = StyleSheet.create({
 
     fontWeight: "bold",
   },
-
 });
