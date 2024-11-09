@@ -1,13 +1,11 @@
 import { StatusBar } from "expo-status-bar";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-} from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
 import styled, { useTheme } from "styled-components/native";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { useEffect, useState } from "react";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db, auth } from "../../../../firebase"; // Importando o Firebase
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -35,10 +33,10 @@ const TextProfile = styled.Text`
 
 const ProfileView = styled.View`
   background-color: ${(props) => props.theme.backgroundProfile};
-  width:90%;
-  height:82%;
+  width: 90%;
+  height: 82%;
   position: relative;
-  top:2%;
+  top: 2%;
   border-radius: 20px;
   border: solid gray 0.5px;
   align-items: center;
@@ -48,15 +46,42 @@ const ProfileView = styled.View`
 
 const IconPencil = styled.TouchableOpacity`
   position: relative;
-  top: 51%;
+  top: 58%;
   left: 38%;
   background-color: ${(props) => props.theme.backgroundIconStyle};
   border-radius: 100px;
   padding: 14px;
 `;
 
-export default function Profile({navigation}) {
+export default function Profile({ navigation }) {
   const theme = useTheme(); // Get the current theme
+  const [dadosPerfil, setDadosPerfil] = useState(null); // Initialize with null
+
+  useEffect(() => {
+    // Escuta mudanças de autenticação
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+      if (user) {
+        // Usuário autenticado, busca os dados do perfil
+        const userRef = doc(db, "tblProfessor", user.uid); // Referência ao documento do professor no Firestore
+
+        const unsubscribe = onSnapshot(userRef, (docSnapshot) => {
+          if (docSnapshot.exists()) {
+            setDadosPerfil(docSnapshot.data()); // Dados do perfil
+          } else {
+            setDadosPerfil(null); // Caso o perfil não exista
+          }
+        });
+
+        // Cleanup do listener de perfil
+        return () => unsubscribe();
+      } else {
+        setDadosPerfil(null); // Caso o usuário não esteja logado
+      }
+    });
+
+    // Cleanup do listener de autenticação
+    return () => unsubscribeAuth();
+  }, []); // O array de dependências vazio significa que o effect só será executado uma vez (na montagem).
 
   return (
     <Container>
@@ -67,16 +92,21 @@ export default function Profile({navigation}) {
             style={styles.image}
             source={require("../../../../assets/Perfil.jpg")}
           />
-          <IconPencil  onPress={() => navigation.navigate("EditProfile")}>
-            <Ionicons name="pencil" size={29} color={theme.colorIconStyle} /> 
+          <IconPencil onPress={() => navigation.navigate("EditProfile")}>
+            <Ionicons name="pencil" size={29} color={theme.colorIconStyle} />
           </IconPencil>
         </View>
 
-        <View style={styles.textBlock}>
-          <TextProfile>Nome</TextProfile>
-          <TextProfile>Email</TextProfile>
-          <TextProfile>Data de Nascimento</TextProfile>
-        </View>
+        {dadosPerfil ? (
+          <View style={styles.textBlock}>
+            <TextProfile>Nome: {dadosPerfil.nome}</TextProfile>
+            <TextProfile>Data de Nascimento: {dadosPerfil.dataNascimento}</TextProfile>
+            <TextProfile>CPF: {dadosPerfil.cpf}</TextProfile>
+            <TextProfile>Número de Celular: {dadosPerfil.numeroCelular}</TextProfile>
+          </View>
+        ) : (
+          <Text style={{ color: theme.color }}>Carregando...</Text>
+        )}
       </ProfileView>
     </Container>
   );
