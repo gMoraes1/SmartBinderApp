@@ -3,7 +3,7 @@ import { StyleSheet, View, Alert } from "react-native";
 import styled from 'styled-components/native';
 
 import { db, auth } from "../../../../firebase"; // Importando a instância do Firestore e auth
-import { collection, addDoc, doc,setDoc } from 'firebase/firestore'; // Funções do Firestore
+import { collection, addDoc, doc } from 'firebase/firestore'; // Funções do Firestore
 import BackBtn from "../../../components/Buttons/BackBtn";
 import Input from "../../../components/Input/Input";
 import Cadastrar from "../../../components/Buttons/Cadastrar";
