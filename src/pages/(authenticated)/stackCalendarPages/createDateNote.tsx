@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Alert, FlatList } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Alert, FlatList, TextInput } from 'react-native';
 import { Calendar, DateData, LocaleConfig } from 'react-native-calendars';
 import { Feather } from "@expo/vector-icons";
 import { ptBR } from '../../../utils/localecalendarConfig';
@@ -51,44 +51,34 @@ export default function Calendars({ navigation }) {
                 Alert.alert("Erro", "Você precisa estar logado para criar um evento.")
                 return;
             }
-
             //Referencia do usuario na coleção'users (referencia  ao documento do usuario)
             const userRef = doc(db, 'users',user.uid); //criação de referencia ao documentodo usuario
-
             // Obtendo a referência da coleção 'tblCalendario' para adicionar um novo evento
             const calendarCollectionRef = collection(db, 'tblCalendario');
-
              // Adicionando os dados do Calendario à coleção 'tblCalendario', associando o documento do usuário ao campo 'userRef'
              await addDoc(calendarCollectionRef,{
                 dataCalendario: dataCompleta,
                 descricaoCalendario: description,
                 userRef: userRef,  // A referência ao documento do usuário
              });
-
              // Navegar de volta para O CALENDARIO de turmas, passando os dados dO EVENTO
              navigation.navigate("Calendars",{
                 calendarData: {
                 descricaoCalendario: description,
                 dataCalendario: dataCompleta,
             },
-               
              });
             }catch (error){
                 console.error("Erro ao adicionar um evento: ", error);
                 Alert.alert("Erro", "Ocorreu um erro ao adicionar um evento. Tente novamente.");
             }
-          
-
         };
-
-    
 
     return (
         <Container contentContainerStyle={{ alignItems: 'center', height: '100%' }}>
             <View style={styles.header}>
                 <BackBtn onPress={() => navigation.navigate("Calendars")} />
             </View>
-
             <Calendar
                 style={styles.calendar}
                 headerStyle={{
@@ -128,10 +118,11 @@ export default function Calendars({ navigation }) {
                     </Text>
                 )}
             />
+        
 
             <View style={styles.inputView}>
-                <Input editable={false} text="Data do Evento" onChangeText={() => { }} value={dataCompleta} />
-                <Input text="Descrição do Evento" onChangeText={setDescription} value={description} />
+                <TextInput style={styles.textInput} onChangeText={() => { }} value={dataCompleta} />
+                <Input style={styles.input} text="Descrição do Evento" onChangeText={setDescription} value={description} />
             </View>
             <View style={styles.cadastrarView}>
                 <Cadastrar onPress={handleAddEvento} disabled={isDisabled} />
@@ -153,6 +144,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         textAlign: 'center',
         alignItems: 'center',
+    },
+    input: {
+        
+    },
+    textInput: {
+        fontSize: 20,
+        color: '#000',
     },
     cadastrarView: {
         justifyContent: 'center',
