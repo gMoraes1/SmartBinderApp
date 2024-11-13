@@ -5,7 +5,7 @@ import { Calendar, DateData, LocaleConfig } from 'react-native-calendars';
 import { Feather } from "@expo/vector-icons";
 import { ptBR } from '../../../utils/localecalendarConfig';
 import styled from 'styled-components/native';
-import { db } from '../../../../firebase';
+import { db , auth  } from '../../../../firebase';
 import { deleteDoc, doc, collection, getDocs, addDoc } from 'firebase/firestore';
 import BackBtn from '../../../components/Buttons/BackBtn';
 import Input from '../../../components/Input/Input';
@@ -42,20 +42,46 @@ export default function Calendars({ navigation }) {
     const isDisabled = !dataCompleta || !description; // Desativa o botão se algum campo estiver vazio
 
     // Função para salvar o evento no Firestore
-    async function addEvento() {
+    const handleAddEvento = async () =>{    
         try {
-            const docRef = await addDoc(collection(db, 'tblCalendario'), {
+            //verificando se o usuario esta autenticado
+            const user = auth.currentUser;
+            if(!user){
+                console.error("usuario não autenticado!");
+                Alert.alert("Erro", "Você precisa estar logado para criar um evento.")
+                return;
+            }
+
+            //Referencia do usuario na coleção'users (referencia  ao documento do usuario)
+            const userRef = doc(db, 'users',user.uid); //criação de referencia ao documentodo usuario
+
+            // Obtendo a referência da coleção 'tblCalendario' para adicionar um novo evento
+            const calendarCollectionRef = collection(db, 'tblCalendario');
+
+             // Adicionando os dados do Calendario à coleção 'tblCalendario', associando o documento do usuário ao campo 'userRef'
+             await addDoc(calendarCollectionRef,{
                 dataCalendario: dataCompleta,
-                descricaoCalendario: description
-            });
-            console.log("Cadastrado com Id:", docRef.id);
-            Alert.alert("Cadastro", "Registros cadastrados com sucesso");
-            navigation.navigate("Calendars");
-        } catch (error) {
-            console.error("Erro ao cadastrar:", error);
-            Alert.alert("Erro", "Erro ao cadastrar, Por favor, Tente novamente.");
-        }
-    }
+                descricaoCalendario: description,
+                userRef: userRef,  // A referência ao documento do usuário
+             });
+
+             // Navegar de volta para O CALENDARIO de turmas, passando os dados dO EVENTO
+             navigation.navigate("Calendars",{
+                calendarData: {
+                descricaoCalendario: description,
+                dataCalendario: dataCompleta,
+            },
+               
+             });
+            }catch (error){
+                console.error("Erro ao adicionar um evento: ", error);
+                Alert.alert("Erro", "Ocorreu um erro ao adicionar um evento. Tente novamente.");
+            }
+          
+
+        };
+
+    
 
     return (
         <Container contentContainerStyle={{ alignItems: 'center', height: '100%' }}>
@@ -108,7 +134,7 @@ export default function Calendars({ navigation }) {
                 <Input text="Descrição do Evento" onChangeText={setDescription} value={description} />
             </View>
             <View style={styles.cadastrarView}>
-                <Cadastrar onPress={addEvento} disabled={isDisabled} />
+                <Cadastrar onPress={handleAddEvento} disabled={isDisabled} />
             </View>
         </Container>
     );
