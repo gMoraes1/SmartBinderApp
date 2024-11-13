@@ -1,17 +1,15 @@
-import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Alert, FlatList } from 'react-native';
-import { Calendar, DateData, LocaleConfig } from 'react-native-calendars';
-import { Feather } from "@expo/vector-icons";
-import { ptBR } from '../../../utils/localecalendarConfig';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native';
+import { db, auth } from '../../../../firebase';
+import { deleteDoc, doc, collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import styled from 'styled-components/native';
-import { db } from '../../../../firebase';
-import { deleteDoc, doc, collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
-
-// Configuração do calendário para Português do Brasil
-LocaleConfig.locales["pt-br"] = ptBR;
-LocaleConfig.defaultLocale = "pt-br";
+// Defina o tipo correto para os eventos
+type Event = {
+  id: string;
+  descricaoCalendario: string;
+  dataCalendario: string;
+};
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -20,41 +18,42 @@ const Container = styled.View`
 `;
 
 export default function Calendars({ navigation }) {
-  const [day, setDay] = useState<DateData>();
-  const [eventos, setEventos] = useState([]);
+  const [eventos, setEventos] = useState<Event[]>([]);
 
-  const diaTratado = day?.day < 10 ? `0${day.day}` : day?.day;
-  const mesTratado = day?.month < 10 ? `0${day.month}` : day?.month;
-  const ano = day?.year;
-  const dataCompleta = day ? `${diaTratado}/${mesTratado}/${ano}` : null;
-
-  useEffect(() => {
-    // Adiciona o `orderBy` na consulta para ordenar por `dataCalendario` 
-    // em ordem ascendente(datas mais recentes primeiro e a mais distantes embaixo)
-    const eventosRef = collection(db, 'tblCalendario');
-    const q = query(eventosRef, orderBy('dataCalendario', 'asc'));
-
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const eventosList = [];
-      querySnapshot.forEach(doc => {
-        eventosList.push({
-          id: doc.id,
-          ...doc.data(),
-        });
-      });
-      setEventos(eventosList);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  async function deleteEvento(id) {
+  async function deleteEvento(id: string) {
     try {
       await deleteDoc(doc(db, 'tblCalendario', id));
     } catch (error) {
       console.error("Erro ao deletar:", error);
     }
   }
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      query(
+        collection(db, 'tblCalendario'),
+        where('userRef', '==', doc(db, 'users', auth.currentUser?.uid)), // Filtra pelos eventos do usuário autenticado
+        orderBy('dataCalendario', 'desc') // Ordena os eventos pelas datas de forma decrescente (mais recentes primeiro)
+      ),
+      (querySnapshot) => {
+        const lista: Event[] = [];
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          lista.push({
+            id: docSnap.id,
+            descricaoCalendario: data.descricaoCalendario,
+            dataCalendario: data.dataCalendario,
+          });
+        });
+        setEventos(lista); // Atualiza os eventos no estado
+      },
+      (error) => {
+        console.error("Erro ao buscar dados:", error);
+      }
+    );
+
+    return () => unsubscribe(); // Limpa a inscrição quando o componente for desmontado
+  }, []); // O useEffect só é executado uma vez quando o componente é montado
 
   return (
     <Container>
@@ -91,14 +90,6 @@ export default function Calendars({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  calendar: {
-    borderWidth: 0.5,
-    borderBottomWidth: 0.8,
-    padding: 13,
-    margin: 10,
-    top: 45,
-    backgroundColor: 'transparent',
-  },
   BtnAdd: {
     width: 60,
     height: 60,
