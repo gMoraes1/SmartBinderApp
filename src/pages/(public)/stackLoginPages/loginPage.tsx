@@ -1,15 +1,28 @@
 import "react-native-gesture-handler";
 import { StyleSheet, Text, View, Image, ImageBackground, TouchableOpacity, TextInput } from 'react-native';
 import { useState, useEffect } from "react";
+import { useRoute } from "@react-navigation/native";
 import { auth } from "../../../../firebase"; // Certifique-se de importar auth corretamente
 import { signInWithEmailAndPassword } from "firebase/auth"; // Importar a função
 import React from "react";
+import { RouteProp } from '@react-navigation/native';
+import { RootStackParamList } from '../../../navigation/types';
+
+type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>;
  
-export default function Login({ navigation }) {
+export default function Login({ navigation, route }: { navigation: any, route: LoginScreenRouteProp }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [initializing, setInitializing] = useState(true);
     const [user, setUser] = useState();
+
+    useEffect(()=>{
+        if (route.params?.clearFields){ 
+            setEmail('');
+            setPassword('');
+        }
+    },[route.params]);
+
  
     const formatInput = (text) => {
         return text

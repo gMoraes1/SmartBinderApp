@@ -1,6 +1,8 @@
 import { useNavigation } from '@react-navigation/native';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
+import { signOut } from "firebase/auth";
+import { auth } from "../../../../firebase"; // Certifique-se de importar corretamente
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -18,17 +20,27 @@ const Title = styled.Text`
 `;
 
 const Button = styled.TouchableOpacity`
-elevation: 2;
-background-color: ${(props) => props.theme.inputBackground};
-color: ${(props) => props.theme.color};
-border-radius: 5px;
-padding: 15px;
-margin-vertical: 10px; 
-width: 88%; 
-align-items: center;
+  elevation: 2;
+  background-color: ${(props) => props.theme.inputBackground};
+  color: ${(props) => props.theme.color};
+  border-radius: 5px;
+  padding: 15px;
+  margin-vertical: 10px; 
+  width: 88%; 
+  align-items: center;
 `;
 
 export default function Configurations({navigation}) {
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // Desconectar o usuário
+      navigation.navigate('Login', { clearFields: true }); // Navegar para a tela de login após o logout
+    } catch (error) {
+      console.log("Erro ao sair: ", error.message);
+      alert("Ocorreu um erro ao tentar sair. Tente novamente.");
+    }
+  };
+
   return (
     <Container>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -51,7 +63,7 @@ export default function Configurations({navigation}) {
         </View>
 
         <View style={styles.bottomButtonContainer}>
-          <TouchableOpacity style={styles.bottomButton}>
+          <TouchableOpacity style={styles.bottomButton} onPress={handleLogout}>
             <Text style={styles.bottomButtonText}>Sair</Text>
           </TouchableOpacity>
         </View>
