@@ -1,4 +1,3 @@
-import { useNavigation } from '@react-navigation/native';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
 import { signOut } from "firebase/auth";
@@ -30,11 +29,12 @@ const Button = styled.TouchableOpacity`
   align-items: center;
 `;
 
-export default function Configurations({navigation}) {
+export default function Configurations({ navigation }) {
   const handleLogout = async () => {
     try {
       await signOut(auth); // Desconectar o usuário
-      navigation.navigate('Login', { clearFields: true }); // Navegar para a tela de login após o logout
+      // Não é necessário usar navigation.navigate aqui,
+      // a navegação será controlada pelo App.js com base no estado isAuthenticated
     } catch (error) {
       console.log("Erro ao sair: ", error.message);
       alert("Ocorreu um erro ao tentar sair. Tente novamente.");
@@ -55,11 +55,10 @@ export default function Configurations({navigation}) {
           </Button>
 
           <Button
-            onPress={() => navigation.navigate('Tema')} // Agora está correto
+            onPress={() => navigation.navigate('Tema')}
           >
             <Text style={styles.topButtonText}>Tema</Text>
           </Button>
-
         </View>
 
         <View style={styles.bottomButtonContainer}>
@@ -84,13 +83,13 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '600',
     textAlign: 'center',
-    top:'8 %',
+    top: '8%',
   },
   topButtonsContainer: {
     flex: 1, // Faz com que o container ocupe o espaço restante acima do botão "Sair"
     justifyContent: 'flex-start', // Alinha os botões no topo da área restante
     alignItems: 'center', // Centraliza os botões horizontalmente
-    top:'26%'
+    top: '26%',
   },
   topButton: {
     borderBottomColor: 'gray',
