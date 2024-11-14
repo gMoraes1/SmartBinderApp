@@ -10,6 +10,8 @@ import { db, auth } from "../../../../firebase"; // Importando o Firebase
 import { TextInputMask } from "react-native-masked-text";
 import { Feather } from "@expo/vector-icons"; // Importando o Feather para o ícone de erro
 import BackBtn from "../../../components/Buttons/BackBtn";
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system'; // Para converter a imagem em base64
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -59,10 +61,36 @@ export default function EditProfile({ navigation, route }) {
   const [date, setDate] = useState(route.params.nascimentoProfessor || "");
   const [telefone, setTelefone] = useState(route.params.telefone || "");
   const [isValidCpf, setIsValidCpf] = useState(true); // Estado para validação do CPF
+  const [image, setImage] = useState<string | null>(null);
 
   const formatUsername = (text) => {
-    return text
-      .toUpperCase() // Garante que todo o texto estará em minúsculas
+    return text.toUpperCase(); // Garante que o nome seja em maiúsculas
+  };
+
+  // Função para escolher a imagem e convertê-la para base64
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const imageUri = result.assets[0].uri;
+      setImage(imageUri); // Armazena a URI da imagem selecionada
+
+      try {
+        // Converte a imagem para base64
+        const base64Image = await FileSystem.readAsStringAsync(imageUri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        setImage(base64Image); // Atualiza a imagem com o conteúdo base64
+      } catch (error) {
+        console.error("Erro ao converter imagem para base64: ", error);
+        Alert.alert("Erro", "Ocorreu um erro ao converter a imagem.");
+      }
+    }
   };
 
   // Função para validar o CPF
@@ -93,14 +121,13 @@ export default function EditProfile({ navigation, route }) {
     return true;
   };
 
-  // Função para lidar com mudanças no CPF
   const handleCpfChange = (text) => {
     setCpf(text);
-    const isValid = validateCpf(text); // Valida o CPF enquanto o usuário digita
-    setIsValidCpf(isValid); // Atualiza o estado de validade do CPF
+    const isValid = validateCpf(text);
+    setIsValidCpf(isValid);
   };
 
-  // Função para atualizar os dados no Firestore
+  // Função para atualizar o perfil
   const updateProfile = async () => {
     const user = auth.currentUser;
     if (!user) {
@@ -111,15 +138,20 @@ export default function EditProfile({ navigation, route }) {
     const userRef = doc(db, "tblProfessor", user.uid);
 
     try {
+      // Se a imagem foi escolhida, vamos atualizar a URL da imagem no Firestore
+      const imageUrl = image || null;
+
       // Atualiza os dados no Firestore
       await updateDoc(userRef, {
         nomeProfessor: username,
         cpf: cpf,
         nascimentoProfessor: date,
         telefone: telefone,
+        imagemPerfil: imageUrl, // Salva a imagem base64 no Firestore
       });
+
       Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
-      navigation.navigate("Profile"); // Navega de volta para a página de perfil
+      navigation.navigate("Profile");
     } catch (error) {
       console.error("Erro ao atualizar perfil:", error);
       Alert.alert("Erro", "Erro ao atualizar perfil. Tente novamente.");
@@ -133,24 +165,22 @@ export default function EditProfile({ navigation, route }) {
       </View>
       <Title>Editar Perfil</Title>
       <View style={styles.imageBlock}>
-        <Image
-          style={styles.image}
-          source={require("../../../../assets/Perfil.jpg")}
-        />
-        <IconPencil onPress={() => console.log("Trocar imagem de perfil")}>
+        {image ? (
+          <Image style={styles.image} source={{ uri: `data:image/jpeg;base64,${image}` }} />
+        ) : (
+          <Image style={styles.image} source={require("../../../../assets/Perfil.jpg")} />
+        )}
+        <IconPencil onPress={pickImage}>
           <Ionicons name="camera" size={26} color={theme.colorIconStyle} />
         </IconPencil>
       </View>
 
       <View style={styles.alignInput}>
-        {/* Campo de Nome */}
         <Input
           text="Nome"
           value={username}
           onChangeText={(text) => setUsername(formatUsername(text))}
         />
-
-        {/* Máscara de CPF */}
         <TextInputMask
           type={'cpf'}
           style={[!isValidCpf && styles.invalidInput, {
@@ -169,12 +199,9 @@ export default function EditProfile({ navigation, route }) {
           placeholder="CPF"
           placeholderTextColor={"rgba(255,255,255,0.6)"}
         />
-        {/* Ícone de erro para CPF inválido */}
         {!isValidCpf && (
           <Feather style={styles.errorIcon} name="x-circle" color={'#ff0000'} size={26} />
         )}
-
-        {/* Máscara de Data de Nascimento */}
         <TextInputMask
           type={'datetime'}
           options={{ format: 'DD/MM/YYYY' }}
@@ -194,8 +221,6 @@ export default function EditProfile({ navigation, route }) {
           placeholder="Data de Nascimento"
           placeholderTextColor={"rgba(255,255,255,0.6)"}
         />
-
-        {/* Máscara de Telefone */}
         <TextInputMask
           type={'cel-phone'}
           options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
@@ -216,13 +241,11 @@ export default function EditProfile({ navigation, route }) {
           placeholder="Número de Celular"
           placeholderTextColor={"rgba(255,255,255,0.6)"}
         />
-
         <Btn onPress={updateProfile} />
       </View>
     </Container>
   );
 }
-
 
 const styles = StyleSheet.create({
   image: {
@@ -230,40 +253,40 @@ const styles = StyleSheet.create({
     height: 180,
     borderRadius: 115,
   },
-
   alignInput: {
     bottom: '6%',
     justifyContent: "center",
     alignItems: "center",
   },
-
   imageBlock: {
     alignItems: "center",
     justifyContent: "center",
     position: 'relative',
-    bottom:'2%'
+    bottom: '2%',
   },
-
   header: {
     right: '41%',
     top: '4.7%',
   },
-
-  textBlock: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-
-
   invalidInput: {
-    borderColor: '#ff0000', // Cor vermelha para borda de campo inválido
+    borderColor: '#ff0000',
     borderWidth: 1,
   },
-
   errorIcon: {
     position: 'absolute',
-    left:'58%',
-    top:'25.3%'
+    left: '58%',
+    top: '25.3%',
+  },
+  inputStyle: {
+    backgroundColor: "#D2DFDA",
+    color: "#000",
+    height: 50,
+    width: 255,
+    margin: 8,
+    marginBottom: '10%',
+    fontSize: 18,
+    paddingLeft: 20,
+    borderRadius: 10,
+    elevation: 5,
   },
 });
