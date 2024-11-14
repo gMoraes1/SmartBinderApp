@@ -4,11 +4,12 @@ import styled, { useTheme } from "styled-components/native";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import Input from "../../../components/Input/Input";
-import Cadastrar from "../../../components/Buttons/Cadastrar";
+import Btn from "../../../components/Buttons/Btn";
 import { doc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../../../../firebase"; // Importando o Firebase
 import { TextInputMask } from "react-native-masked-text";
 import { Feather } from "@expo/vector-icons"; // Importando o Feather para o ícone de erro
+import BackBtn from "../../../components/Buttons/BackBtn";
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -25,7 +26,7 @@ const Title = styled.Text`
   padding-top: 12%;
   color: ${(props) => props.theme.color};
   position: relative;
-  bottom: 10px;
+  bottom: 50px;
 `;
 
 const ProfileView = styled.SafeAreaView`
@@ -58,6 +59,11 @@ export default function EditProfile({ navigation, route }) {
   const [date, setDate] = useState(route.params.nascimentoProfessor || "");
   const [telefone, setTelefone] = useState(route.params.telefone || "");
   const [isValidCpf, setIsValidCpf] = useState(true); // Estado para validação do CPF
+
+  const formatUsername = (text) => {
+    return text
+      .toUpperCase() // Garante que todo o texto estará em minúsculas
+  };
 
   // Função para validar o CPF
   const validateCpf = (cpf) => {
@@ -122,8 +128,10 @@ export default function EditProfile({ navigation, route }) {
 
   return (
     <Container>
+      <View style={styles.header}>
+        <BackBtn onPress={() => navigation.navigate("Profile")} />
+      </View>
       <Title>Editar Perfil</Title>
-
       <View style={styles.imageBlock}>
         <Image
           style={styles.image}
@@ -139,24 +147,23 @@ export default function EditProfile({ navigation, route }) {
         <Input
           text="Nome"
           value={username}
-          onChangeText={setUsername}
+          onChangeText={(text) => setUsername(formatUsername(text))}
         />
 
         {/* Máscara de CPF */}
         <TextInputMask
           type={'cpf'}
-          style={[styles.input, !isValidCpf && styles.invalidInput, {
-            backgroundColor: theme.inputBackground || "#D2DFDA",  // Mesma cor de fundo de StyleInput
-            color: theme.color || "#000",  // Mesma cor de texto
-            height: 50,  // Mesma altura
+          style={[!isValidCpf && styles.invalidInput, {
+            backgroundColor: theme.inputBackground || "#D2DFDA",
+            color: theme.color || "#000",
+            height: 50,
             width: 255,
-            margin: 8,  // Mesma margem
-            marginBottom:-18,
-            fontSize: 18,  // Mesma fonte
-            paddingLeft: 20,  // Mesmo padding
-            borderRadius: 10,  // Mesma borda arredondada
-            elevation: 5,  // Mesma sombra
-          }]} // Aplica o estilo de erro se o CPF for inválido
+            margin: 8,
+            fontSize: 18,
+            paddingLeft: 20,
+            borderRadius: 10,
+            elevation: 5,
+          }]}
           value={cpf}
           onChangeText={handleCpfChange}
           placeholder="CPF"
@@ -171,17 +178,17 @@ export default function EditProfile({ navigation, route }) {
         <TextInputMask
           type={'datetime'}
           options={{ format: 'DD/MM/YYYY' }}
-          style={[styles.input, {
-            backgroundColor: theme.inputBackground || "#D2DFDA",  // Mesma cor de fundo de StyleInput
-            color: theme.color || "#000",  // Mesma cor de texto
-            height: 50,  // Mesma altura
+          style={[{
+            backgroundColor: theme.inputBackground || "#D2DFDA",
+            color: theme.color || "#000",
+            height: 50,
             width: 255,
-            margin: 8,  // Mesma margem
-            fontSize: 18,  // Mesma fonte
-            paddingLeft: 20,  // Mesmo padding
-            borderRadius: 10,  // Mesma borda arredondada
-            elevation: 5,  // Mesma sombra
-          }]} // Aplica o estilo de erro se o CPF for inválido
+            margin: 8,
+            fontSize: 18,
+            paddingLeft: 20,
+            borderRadius: 10,
+            elevation: 5,
+          }]}
           value={date}
           onChangeText={setDate}
           placeholder="Data de Nascimento"
@@ -192,28 +199,30 @@ export default function EditProfile({ navigation, route }) {
         <TextInputMask
           type={'cel-phone'}
           options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
-          style={[styles.input, {
-            backgroundColor: theme.inputBackground || "#D2DFDA",  // Mesma cor de fundo de StyleInput
-            color: theme.color || "#000",  // Mesma cor de texto
-            height: 50,  // Mesma altura
+          style={[{
+            backgroundColor: theme.inputBackground || "#D2DFDA",
+            color: theme.color || "#000",
+            height: 50,
             width: 255,
-            margin: 8,  // Mesma margem
-            fontSize: 18,  // Mesma fonte
-            paddingLeft: 20,  // Mesmo padding
-            borderRadius: 10,  // Mesma borda arredondada
-            elevation: 5,  // Mesma sombra
-          }]} // Aplica o estilo de erro se o CPF for inválido
+            margin: 8,
+            marginBottom: '10%',
+            fontSize: 18,
+            paddingLeft: 20,
+            borderRadius: 10,
+            elevation: 5,
+          }]}
           value={telefone}
           onChangeText={setTelefone}
           placeholder="Número de Celular"
           placeholderTextColor={"rgba(255,255,255,0.6)"}
         />
 
-        <Cadastrar onPress={updateProfile} />
+        <Btn onPress={updateProfile} />
       </View>
     </Container>
   );
 }
+
 
 const styles = StyleSheet.create({
   image: {
@@ -223,14 +232,21 @@ const styles = StyleSheet.create({
   },
 
   alignInput: {
-    bottom: '3%',
+    bottom: '6%',
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   imageBlock: {
     alignItems: "center",
     justifyContent: "center",
     position: 'relative',
-    top: '2%',
+    bottom:'2%'
+  },
+
+  header: {
+    right: '41%',
+    top: '4.7%',
   },
 
   textBlock: {
@@ -238,16 +254,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  input: {
-    width: '100%',
-    height: 50,
-    borderRadius: 8,
-    backgroundColor: '#f0f0f0',
-    paddingLeft: 16,
-    marginBottom: 12,
-    fontSize: 16,
-    position: 'relative',
-  },
 
 
   invalidInput: {
@@ -256,8 +262,8 @@ const styles = StyleSheet.create({
   },
 
   errorIcon: {
-    position: 'relative',
-    left: '58%',
-    bottom: '6%',
+    position: 'absolute',
+    left:'58%',
+    top:'25.3%'
   },
 });
