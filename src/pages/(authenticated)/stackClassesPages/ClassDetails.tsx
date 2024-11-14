@@ -36,9 +36,9 @@ export default function ClassDetails() {
 
       <View style={styles.btnView}>
         <Btn onPress={() => navigation.navigate("Classes")} texto="Cadastrar aluno"/>
-        <Btn onPress={() => navigation.navigate("Classes")} texto="Cadastrar aluno"/>
-        <Btn onPress={() => navigation.navigate("Classes")} texto="Cadastrar aluno"/>
-        <Btn onPress={() => navigation.navigate("Classes")} texto="Cadastrar aluno"/>
+        <Btn onPress={() => navigation.navigate("Classes")} texto="Listar alunos"/>
+        <Btn onPress={() => navigation.navigate("Classes")} texto="Configurações da turma"/>
+        <Btn onPress={() => navigation.navigate("Classes")} texto="Exportar "/>
       </View>
     </Container>
   );

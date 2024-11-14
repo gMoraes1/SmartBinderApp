@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         alignItems: 'center',
         top: '11%',
+        marginTop: 30
     },
     alignAll: {
         textAlign: 'center',

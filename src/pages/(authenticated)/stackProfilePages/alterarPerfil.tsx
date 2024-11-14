@@ -4,7 +4,7 @@ import styled, { useTheme } from "styled-components/native";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import Input from "../../../components/Input/Input";
-import Cadastrar from "../../../components/Buttons/Cadastrar";
+import Btn from "../../../components/Buttons/Btn";
 import { doc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../../../../firebase"; // Importando o Firebase
 import { TextInputMask } from "react-native-masked-text";
@@ -209,7 +209,7 @@ export default function EditProfile({ navigation, route }) {
           placeholderTextColor={"rgba(255,255,255,0.6)"}
         />
 
-        <Cadastrar onPress={updateProfile} />
+        <Btn onPress={updateProfile} />
       </View>
     </Container>
   );
