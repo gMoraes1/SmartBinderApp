@@ -6,7 +6,7 @@ import { db, auth } from "../../../../firebase"; // Importando a instância do F
 import { collection, addDoc, doc } from 'firebase/firestore'; // Funções do Firestore
 import BackBtn from "../../../components/Buttons/BackBtn";
 import Input from "../../../components/Input/Input";
-import Cadastrar from "../../../components/Buttons/Cadastrar";
+import Cadastrar from "../../../components/Buttons/Btn";
 
 // Definindo o estilo para os componentes
 const Container = styled.View`
