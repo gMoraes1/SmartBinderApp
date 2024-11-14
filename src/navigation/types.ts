@@ -10,4 +10,5 @@ export type RootStackParamList = {
   Classes: { classData?: ClassData }; // Adicione a propriedade classData
   RegisterClasses: undefined;
   ClassDetails: undefined;
+  Login: { clearFields?: boolean };
 };
