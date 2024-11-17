@@ -1,41 +1,37 @@
 import "react-native-gesture-handler";
 import { StyleSheet, Text, View, Image, ImageBackground, TouchableOpacity, TextInput } from 'react-native';
 import { useState, useEffect } from "react";
-import { useRoute } from "@react-navigation/native";
-import { auth } from "../../../../firebase"; // Certifique-se de importar auth corretamente
 import { signInWithEmailAndPassword } from "firebase/auth"; // Importar a função
+import { auth } from "../../../../firebase"; // Importando auth do Firebase
 import React from "react";
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../../navigation/types';
 
 type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>;
- 
+
 export default function Login({ navigation, route }: { navigation: any, route: LoginScreenRouteProp }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [initializing, setInitializing] = useState(true);
     const [user, setUser] = useState();
 
-    useEffect(()=>{
-        if (route.params?.clearFields){ 
+    useEffect(() => {
+        if (route.params?.clearFields) {
             setEmail('');
             setPassword('');
         }
-    },[route.params]);
+    }, [route.params]);
 
- 
     const formatInput = (text) => {
-        return text
-          .toLowerCase() // Garante que todo o texto estará em minúsculas
-      };
+        return text.toLowerCase(); // Garante que o texto esteja em minúsculas
+    };
 
     function dados(user) {
         setUser(user);
         if (initializing) setInitializing(false);
     }
- 
-    function logar() {
-        // Verifica se o email está no formato correto
+
+    async function logar() {
         if (!email) {
             alert('Por favor, insira um email.');
             return;
@@ -44,49 +40,49 @@ export default function Login({ navigation, route }: { navigation: any, route: L
             alert('Por favor, insira uma senha.');
             return;
         }
- 
-        signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                const user = userCredential.user; // Obter o usuário logado
-                if (user) {
-                    navigation.navigate('Tabs', { email });
-                }
-            })
-            .catch((error) => {
-                console.log('Código de erro:', error.code); // Log do código de erro
-                console.log('Mensagem de erro:', error.message); // Log da mensagem de erro
- 
-                let errorMessage;
-                switch (error.code) {
-                    case 'auth/wrong-password':
-                        errorMessage = 'Senha inválida. Tente novamente.';
-                        break;
-                    case 'auth/user-not-found':
-                        errorMessage = 'Email inválido. Usuário não encontrado.';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = 'Email inválido. Verifique o formato.';
-                        break;
-                    default:
-                        errorMessage = 'Ocorreu um erro Email ou senha invalidos. Tente novamente.';
-                }
-               
-                alert(errorMessage); // Exibir a mensagem de erro específica
-            });
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user; // Obter o usuário logado
+            if (user) {
+                // Após o login bem-sucedido, a navegação será automaticamente controlada
+                // pelo estado de autenticação no App.js via onAuthStateChanged.
+            }
+        } catch (error) {
+            console.log('Código de erro:', error.code); // Log do código de erro
+            console.log('Mensagem de erro:', error.message); // Log da mensagem de erro
+
+            let errorMessage;
+            switch (error.code) {
+                case 'auth/wrong-password':
+                    errorMessage = 'Senha inválida. Tente novamente.';
+                    break;
+                case 'auth/user-not-found':
+                    errorMessage = 'Email inválido. Usuário não encontrado.';
+                    break;
+                case 'auth/invalid-email':
+                    errorMessage = 'Email inválido. Verifique o formato.';
+                    break;
+                default:
+                    errorMessage = 'Ocorreu um erro Email ou senha inválidos. Tente novamente.';
+            }
+
+            alert(errorMessage); // Exibir a mensagem de erro específica
+        }
     }
- 
+
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {
             dados(user);
         });
         return () => unsubscribe();
     }, []);
- 
+
     return (
         <ImageBackground style={styles.fundo} source={require('../../../../assets/inicio.png')}>
             <View style={styles.container}>
                 <Image source={require('../../../../assets/logoApp.png')} style={styles.imagem} />
- 
+
                 <View style={styles.inputView}>
                     <TextInput
                         style={styles.input}
@@ -104,7 +100,7 @@ export default function Login({ navigation, route }: { navigation: any, route: L
                         placeholderTextColor={'rgba(255,255,255,0.6)'}
                     />
                 </View>
- 
+
                 <TouchableOpacity style={styles.btnInicio} onPress={logar}>
                     <Text style={styles.txtBtn}>
                         Login
@@ -113,8 +109,8 @@ export default function Login({ navigation, route }: { navigation: any, route: L
             </View>
         </ImageBackground>
     );
-};
- 
+}
+
 const styles = StyleSheet.create({
     container: {
         width: '100%',
