@@ -106,6 +106,14 @@ export default function Login({ navigation, route }: { navigation: any, route: L
                         Login
                     </Text>
                 </TouchableOpacity>
+
+                <View style={styles.signView}>
+                        <Text style={styles.txtSign}>Esqueceu a senha?</Text>
+                        <TouchableOpacity style={styles.btnSign} onPress={() => navigation.navigate('')}>
+                            <Text style={styles.txtBtnSign}> Clique aqui</Text>
+                        </TouchableOpacity>
+                    </View>
+
             </View>
         </ImageBackground>
     );
@@ -165,5 +173,34 @@ const styles = StyleSheet.create({
     },
     imagem: {
         // Adicione estilos para a imagem, se necessário
+    },
+
+    txtSign:{
+        color: '#fff',
+        fontWeight: '800',
+        fontSize: 18,
+
+    },
+
+    btnSign:{
+
+    },
+
+    txtBtnSign:{
+        color: 'skyblue',
+        fontWeight: '800',
+        fontSize: 18,
+    },
+
+    signView:{
+        borderTopColor:'black',
+        borderTopWidth:0.6,
+        width:'100%',
+        justifyContent:'center',
+        textAlign:'center',
+        padding:20,
+        position:'absolute',
+        flexDirection:'row',
+        bottom:"-6%",
     },
 });
