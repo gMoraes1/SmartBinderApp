@@ -201,6 +201,6 @@ const styles = StyleSheet.create({
         padding:20,
         position:'relative',
         flexDirection:'row',
-        top:"48%",
+        top:"24%",
     },
 });
