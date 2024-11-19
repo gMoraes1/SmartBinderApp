@@ -109,7 +109,7 @@ export default function Login({ navigation, route }: { navigation: any, route: L
 
                 <View style={styles.signView}>
                         <Text style={styles.txtSign}>Esqueceu a senha?</Text>
-                        <TouchableOpacity style={styles.btnSign} onPress={() => navigation.navigate('')}>
+                        <TouchableOpacity style={styles.btnSign} onPress={() => navigation.navigate('ForgotPass')}>
                             <Text style={styles.txtBtnSign}> Clique aqui</Text>
                         </TouchableOpacity>
                     </View>
@@ -199,8 +199,8 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         textAlign:'center',
         padding:20,
-        position:'absolute',
+        position:'relative',
         flexDirection:'row',
-        bottom:"-6%",
+        top:"48%",
     },
 });
