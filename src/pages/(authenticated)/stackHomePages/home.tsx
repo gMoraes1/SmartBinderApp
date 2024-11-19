@@ -1,11 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, FlatList, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, FlatList } from 'react-native';
 import styled from 'styled-components/native'; // Importar styled-components
-import { LinearGradient } from 'expo-linear-gradient'
-import { useEffect, useState } from 'react';
-import { collection, onSnapshot, orderBy, query, limit } from 'firebase/firestore';
-import { db } from '../../../../firebase';
+import { LinearGradient } from 'expo-linear-gradient';
+import { collection, onSnapshot, orderBy, query, limit, where, doc } from 'firebase/firestore';
+import { db, auth } from '../../../../firebase'; // Importar o auth para filtrar pelos eventos do usuário autenticado
 
 const Container = styled.View`
   background-color: ${props => props.theme.background};
@@ -25,24 +24,28 @@ const AvisosRecentes = styled.View`
 `;
 
 const Title = styled.Text`
-font-size: 32px;
-font-weight: 600;
-text-align: center;
-padding-top: 12%;
-color: ${props => props.theme.color};
+  font-size: 32px;
+  font-weight: 600;
+  text-align: center;
+  padding-top: 12%;
+  color: ${props => props.theme.color};
 `;
 
 export default function Home() {
-
   const [eventos, setEventos] = useState([]);
 
   useEffect(() => {
     const eventosRef = collection(db, 'tblCalendario');
-    const q = query(eventosRef, orderBy('dataCalendario', 'asc'), limit(3));
+    const q = query(
+      eventosRef,
+      where('userRef', '==', doc(db, 'users', auth.currentUser?.uid)), // Filtra os eventos do usuário autenticado
+      orderBy('dataCalendario', 'asc'),
+      limit(3)
+    );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const eventosList = [];
-      querySnapshot.forEach(doc => {
+      querySnapshot.forEach((doc) => {
         eventosList.push({
           id: doc.id,
           ...doc.data(),
@@ -50,6 +53,7 @@ export default function Home() {
       });
       setEventos(eventosList);
     });
+
     return () => unsubscribe();
   }, []);
 
@@ -71,14 +75,12 @@ export default function Home() {
               data={eventos}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.eventDetails}>
-                      <Text style={styles.eventDate}>{item.dataCalendario}</Text>
-                      <Text style={styles.eventDescription}>{item.descricaoCalendario}</Text>
-                    </View>
+                <View style={styles.itemContainer}>
+                  <View style={styles.eventDetails}>
+                    <Text style={styles.eventDate}>{item.dataCalendario}</Text>
+                    <Text style={styles.eventDescription}>{item.descricaoCalendario}</Text>
                   </View>
-                </>
+                </View>
               )}
             />
           ) : (
@@ -97,10 +99,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 8,
     margin: 8,
-    marginHorizontal:'5%',
+    marginHorizontal: '5%',
     alignItems: 'center',
     justifyContent: 'space-between',
-    shadowColor: "gray",
+    shadowColor: 'gray',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -110,20 +112,23 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
 
-  avisosrecentesText:{
+  avisosrecentesText: {
     fontSize: 22,
     fontWeight: '700',
-    margin:1,
-    textAlign:'center'
+    margin: 1,
+    textAlign: 'center',
   },
+
   eventDetails: {
     marginRight: 10,
   },
+
   eventDate: {
     fontSize: 16,
     fontWeight: '700',
     margin: -2,
   },
+
   eventDescription: {
     fontSize: 16,
     margin: 8,

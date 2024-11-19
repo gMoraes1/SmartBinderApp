@@ -3,10 +3,11 @@ import { StyleSheet, View, Alert } from "react-native";
 import styled from 'styled-components/native';
 
 import { db, auth } from "../../../../firebase"; // Importando a instância do Firestore e auth
-import { collection, addDoc, doc,setDoc } from 'firebase/firestore'; // Funções do Firestore
+import { collection, addDoc, doc } from 'firebase/firestore'; // Funções do Firestore
 import BackBtn from "../../../components/Buttons/BackBtn";
 import Input from "../../../components/Input/Input";
-import Cadastrar from "../../../components/Buttons/Cadastrar";
+
+import Btn from "../../../components/Buttons/Btn";
 
 // Definindo o estilo para os componentes
 const Container = styled.View`
@@ -14,6 +15,8 @@ const Container = styled.View`
   width: 100%;
   height: 100%;
   align-items: center;
+  display: flex;
+  gap: 30px;
 `;
 
 const Title = styled.Text`
@@ -86,7 +89,7 @@ export default function RegisterClasses({ navigation }) {
         <Input text="Escola" onChangeText={setSchool} />
       </View>
 
-      <Cadastrar onPress={handleAddClass} />
+      <Btn onPress={handleAddClass} texto="Cadastrar" />
     </Container>
   );
 }
