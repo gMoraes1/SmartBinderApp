@@ -30,8 +30,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <NavigationContainer>
-        {/* {isAuthenticated ? <TabNavigator /> : <StackLogin />} */}
-        <CreateDoc/>
+        {isAuthenticated ? <TabNavigator /> : <StackLogin />}
       </NavigationContainer>
     </ThemeProvider>
   );
