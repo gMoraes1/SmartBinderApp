@@ -153,35 +153,33 @@ export default function EditProfile({ navigation, route }) {
   };
 
   // Função para atualizar o perfil
-  const updateProfile = async () => {
-    const user = auth.currentUser;
-    if (!user) {
-      Alert.alert("Erro", "Usuário não autenticado.");
-      return;
-    }
+const updateProfile = async () => {
+  const user = auth.currentUser;
+  if (!user) {
+    Alert.alert("Erro", "Usuário não autenticado.");
+    return;
+  }
 
-    const userRef = doc(db, "tblProfessor", user.uid);
+  const userRef = doc(db, "tblProfessor", user.uid);
 
-    try {
-      // Se a imagem foi escolhida, vamos atualizar a URL da imagem no Firestore
-      const imageUrl = image || null;
+  try {
+    // Se a imagem foi escolhida, vamos atualizar a URL da imagem no Firestore
+    const imageUrl = image || dadosPerfil?.imagemPerfil; // Mantém a imagem atual se nenhuma nova imagem for escolhida
 
-      // Atualiza os dados no Firestore
-      await updateDoc(userRef, {
-        nomeProfessor: username,
-        cpf: cpf,
-        nascimentoProfessor: date,
-        telefone: telefone,
-        imagemPerfil: imageUrl, // Salva a imagem base64 no Firestore
-      });
-
-      Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
-      navigation.navigate("Profile");
-    } catch (error) {
-      console.error("Erro ao atualizar perfil:", error);
-      Alert.alert("Erro", "Erro ao atualizar perfil. Tente novamente.");
-    }
-  };
+    // Atualiza os dados no Firestore
+    await updateDoc(userRef, {
+      nomeProfessor: username,
+      cpf: cpf,
+      nascimentoProfessor: date,
+      telefone: telefone,
+      imagemPerfil: imageUrl, // Atualiza apenas se houver uma nova imagem
+    });
+    navigation.navigate("Profile");
+  } catch (error) {
+    console.error("Erro ao atualizar perfil:", error);
+    Alert.alert("Erro", "Erro ao atualizar perfil. Tente novamente.");
+  }
+};
 
   return (
     <Container>
@@ -270,7 +268,7 @@ export default function EditProfile({ navigation, route }) {
           placeholder="Número de Celular"
           placeholderTextColor={"rgba(255,255,255,0.6)"}
         />
-        <Btn onPress={updateProfile} />
+        <Btn onPress={updateProfile} disabled={!isValidCpf}/>
       </View>
     </Container>
   );
