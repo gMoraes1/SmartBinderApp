@@ -2,10 +2,10 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, Alert, Image } from "react-native";
 import styled, { useTheme } from "styled-components/native";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Input from "../../../components/Input/Input";
 import Btn from "../../../components/Buttons/Btn";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db, auth } from "../../../../firebase"; // Importando o Firebase
 import { TextInputMask } from "react-native-masked-text";
 import { Feather } from "@expo/vector-icons"; // Importando o Feather para o ícone de erro
@@ -62,6 +62,31 @@ export default function EditProfile({ navigation, route }) {
   const [telefone, setTelefone] = useState(route.params.telefone || "");
   const [isValidCpf, setIsValidCpf] = useState(true); // Estado para validação do CPF
   const [image, setImage] = useState<string | null>(null);
+  const [dadosPerfil, setDadosPerfil] = useState(null); // Initialize with null
+
+  useEffect(() => {
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+      if (user) {
+        // Busca os dados do perfil do Firestore usando o uid do usuário autenticado
+        const userRef = doc(db, "tblProfessor", user.uid);
+        const unsubscribe = onSnapshot(userRef, (docSnapshot) => {
+          if (docSnapshot.exists()) {
+            setDadosPerfil(docSnapshot.data()); // Carrega os dados do usuário no estado
+          } else {
+            setDadosPerfil(null); // Caso o perfil não exista no Firestore
+          }
+        });
+
+        // Cleanup do listener de perfil
+        return () => unsubscribe();
+      } else {
+        setDadosPerfil(null); // Caso o usuário não esteja logado
+      }
+    });
+
+    // Cleanup do listener de autenticação
+    return () => unsubscribeAuth();
+  }, []); // Esse useEffect só executa uma vez após o componente ser montado
 
   const formatUsername = (text) => {
     return text.toUpperCase(); // Garante que o nome seja em maiúsculas
@@ -168,7 +193,11 @@ export default function EditProfile({ navigation, route }) {
         {image ? (
           <Image style={styles.image} source={{ uri: `data:image/jpeg;base64,${image}` }} />
         ) : (
-          <Image style={styles.image} source={require("../../../../assets/Perfil.jpg")} />
+          dadosPerfil && dadosPerfil.imagemPerfil ? (
+            <Image style={styles.image} source={{ uri: `data:image/jpeg;base64,${dadosPerfil.imagemPerfil}` }} />
+          ) : (
+            <Image style={styles.image} source={require('../../../../assets/Perfil.jpg')} /> // Caso não haja imagem, use uma imagem padrão
+          )
         )}
         <IconPencil onPress={pickImage}>
           <Ionicons name="camera" size={26} color={theme.colorIconStyle} />
