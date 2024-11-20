@@ -10,9 +10,9 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { TextInputMask } from "react-native-masked-text"; // Importando o TextInputMask
-import { Feather, Ionicons } from "@expo/vector-icons";
-import { createUserWithEmailAndPassword } from "firebase/auth"; // Importando a função de Auth
+import { createUserWithEmailAndPassword, 
+  sendEmailVerification,
+  signOut,} from "firebase/auth"; // Importando a função de Auth
 import { auth } from '../../../../firebase'; // Importando a configuração do auth
 import { getFirestore, doc, setDoc } from "firebase/firestore"; // Importando funções do Firestore
 
@@ -119,6 +119,12 @@ export default function Sign({ navigation }) {
       // Criando usuário no Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+
+      // Enviar e-mail de verificação
+      await sendEmailVerification(user);
+
+      //Fazer logout para garantir que o usuário não seja autenticado
+      await signOut(auth);
 
       // Criando o perfil do usuário no Firestore
       const userDocRef = doc(firestore, 'tblProfessor', user.uid); // Referência para o documento
@@ -359,4 +365,3 @@ const styles = StyleSheet.create({
     marginTop: 5,
   }
 });
-
