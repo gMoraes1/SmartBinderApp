@@ -2,7 +2,6 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, Image } from "react-native";
 import styled, { useTheme } from "styled-components/native";
 import { Ionicons } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db, auth } from "../../../../firebase"; // Importando o Firebase
@@ -58,17 +57,15 @@ export default function Profile({ navigation }) {
   const [dadosPerfil, setDadosPerfil] = useState(null); // Initialize with null
 
   useEffect(() => {
-    // Escuta mudanças de autenticação
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       if (user) {
-        // Usuário autenticado, busca os dados do perfil
-        const userRef = doc(db, "tblProfessor", user.uid); // Referência ao documento do professor no Firestore
-
+        // Busca os dados do perfil do Firestore usando o uid do usuário autenticado
+        const userRef = doc(db, "tblProfessor", user.uid);
         const unsubscribe = onSnapshot(userRef, (docSnapshot) => {
           if (docSnapshot.exists()) {
-            setDadosPerfil(docSnapshot.data()); // Dados do perfil
+            setDadosPerfil(docSnapshot.data()); // Carrega os dados do usuário no estado
           } else {
-            setDadosPerfil(null); // Caso o perfil não exista
+            setDadosPerfil(null); // Caso o perfil não exista no Firestore
           }
         });
 
@@ -81,28 +78,48 @@ export default function Profile({ navigation }) {
 
     // Cleanup do listener de autenticação
     return () => unsubscribeAuth();
-  }, []); // O array de dependências vazio significa que o effect só será executado uma vez (na montagem).
+  }, []); // Esse useEffect só executa uma vez após o componente ser montado
+
+  const handleEditProfile = () => {
+    if (dadosPerfil) {
+      navigation.navigate("EditProfile", {
+        nomeProfessor: dadosPerfil.nomeProfessor || "",
+        cpf: dadosPerfil.cpf || "",
+        nascimentoProfessor: dadosPerfil.nascimentoProfessor || "",
+        telefone: dadosPerfil.telefone || "",
+        imagemPerfil: dadosPerfil.imagemPerfil || "",
+      });
+    }
+  };
 
   return (
     <Container>
       <ProfileView>
         <Title>Perfil</Title>
         <View style={styles.imageBlock}>
-          <Image
-            style={styles.image}
-            source={require("../../../../assets/Perfil.jpg")}
-          />
-          <IconPencil onPress={() => navigation.navigate("EditProfile")}>
+          {dadosPerfil && dadosPerfil.imagemPerfil ? (
+            <Image
+              style={styles.image}
+              source={{ uri: `data:image/jpeg;base64,${dadosPerfil.imagemPerfil}` }} // A imagem em base64
+            />
+          ) : (
+            <Image
+              style={styles.image}
+              source={require("../../../../assets/Perfil.jpg")} // Imagem padrão caso não tenha imagem no Firestore
+            />
+          )}
+
+          <IconPencil onPress={handleEditProfile}>
             <Ionicons name="pencil" size={29} color={theme.colorIconStyle} />
           </IconPencil>
         </View>
 
         {dadosPerfil ? (
           <View style={styles.textBlock}>
-            <TextProfile>Nome: {dadosPerfil.nome}</TextProfile>
-            <TextProfile>Data de Nascimento: {dadosPerfil.dataNascimento}</TextProfile>
+            <TextProfile>Nome: {dadosPerfil.nomeProfessor}</TextProfile>
+            <TextProfile>Data de Nascimento: {dadosPerfil.nascimentoProfessor}</TextProfile>
             <TextProfile>CPF: {dadosPerfil.cpf}</TextProfile>
-            <TextProfile>Número de Celular: {dadosPerfil.numeroCelular}</TextProfile>
+            <TextProfile>Número de Celular: {dadosPerfil.telefone}</TextProfile>
           </View>
         ) : (
           <Text style={{ color: theme.color }}>Carregando...</Text>
@@ -116,7 +133,7 @@ const styles = StyleSheet.create({
   image: {
     width: 230,
     height: 230,
-    borderRadius: 115, // Ensure it's a perfect circle
+    borderRadius: 115, // Para garantir que seja um círculo perfeito
     justifyContent: "center",
   },
 

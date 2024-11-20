@@ -15,7 +15,6 @@ export default function StackLogin() {
             <Stack.Screen name="InicioRegister" component={InicioRegister} />
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Sign" component={Sign} />
-            <Stack.Screen name="Tabs" component={TabNavigator} />
         </Stack.Navigator>
     );
 }

@@ -1,31 +1,28 @@
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { StyleSheet, Text } from "react-native";
+import React from "react";
+import { TouchableOpacity, StyleSheet, Text } from "react-native";
 
-const Cadastrar = ({ onPress, ...props }) => {
+export default function Btn({ onPress, texto = "Cadastrar", ...props }) {
   return (
     <TouchableOpacity onPress={onPress} {...props} style={styles.button}>
-      <Text style={styles.textButton}>Cadastrar</Text>
+      <Text style={styles.textButton}>{texto}</Text>
     </TouchableOpacity>
   );
-};
-
-export default Cadastrar;
+}
 
 const styles = StyleSheet.create({
   button: {
     backgroundColor: "#6939E9",
-    width: 200,
-    height: 38,
+    width: 250,
+    height: 45,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 30,
     elevation: 10,
-    margin:'10%',
   },
   textButton: {
     color: "white",
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
   },
 });

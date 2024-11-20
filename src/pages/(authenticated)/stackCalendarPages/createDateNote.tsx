@@ -9,7 +9,7 @@ import { db , auth  } from '../../../../firebase';
 import { deleteDoc, doc, collection, getDocs, addDoc } from 'firebase/firestore';
 import BackBtn from '../../../components/Buttons/BackBtn';
 import Input from '../../../components/Input/Input';
-import Cadastrar from '../../../components/Buttons/Cadastrar';
+import Cadastrar from '../../../components/Buttons/Btn';
 
 // Configuração do calendário para Português do Brasil
 LocaleConfig.locales["pt-br"] = ptBR;
@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         alignItems: 'center',
         top: '11%',
+        marginTop: 30
     },
     alignAll: {
         textAlign: 'center',
