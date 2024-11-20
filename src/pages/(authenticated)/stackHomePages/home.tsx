@@ -15,12 +15,15 @@ const Container = styled.View`
 `;
 
 const AvisosRecentes = styled.View`
-  position: absolute;
-  width: 88%;
+  width: 90%;
+  height:52%;
+  position:relative;
+  top:8%;
   border-radius: 30px;
-  height: 19%;
-  bottom: 30px;
   overflow: hidden; /* Para garantir que o gradiente respeite o border-radius */
+  justify-content: center;
+  text-align:center;
+  align-itens:center;
 `;
 
 const Title = styled.Text`
@@ -33,6 +36,31 @@ const Title = styled.Text`
 
 export default function Home() {
   const [eventos, setEventos] = useState([]);
+  const [dadosPerfil, setDadosPerfil] = useState(null); // Initialize with null
+
+  useEffect(() => {
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+      if (user) {
+        // Busca os dados do perfil do Firestore usando o uid do usuário autenticado
+        const userRef = doc(db, "tblProfessor", user.uid);
+        const unsubscribe = onSnapshot(userRef, (docSnapshot) => {
+          if (docSnapshot.exists()) {
+            setDadosPerfil(docSnapshot.data()); // Carrega os dados do usuário no estado
+          } else {
+            setDadosPerfil(null); // Caso o perfil não exista no Firestore
+          }
+        });
+
+        // Cleanup do listener de perfil
+        return () => unsubscribe();
+      } else {
+        setDadosPerfil(null); // Caso o usuário não esteja logado
+      }
+    });
+
+    // Cleanup do listener de autenticação
+    return () => unsubscribeAuth();
+  }, []); // Esse useEffect só executa uma vez após o componente ser montado
 
   useEffect(() => {
     const eventosRef = collection(db, 'tblCalendario');
@@ -57,10 +85,19 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
+  // Função para pegar apenas o primeiro nome
+  const getFirstName = (fullName) => {
+    if (!fullName) return ''; // Caso o nome esteja vazio
+    return fullName.split(' ')[0]; // Pega a primeira palavra antes do primeiro espaço
+  };
+
   return (
     <Container>
-      <Title>Home</Title>
       <StatusBar style="auto" />
+      <Title>Home</Title>
+      <Title>
+        <Text>Bem-Vindo {dadosPerfil ? getFirstName(dadosPerfil.nomeProfessor) : 'Usuário'}</Text>
+      </Title>
       <AvisosRecentes>
         <LinearGradient
           colors={['#946CFF', '#2E1966']}
@@ -97,11 +134,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#fff',
     borderRadius: 10,
-    padding: 8,
-    margin: 8,
-    marginHorizontal: '5%',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    margin: 12,
+    marginHorizontal: 13,
+    padding: 10,
     shadowColor: 'gray',
     shadowOffset: {
       width: 0,
@@ -116,6 +151,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     margin: 1,
+    padding: 10,
     textAlign: 'center',
   },
 
