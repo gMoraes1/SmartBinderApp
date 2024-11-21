@@ -8,7 +8,7 @@ import { useColorScheme } from "react-native";
 import themes from "./src/theme";
 import { useState, useEffect } from "react";
 import { auth } from "./firebase"; // Importando o auth do Firebase
-import CreateDoc from "./src/pages/(authenticated)/stackClassesPages/CreateDoc";
+import CreateDoc from "./src/pages/(authenticated)/stackClassesPages/ExportDoc";
 
 const Stack = createStackNavigator();
 

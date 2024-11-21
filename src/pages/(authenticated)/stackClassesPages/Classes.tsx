@@ -45,8 +45,8 @@ const Title = styled.Text`
   color: ${(props) => props.theme.color};
 `;
 
-export default function Classes() {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+export default function Classes({navigation}) {
+
 
   const [turma, setTurma] = useState<ClassData[]>([]); // Alterado para o tipo ClassData
 
