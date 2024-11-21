@@ -1,7 +1,7 @@
 import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+import { createBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
 import styled from "styled-components/native";
