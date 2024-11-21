@@ -1,9 +1,5 @@
 import React from "react";
-
 import { StyleSheet, View } from "react-native";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
-
-import { RootStackParamList } from "../../../navigation/types";
 import styled from 'styled-components/native';
 import BackBtn from "../../../components/Buttons/BackBtn";
 import Btn from "../../../components/Buttons/Btn";
@@ -24,9 +20,7 @@ const Title = styled.Text`
   color: ${(props) => props.theme.color};
 `;
 
-export default function ClassDetails() {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-
+export default function ClassDetails({navigation}) {
   return (
     <Container>
       <View style={styles.header}>
@@ -35,20 +29,16 @@ export default function ClassDetails() {
       </View>
 
       <View style={styles.btnView}>
-        <Btn onPress={() => navigation.navigate("Classes")} texto="Cadastrar aluno"/>
-        <Btn onPress={() => navigation.navigate("Classes")} texto="Listar alunos"/>
-        <Btn onPress={() => navigation.navigate("Classes")} texto="Configurações da turma"/>
-        <Btn onPress={() => navigation.navigate("Classes")} texto="Exportar "/>
+        <Btn onPress={() => navigation.navigate("CreateStudent")} texto="Cadastrar aluno" />
+        <Btn onPress={() => navigation.navigate("ListStudents")} texto="Listar alunos" />
+        <Btn onPress={() => navigation.navigate("ConfigurationClass")} texto="Configurações da turma" />
+        <Btn onPress={() => navigation.navigate("ExportDoc")} texto="Exportar" />
       </View>
     </Container>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    height: "100%",
-  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -59,6 +49,6 @@ const styles = StyleSheet.create({
     marginTop: 90,
     display: "flex",
     flexDirection: "column",
-    gap: 20
-  }
+    gap: 20,
+  },
 });
