@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     elevation: 5,
+    top:700
   },
   TxtBtn1: {
     fontSize: 40,
@@ -108,6 +109,7 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     lineHeight: 60,
+    top:-7
   },
   itensView: {
     flex: 1,
