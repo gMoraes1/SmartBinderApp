@@ -1,7 +1,7 @@
 import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { createBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
 import styled from "styled-components/native";
@@ -14,7 +14,7 @@ import StackSettings from "./stackSetting.routes";
 
 
 
-const Tab = createMaterialBottomTabNavigator();
+const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 
@@ -29,7 +29,7 @@ export default function TabNavigator() {
       <Container>
       <Tab.Navigator screenOptions={{
         headerShown: false,
-        tabBarLabel: false,
+        tabBarShowLabel:false,
         tabBarStyle: {
           position: 'absolute',
           height: 90,
@@ -42,7 +42,6 @@ export default function TabNavigator() {
           name="home"
           component={Home}
           options={{
-            tabBarShowLabel: false,
             tabBarIcon: ({ color, size, focused }) => {
               if (focused) {
                 return <Ionicons name="home" size={29} color={"#2E1966"} />
