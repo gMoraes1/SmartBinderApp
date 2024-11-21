@@ -65,7 +65,6 @@ export default function Login({ navigation, route }: { navigation: any, route: L
     
             // Se validado, redireciona para a Home
             console.log("E-mail verificado: Redirecionando para Home.");
-            navigation.navigate("Home" as never);
     
         } catch (error: any) {
             console.error('Erro ao logar:', error.code); // Para debug
