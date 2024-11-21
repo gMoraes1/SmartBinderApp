@@ -87,6 +87,7 @@ export default function Profile({ navigation }) {
         cpf: dadosPerfil.cpf || "",
         nascimentoProfessor: dadosPerfil.nascimentoProfessor || "",
         telefone: dadosPerfil.telefone || "",
+        imagemPerfil: dadosPerfil.imagemPerfil || "",
       });
     }
   };
@@ -96,10 +97,18 @@ export default function Profile({ navigation }) {
       <ProfileView>
         <Title>Perfil</Title>
         <View style={styles.imageBlock}>
-          <Image
-            style={styles.image}
-            source={require("../../../../assets/Perfil.jpg")}
-          />
+          {dadosPerfil && dadosPerfil.imagemPerfil ? (
+            <Image
+              style={styles.image}
+              source={{ uri: `data:image/jpeg;base64,${dadosPerfil.imagemPerfil}` }} // A imagem em base64
+            />
+          ) : (
+            <Image
+              style={styles.image}
+              source={require("../../../../assets/Perfil.jpg")} // Imagem padrão caso não tenha imagem no Firestore
+            />
+          )}
+
           <IconPencil onPress={handleEditProfile}>
             <Ionicons name="pencil" size={29} color={theme.colorIconStyle} />
           </IconPencil>

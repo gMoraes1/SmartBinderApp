@@ -2,13 +2,16 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, Alert, Image } from "react-native";
 import styled, { useTheme } from "styled-components/native";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Input from "../../../components/Input/Input";
 import Btn from "../../../components/Buttons/Btn";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db, auth } from "../../../../firebase"; // Importando o Firebase
 import { TextInputMask } from "react-native-masked-text";
 import { Feather } from "@expo/vector-icons"; // Importando o Feather para o ícone de erro
+import BackBtn from "../../../components/Buttons/BackBtn";
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system'; // Para converter a imagem em base64
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -25,7 +28,7 @@ const Title = styled.Text`
   padding-top: 12%;
   color: ${(props) => props.theme.color};
   position: relative;
-  bottom: 10px;
+  bottom: 50px;
 `;
 
 const ProfileView = styled.SafeAreaView`
@@ -58,6 +61,62 @@ export default function EditProfile({ navigation, route }) {
   const [date, setDate] = useState(route.params.nascimentoProfessor || "");
   const [telefone, setTelefone] = useState(route.params.telefone || "");
   const [isValidCpf, setIsValidCpf] = useState(true); // Estado para validação do CPF
+  const [image, setImage] = useState<string | null>(null);
+  const [dadosPerfil, setDadosPerfil] = useState(null); // Initialize with null
+
+  useEffect(() => {
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+      if (user) {
+        // Busca os dados do perfil do Firestore usando o uid do usuário autenticado
+        const userRef = doc(db, "tblProfessor", user.uid);
+        const unsubscribe = onSnapshot(userRef, (docSnapshot) => {
+          if (docSnapshot.exists()) {
+            setDadosPerfil(docSnapshot.data()); // Carrega os dados do usuário no estado
+          } else {
+            setDadosPerfil(null); // Caso o perfil não exista no Firestore
+          }
+        });
+
+        // Cleanup do listener de perfil
+        return () => unsubscribe();
+      } else {
+        setDadosPerfil(null); // Caso o usuário não esteja logado
+      }
+    });
+
+    // Cleanup do listener de autenticação
+    return () => unsubscribeAuth();
+  }, []); // Esse useEffect só executa uma vez após o componente ser montado
+
+  const formatUsername = (text) => {
+    return text.toUpperCase(); // Garante que o nome seja em maiúsculas
+  };
+
+  // Função para escolher a imagem e convertê-la para base64
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const imageUri = result.assets[0].uri;
+      setImage(imageUri); // Armazena a URI da imagem selecionada
+
+      try {
+        // Converte a imagem para base64
+        const base64Image = await FileSystem.readAsStringAsync(imageUri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        setImage(base64Image); // Atualiza a imagem com o conteúdo base64
+      } catch (error) {
+        console.error("Erro ao converter imagem para base64: ", error);
+        Alert.alert("Erro", "Ocorreu um erro ao converter a imagem.");
+      }
+    }
+  };
 
   // Função para validar o CPF
   const validateCpf = (cpf) => {
@@ -87,129 +146,129 @@ export default function EditProfile({ navigation, route }) {
     return true;
   };
 
-  // Função para lidar com mudanças no CPF
   const handleCpfChange = (text) => {
     setCpf(text);
-    const isValid = validateCpf(text); // Valida o CPF enquanto o usuário digita
-    setIsValidCpf(isValid); // Atualiza o estado de validade do CPF
+    const isValid = validateCpf(text);
+    setIsValidCpf(isValid);
   };
 
-  // Função para atualizar os dados no Firestore
-  const updateProfile = async () => {
-    const user = auth.currentUser;
-    if (!user) {
-      Alert.alert("Erro", "Usuário não autenticado.");
-      return;
-    }
+  // Função para atualizar o perfil
+const updateProfile = async () => {
+  const user = auth.currentUser;
+  if (!user) {
+    Alert.alert("Erro", "Usuário não autenticado.");
+    return;
+  }
 
-    const userRef = doc(db, "tblProfessor", user.uid);
+  const userRef = doc(db, "tblProfessor", user.uid);
 
-    try {
-      // Atualiza os dados no Firestore
-      await updateDoc(userRef, {
-        nomeProfessor: username,
-        cpf: cpf,
-        nascimentoProfessor: date,
-        telefone: telefone,
-      });
-      Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
-      navigation.navigate("Profile"); // Navega de volta para a página de perfil
-    } catch (error) {
-      console.error("Erro ao atualizar perfil:", error);
-      Alert.alert("Erro", "Erro ao atualizar perfil. Tente novamente.");
-    }
-  };
+  try {
+    // Se a imagem foi escolhida, vamos atualizar a URL da imagem no Firestore
+    const imageUrl = image || dadosPerfil?.imagemPerfil; // Mantém a imagem atual se nenhuma nova imagem for escolhida
+
+    // Atualiza os dados no Firestore
+    await updateDoc(userRef, {
+      nomeProfessor: username,
+      cpf: cpf,
+      nascimentoProfessor: date,
+      telefone: telefone,
+      imagemPerfil: imageUrl, // Atualiza apenas se houver uma nova imagem
+    });
+    navigation.navigate("Profile");
+  } catch (error) {
+    console.error("Erro ao atualizar perfil:", error);
+    Alert.alert("Erro", "Erro ao atualizar perfil. Tente novamente.");
+  }
+};
 
   return (
     <Container>
+      <View style={styles.header}>
+        <BackBtn onPress={() => navigation.navigate("Profile")} />
+      </View>
       <Title>Editar Perfil</Title>
-
       <View style={styles.imageBlock}>
-        <Image
-          style={styles.image}
-          source={require("../../../../assets/Perfil.jpg")}
-        />
-        <IconPencil onPress={() => console.log("Trocar imagem de perfil")}>
+        {image ? (
+          <Image style={styles.image} source={{ uri: `data:image/jpeg;base64,${image}` }} />
+        ) : (
+          dadosPerfil && dadosPerfil.imagemPerfil ? (
+            <Image style={styles.image} source={{ uri: `data:image/jpeg;base64,${dadosPerfil.imagemPerfil}` }} />
+          ) : (
+            <Image style={styles.image} source={require('../../../../assets/Perfil.jpg')} /> // Caso não haja imagem, use uma imagem padrão
+          )
+        )}
+        <IconPencil onPress={pickImage}>
           <Ionicons name="camera" size={26} color={theme.colorIconStyle} />
         </IconPencil>
       </View>
 
       <View style={styles.alignInput}>
-        {/* Campo de Nome */}
         <Input
           text="Nome"
           value={username}
-          onChangeText={setUsername}
+          onChangeText={(text) => setUsername(formatUsername(text))}
         />
-
-        {/* Máscara de CPF */}
         <TextInputMask
           type={'cpf'}
-          style={[styles.input, !isValidCpf && styles.invalidInput, {
-            backgroundColor: theme.inputBackground || "#D2DFDA",  // Mesma cor de fundo de StyleInput
-            color: theme.color || "#000",  // Mesma cor de texto
-            height: 50,  // Mesma altura
+          style={[!isValidCpf && styles.invalidInput, {
+            backgroundColor: theme.inputBackground || "#D2DFDA",
+            color: theme.color || "#000",
+            height: 50,
             width: 255,
-            margin: 8,  // Mesma margem
-            marginBottom:-18,
-            fontSize: 18,  // Mesma fonte
-            paddingLeft: 20,  // Mesmo padding
-            borderRadius: 10,  // Mesma borda arredondada
-            elevation: 5,  // Mesma sombra
-          }]} // Aplica o estilo de erro se o CPF for inválido
+            margin: 8,
+            fontSize: 18,
+            paddingLeft: 20,
+            borderRadius: 10,
+            elevation: 5,
+          }]}
           value={cpf}
           onChangeText={handleCpfChange}
           placeholder="CPF"
           placeholderTextColor={"rgba(255,255,255,0.6)"}
         />
-        {/* Ícone de erro para CPF inválido */}
         {!isValidCpf && (
           <Feather style={styles.errorIcon} name="x-circle" color={'#ff0000'} size={26} />
         )}
-
-        {/* Máscara de Data de Nascimento */}
         <TextInputMask
           type={'datetime'}
           options={{ format: 'DD/MM/YYYY' }}
-          style={[styles.input, {
-            backgroundColor: theme.inputBackground || "#D2DFDA",  // Mesma cor de fundo de StyleInput
-            color: theme.color || "#000",  // Mesma cor de texto
-            height: 50,  // Mesma altura
+          style={[{
+            backgroundColor: theme.inputBackground || "#D2DFDA",
+            color: theme.color || "#000",
+            height: 50,
             width: 255,
-            margin: 8,  // Mesma margem
-            fontSize: 18,  // Mesma fonte
-            paddingLeft: 20,  // Mesmo padding
-            borderRadius: 10,  // Mesma borda arredondada
-            elevation: 5,  // Mesma sombra
-          }]} // Aplica o estilo de erro se o CPF for inválido
+            margin: 8,
+            fontSize: 18,
+            paddingLeft: 20,
+            borderRadius: 10,
+            elevation: 5,
+          }]}
           value={date}
           onChangeText={setDate}
           placeholder="Data de Nascimento"
           placeholderTextColor={"rgba(255,255,255,0.6)"}
         />
-
-        {/* Máscara de Telefone */}
         <TextInputMask
           type={'cel-phone'}
           options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
-          style={[styles.input, {
-            backgroundColor: theme.inputBackground || "#D2DFDA",  // Mesma cor de fundo de StyleInput
-            color: theme.color || "#000",  // Mesma cor de texto
-            height: 50,  // Mesma altura
+          style={[{
+            backgroundColor: theme.inputBackground || "#D2DFDA",
+            color: theme.color || "#000",
+            height: 50,
             width: 255,
-            margin: 8,  // Mesma margem
-            fontSize: 18,  // Mesma fonte
-            paddingLeft: 20,  // Mesmo padding
-            borderRadius: 10,  // Mesma borda arredondada
-            elevation: 5,  // Mesma sombra
-          }]} // Aplica o estilo de erro se o CPF for inválido
+            margin: 8,
+            marginBottom: '10%',
+            fontSize: 18,
+            paddingLeft: 20,
+            borderRadius: 10,
+            elevation: 5,
+          }]}
           value={telefone}
           onChangeText={setTelefone}
           placeholder="Número de Celular"
           placeholderTextColor={"rgba(255,255,255,0.6)"}
         />
-
-        <Btn onPress={updateProfile} />
+        <Btn onPress={updateProfile} disabled={!isValidCpf}/>
       </View>
     </Container>
   );
@@ -221,43 +280,40 @@ const styles = StyleSheet.create({
     height: 180,
     borderRadius: 115,
   },
-
   alignInput: {
-    bottom: '3%',
+    bottom: '6%',
+    justifyContent: "center",
+    alignItems: "center",
   },
-
   imageBlock: {
     alignItems: "center",
     justifyContent: "center",
     position: 'relative',
-    top: '2%',
+    bottom: '2%',
   },
-
-  textBlock: {
-    justifyContent: "center",
-    alignItems: "center",
+  header: {
+    right: '41%',
+    top: '4.7%',
   },
-
-  input: {
-    width: '100%',
-    height: 50,
-    borderRadius: 8,
-    backgroundColor: '#f0f0f0',
-    paddingLeft: 16,
-    marginBottom: 12,
-    fontSize: 16,
-    position: 'relative',
-  },
-
-
   invalidInput: {
-    borderColor: '#ff0000', // Cor vermelha para borda de campo inválido
+    borderColor: '#ff0000',
     borderWidth: 1,
   },
-
   errorIcon: {
-    position: 'relative',
+    position: 'absolute',
     left: '58%',
-    bottom: '6%',
+    top: '25.3%',
+  },
+  inputStyle: {
+    backgroundColor: "#D2DFDA",
+    color: "#000",
+    height: 50,
+    width: 255,
+    margin: 8,
+    marginBottom: '10%',
+    fontSize: 18,
+    paddingLeft: 20,
+    borderRadius: 10,
+    elevation: 5,
   },
 });
