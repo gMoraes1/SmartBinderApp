@@ -46,28 +46,29 @@ export default function Login({ navigation, route }: { navigation: any, route: L
     
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user; // Obter o usuário logado
+            const user = userCredential.user;
     
-            // Forçar o recarregamento do estado do usuário
-            await user.reload(); // Atualiza as propriedades do usuário
+            // Atualizar o estado do usuário para garantir que tenhamos informações atualizadas
+            await user.reload();
     
-            console.log('Email verificado após reload:', user.emailVerified); // Verifique o status após o reload
-    
+            // Verificar se o e-mail foi validado
             if (!user.emailVerified) {
-                console.log("E-mail não verificado: Não redirecionando.");
                 Alert.alert(
                     "E-mail não verificado",
                     "Por favor, verifique seu e-mail antes de continuar."
                 );
-                return; // Não redirecionar para a tela Home se o e-mail não for verificado
+    
+                // Fazer logout automático para evitar o redirecionamento
+                await auth.signOut();
+                return;
             }
     
+            // Se validado, redireciona para a Home
             console.log("E-mail verificado: Redirecionando para Home.");
             navigation.navigate("Home" as never);
     
         } catch (error: any) {
-            console.log('Código de erro:', error.code); // Log do código de erro
-            Alert.alert("Erro no login", error.message);
+            console.error('Erro ao logar:', error.code); // Para debug
     
             let errorMessage;
             switch (error.code) {
@@ -84,7 +85,7 @@ export default function Login({ navigation, route }: { navigation: any, route: L
                     errorMessage = 'Ocorreu um erro. Tente novamente.';
             }
     
-            alert(errorMessage); // Exibir a mensagem de erro específica
+            Alert.alert("Erro no login", errorMessage);
         }
     }
     
