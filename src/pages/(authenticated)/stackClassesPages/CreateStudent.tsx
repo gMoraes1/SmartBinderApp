@@ -1,4 +1,6 @@
 import styled from "styled-components/native";
+import BackBtn from "../../../components/Buttons/BackBtn";
+import { StyleSheet, View } from "react-native";
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -19,10 +21,22 @@ const Title = styled.Text`
 
 
 
-export default function CreateStudent() {
-    return(
-        <Container>
-         <Title>Cadastrar Aluno</Title>
-        </Container> 
-     )
+export default function CreateStudent({ navigation }) {
+  return (
+    <Container>
+      <View style={styles.header}>
+        <BackBtn onPress={() => navigation.navigate("ClassDetails")} />
+      </View>
+      <Title>Cadastrar Aluno</Title>
+    </Container>
+  )
 };
+
+const styles = StyleSheet.create({
+
+  header: {
+    right: '41%',
+    top: '5%',
+  },
+
+});
