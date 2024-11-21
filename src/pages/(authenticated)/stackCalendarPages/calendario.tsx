@@ -96,20 +96,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#6939E9",
     borderRadius: 30,
     position: "absolute",
-    bottom: 30,
-    right: 30,
+    top:'78.7%',
+    right: '6%',
     alignItems: "center",
     justifyContent: "center",
     elevation: 5,
-    top:700
   },
+
   TxtBtn1: {
     fontSize: 40,
     fontWeight: "900",
     color: "white",
     textAlign: "center",
-    lineHeight: 60,
-    top:-7
+    top:-2
   },
   itensView: {
     flex: 1,
