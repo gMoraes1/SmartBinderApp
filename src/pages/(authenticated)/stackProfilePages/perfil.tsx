@@ -10,7 +10,6 @@ const Container = styled.View`
   background-color: ${(props) => props.theme.background};
   width: 100%;
   height: 100%;
-  justify-content: center;
   align-items: center;
 `;
 
@@ -35,7 +34,7 @@ const ProfileView = styled.View`
   width: 90%;
   height: 82%;
   position: relative;
-  top: 2%;
+  top: 6%;
   border-radius: 20px;
   border: solid gray 0.5px;
   align-items: center;
