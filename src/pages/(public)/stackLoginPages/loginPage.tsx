@@ -1,7 +1,7 @@
 import "react-native-gesture-handler";
-import { StyleSheet, Text, View, Image, ImageBackground, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Image, ImageBackground, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { useState, useEffect } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth"; // Importar a função
+import { signInWithEmailAndPassword } from "firebase/auth"; // Importando a função
 import { auth } from "../../../../firebase"; // Importando auth do Firebase
 import React from "react";
 import { RouteProp } from '@react-navigation/native';
@@ -15,6 +15,7 @@ export default function Login({ navigation, route }: { navigation: any, route: L
     const [initializing, setInitializing] = useState(true);
     const [user, setUser] = useState();
 
+    // Reseta os campos quando a rota exige
     useEffect(() => {
         if (route.params?.clearFields) {
             setEmail('');
@@ -26,11 +27,13 @@ export default function Login({ navigation, route }: { navigation: any, route: L
         return text.toLowerCase(); // Garante que o texto esteja em minúsculas
     };
 
+    // Definir o usuário após a autenticação
     function dados(user) {
         setUser(user);
         if (initializing) setInitializing(false);
     }
 
+    // Função para logar o usuário
     async function logar() {
         if (!email) {
             alert('Por favor, insira um email.');
@@ -40,18 +43,32 @@ export default function Login({ navigation, route }: { navigation: any, route: L
             alert('Por favor, insira uma senha.');
             return;
         }
-
+    
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user; // Obter o usuário logado
-            if (user) {
-                // Após o login bem-sucedido, a navegação será automaticamente controlada
-                // pelo estado de autenticação no App.js via onAuthStateChanged.
+            const user = userCredential.user;
+    
+            // Atualizar o estado do usuário para garantir que tenhamos informações atualizadas
+            await user.reload();
+    
+            // Verificar se o e-mail foi validado
+            if (!user.emailVerified) {
+                Alert.alert(
+                    "E-mail não verificado",
+                    "Por favor, verifique seu e-mail antes de continuar."
+                );
+    
+                // Fazer logout automático para evitar o redirecionamento
+                await auth.signOut();
+                return;
             }
-        } catch (error) {
-            console.log('Código de erro:', error.code); // Log do código de erro
-            console.log('Mensagem de erro:', error.message); // Log da mensagem de erro
-
+    
+            // Se validado, redireciona para a Home
+            console.log("E-mail verificado: Redirecionando para Home.");
+    
+        } catch (error: any) {
+            console.error('Erro ao logar:', error.code); // Para debug
+    
             let errorMessage;
             switch (error.code) {
                 case 'auth/wrong-password':
@@ -64,13 +81,14 @@ export default function Login({ navigation, route }: { navigation: any, route: L
                     errorMessage = 'Email inválido. Verifique o formato.';
                     break;
                 default:
-                    errorMessage = 'Ocorreu um erro Email ou senha inválidos. Tente novamente.';
+                    errorMessage = 'Ocorreu um erro. Tente novamente.';
             }
-
-            alert(errorMessage); // Exibir a mensagem de erro específica
+    
+            Alert.alert("Erro no login", errorMessage);
         }
     }
-
+    
+    
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {
             dados(user);
@@ -108,12 +126,11 @@ export default function Login({ navigation, route }: { navigation: any, route: L
                 </TouchableOpacity>
 
                 <View style={styles.signView}>
-                        <Text style={styles.txtSign}>Esqueceu a senha?</Text>
-                        <TouchableOpacity style={styles.btnSign} onPress={() => navigation.navigate('ForgotPass')}>
-                            <Text style={styles.txtBtnSign}> Clique aqui</Text>
-                        </TouchableOpacity>
-                    </View>
-
+                    <Text style={styles.txtSign}>Esqueceu a senha?</Text>
+                    <TouchableOpacity style={styles.btnSign} onPress={() => navigation.navigate('ForgotPass')}>
+                        <Text style={styles.txtBtnSign}> Clique aqui</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </ImageBackground>
     );
@@ -174,33 +191,26 @@ const styles = StyleSheet.create({
     imagem: {
         // Adicione estilos para a imagem, se necessário
     },
-
-    txtSign:{
+    txtSign: {
         color: '#fff',
         fontWeight: '800',
         fontSize: 18,
-
     },
-
-    btnSign:{
-
-    },
-
-    txtBtnSign:{
+    btnSign: {},
+    txtBtnSign: {
         color: 'skyblue',
         fontWeight: '800',
         fontSize: 18,
     },
-
-    signView:{
-        borderTopColor:'black',
-        borderTopWidth:0.6,
-        width:'100%',
-        justifyContent:'center',
-        textAlign:'center',
-        padding:20,
-        position:'relative',
-        flexDirection:'row',
-        top:"24%",
+    signView: {
+        borderTopColor: 'black',
+        borderTopWidth: 0.6,
+        width: '100%',
+        justifyContent: 'center',
+        textAlign: 'center',
+        padding: 20,
+        position: 'relative',
+        flexDirection: 'row',
+        top: "24%",
     },
 });
