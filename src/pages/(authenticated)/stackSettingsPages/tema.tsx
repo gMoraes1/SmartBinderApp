@@ -1,8 +1,10 @@
+// tema.tsx
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Switch, useColorScheme } from 'react-native';
-import { isEnabled } from 'react-native/Libraries/Performance/Systrace';
+import { useState } from 'react';
+import { StyleSheet, Text, View, useColorScheme } from 'react-native';
 import styled from 'styled-components/native';
+import { Checkbox } from 'react-native-paper';
+import Globais from '../../../components/GlobalConsts/global'; // Importa o arquivo de variáveis globais
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -13,7 +15,7 @@ const Container = styled.View`
 
 const Title = styled.Text`
   font-size: 32px;
-  width:100%;
+  width: 100%;
   font-weight: 600;
   text-align: center;
   padding: 12%;
@@ -21,83 +23,107 @@ const Title = styled.Text`
 `;
 
 const Theme = styled.View`
-flexDirection: row;
-alignItems: center;
-justifyContent: space-between;
-width: 100%;
-paddingHorizontal: 20px;
-backgroundColor: ${(props) => props.theme.inputBackground};
-borderRadius: 10px;
-padding: 10px;
-elevation: 2;
+  flex-direction: column;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  padding-horizontal: 20px;
+  background-color: ${(props) => props.theme.inputBackground};
+  border-radius: 10px;
+  padding: 10px;
+  elevation: 2;
 `;
 
-const ThemeText = styled.Text`   
-fontSize: 18px;
-fontWeight: 500;
-marginRight: 10px;
-color: ${(props) => props.theme.color}
+const ThemeText = styled.Text`
+  font-size: 18px;
+  font-weight: 500;
+  color: ${(props) => props.theme.color};
 `;
 
 export default function ThemeSettings() {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [themeText, setThemeText] = useState('');
-  const deviceTheme = useColorScheme(); // Get the device theme
-  // Set the initial state based on device theme
-  useEffect(() => {
-    if (deviceTheme === "dark") {
-      setIsEnabled(true);
-      setThemeText('Escuro');
-    } else {
-      setIsEnabled(false);
-      setThemeText('Claro');
-    }
-  }, [deviceTheme]); // Depend on deviceTheme
+  const [isCheck1, setIsCheck1] = useState(true); // Padrão
+  const [isCheck2, setIsCheck2] = useState(false); // Claro
+  const [isCheck3, setIsCheck3] = useState(false); // Escuro
 
-  const toggleSwitch = () => {
-    setIsEnabled(previousState => !previousState);
-    setThemeText(previousState => previousState === 'Claro' ? 'Escuro' : 'Claro');
+  // Lógica para garantir que apenas um checkbox esteja selecionado por vez
+  const handleCheck1 = () => {
+    setIsCheck1(true);
+    setIsCheck2(false);
+    setIsCheck3(false);
+    Globais.setCurrentTheme('device'); // Seleciona o tema baseado no dispositivo
+  };
+
+  const handleCheck2 = () => {
+    setIsCheck1(false);
+    setIsCheck2(true);
+    setIsCheck3(false);
+    Globais.setCurrentTheme('light'); // Seleciona o tema Claro
+  };
+
+  const handleCheck3 = () => {
+    setIsCheck1(false);
+    setIsCheck2(false);
+    setIsCheck3(true);
+    Globais.setCurrentTheme('dark'); // Seleciona o tema Escuro
   };
 
   return (
     <Container>
       <Title>Configurações de Tema</Title>
       <Theme>
-        <ThemeText>Modo: {themeText}</ThemeText>
-        <Switch
-          trackColor={{ false: '#767577', true: '#363636' }}
-          thumbColor={isEnabled ? '#7343F3' : '#f4f3f4'}
-          ios_backgroundColor="#3e3e3e"
-          onValueChange={toggleSwitch}
-          value={isEnabled}
-        />
+        <View style={styles.AlignView}>
+          <Text style={styles.themeText}>Padrão:</Text>
+          <View style={styles.alignCheck}>
+            <Checkbox
+              status={isCheck1 ? 'checked' : 'unchecked'}
+              onPress={handleCheck1}  // Chama a função que define qual checkbox selecionar
+            />
+          </View>
+        </View>
+
+        <View style={styles.AlignView}>
+          <Text style={styles.themeText}>Claro:</Text>
+          <View style={styles.alignCheck}>
+            <Checkbox
+              status={isCheck2 ? 'checked' : 'unchecked'}
+              onPress={handleCheck2}  // Chama a função que define qual checkbox selecionar
+            />
+          </View>
+        </View>
+
+        <View style={styles.AlignView}>
+          <Text style={styles.themeText}>Escuro:</Text>
+          <View style={styles.alignCheck}>
+            <Checkbox
+              status={isCheck3 ? 'checked' : 'unchecked'}
+              onPress={handleCheck3}  // Chama a função que define qual checkbox selecionar
+            />
+          </View>
+        </View>
       </Theme>
     </Container>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '5%',
-    backgroundColor: '#f5f5f5', // Light background color
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: 20,
-    backgroundColor: '#fff', // White background for the switch area
-    borderRadius: 10,
-    padding: 10,
-    elevation: 2, // For Android shadow
-  },
   themeText: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '500',
     marginRight: 10,
+    display: 'flex',
+    flexDirection: 'column',
+    alignSelf: 'center',
+  },
+
+  AlignView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10, // Espaçamento entre os itens
+  },
+
+  alignCheck: {
+    position: 'absolute',
+    left: '26%', // Garante o alinhamento do checkbox em relação ao texto
   },
 });
-

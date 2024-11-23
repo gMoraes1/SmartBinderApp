@@ -1,6 +1,4 @@
 import { StatusBar } from "expo-status-bar";
-import { useNavigation } from "@react-navigation/native";
-import { NavigationProp } from "@react-navigation/native";
 import {
   StyleSheet,
   Text,
@@ -10,7 +8,6 @@ import {
   Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { RootStackParamList } from "../../../navigation/types"; // Ajuste o caminho conforme necessário
 import styled from "styled-components/native";
 import {
   collection,
@@ -46,10 +43,7 @@ const Title = styled.Text`
 `;
 
 export default function Classes({navigation}) {
-
-
   const [turma, setTurma] = useState<ClassData[]>([]); // Alterado para o tipo ClassData
-
   // Função para deletar turma
   async function deleteTurma(id: string) {
     try {
@@ -139,23 +133,19 @@ const styles = StyleSheet.create({
     height: "100%",
     padding: 16,
   },
-
   title: {
     fontSize: 32,
     fontWeight: "600",
     textAlign: "center",
     paddingVertical: 20,
   },
-
   list: {
     marginBottom: 20,
   },
-
   classItem: {
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "flex-start", // Alinha o conteúdo à esquerda
-
     padding: 15,
     marginVertical: 8,
     borderWidth: 2,
@@ -164,53 +154,45 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     elevation: 5,
   },
-
   classInfo: {
     alignItems: "flex-start", // Garante que os textos fiquem à esquerda
     marginBottom: 10, // Espaço entre os dados da turma e o botão
   },
-
   BtnDelete: {
     marginTop: 10,
     backgroundColor: "#ff4d4d",
     padding: 10,
-
     borderRadius: 10,
     width: 100,
     alignSelf: "center", // Centraliza o botão no item
   },
-
   TxtDelete: {
     color: "white",
     textAlign: "center",
     fontWeight: "bold",
   },
-
   BtnAdd: {
     width: 60,
     height: 60,
     backgroundColor: "#6939E9",
     borderRadius: 30,
     position: "absolute",
-    bottom: 30,
-    right: 30,
+    top:'82%',
+    right: '6.2%',
     alignItems: "center",
     justifyContent: "center",
     elevation: 5,
   },
-
   TxtBtn1: {
     fontSize: 40,
     fontWeight: "900",
     color: "white",
     textAlign: "center",
-    lineHeight: 60,
+    top:-2
   },
-
   textData: {
     color: "black",
     fontSize: 15,
-
     fontWeight: "bold",
   },
 });

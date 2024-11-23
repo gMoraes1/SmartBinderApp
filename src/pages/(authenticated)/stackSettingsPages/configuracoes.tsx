@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
     width: 90, // Largura menor do botão
     verticalAlign: 'middle',
     height: 40, // Altura do botão
+    top:-150
   },
   bottomButtonText: {
     color: '#FFFFFF', // Cor do texto do botão
