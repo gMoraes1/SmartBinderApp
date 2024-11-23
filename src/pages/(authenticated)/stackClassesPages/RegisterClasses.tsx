@@ -74,7 +74,7 @@ export default function RegisterClasses({ navigation }) {
   return (
     <Container>
       <View style={styles.header}>
-        <BackBtn onPress={() => navigation.navigate("Classes")} />
+        <BackBtn onPress={() => navigation.goBack()} />
         <Title>Cadastrar Turma</Title>
       </View>
 

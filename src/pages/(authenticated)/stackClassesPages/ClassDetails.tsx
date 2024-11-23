@@ -10,7 +10,7 @@ import {
 import styled from "styled-components/native";
 import BackBtn from "../../../components/Buttons/BackBtn";
 import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
-import { auth, db } from "../../../../firebase"; // Importando o Firebase
+import { db, auth } from "../../../../firebase"; // Importando o Firebase
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -28,60 +28,74 @@ const Title = styled.Text`
   color: ${(props) => props.theme.color};
 `;
 
-interface ClassData {
+interface StudentData {
   id: string;
   nomeAluno: string;
   nascimentoAluno: string;
   rmAluno: string;
 }
 
-const { width } = Dimensions.get('window');  
+const { width } = Dimensions.get("window");
 
-export default function ClassDetails({ navigation, route }) {
-  const [student, setStudent] = useState<ClassData[]>([]); // Alterado para o tipo ClassData
+export default function ClassDetails({ navigation }) {
+  const [students, setStudents] = useState<StudentData[]>([]); // Lista de alunos
 
-  const { classId } = route.params; // Supondo que o ID da turma seja passado via navegação
-
+  // Função para pegar os alunos do usuário logado
   useEffect(() => {
-    // Alterando a consulta para pegar alunos pela turma, filtrando pelo ID da turma
+    // Verifique se o usuário está logado
+    if (!auth.currentUser) {
+      console.error("Usuário não logado");
+      return;
+    }
+
+    console.log("Usuário logado:", auth.currentUser.uid); // Verificar o ID do usuário logado
+
+    // Consulta no Firestore para pegar os alunos do usuário logado
     const unsubscribe = onSnapshot(
       query(
-        collection(db, "tblAluno"),
-        where("classRef", "==", doc(db, "tblTurma", classId))  // Filtrando pela referência da turma
+        collection(db, "tblAlunos"), // Coleção de alunos
+        where("userRef", "==", doc(db, "users", auth.currentUser?.uid)) // Associe os alunos ao usuário logado
       ),
       (querySnapshot) => {
-        const lista: ClassData[] = [];
+        const studentList: StudentData[] = [];
+        if (querySnapshot.empty) {
+          console.log("Nenhum aluno encontrado para este usuário");
+        }
         querySnapshot.forEach((docSnap) => {
           const data = docSnap.data();
-          lista.push({
+          console.log("Aluno encontrado:", data); // Verificando os dados do aluno
+          studentList.push({
             id: docSnap.id,
             nomeAluno: data.nomeAluno,
             nascimentoAluno: data.nascimentoAluno,
             rmAluno: data.rmAluno,
           });
         });
-        setStudent(lista); // Atualizando o estado com os alunos encontrados
+
+        setStudents(studentList); // Atualiza o estado com a lista de alunos
+      },
+      (error) => {
+        console.error("Erro ao buscar alunos:", error);
       }
     );
-    return () => unsubscribe(); // Cleanup para a consulta
-  }, [classId]); // Dependendo do classId, a consulta será reexecutada
+
+    return () => unsubscribe(); // Limpeza da consulta
+  }, []); // A consulta é executada apenas uma vez ao montar o componente
 
   return (
     <Container>
       <View style={styles.header}>
-        <BackBtn onPress={() => navigation.navigate("Classes")} />
+        <BackBtn onPress={() => navigation.goBack()} />
         <Title>Detalhes da Turma</Title>
       </View>
 
+      {/* Exibe a lista de alunos */}
       <FlatList
-        data={student}
+        data={students}
         keyExtractor={(item) => item.id}
         style={styles.list}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.classItem}
-            onPress={() => navigation.navigate("ClassDetails")}
-          >
+          <TouchableOpacity style={styles.classItem}>
             <View style={[styles.studentInfo, { width: width * 0.8 }]}>
               <Text style={styles.studentName}>{item.nomeAluno}</Text>
               <Text style={styles.textData}>{item.nascimentoAluno}</Text>
@@ -91,8 +105,9 @@ export default function ClassDetails({ navigation, route }) {
         )}
       />
 
+      {/* Botão para adicionar novo aluno */}
       <TouchableOpacity
-        onPress={() => navigation.navigate("CreateStudent")}
+        onPress={() => navigation.navigate("CreateStudent")} 
         style={styles.BtnAdd}
       >
         <Text style={styles.TxtBtn1}>+</Text>
@@ -108,15 +123,9 @@ const styles = StyleSheet.create({
     height: 120,
     paddingHorizontal: 16,
   },
-  btnView: {
-    marginTop: 90,
-    display: "flex",
-    flexDirection: "column",
-    gap: 20,
-  },
   list: {
     marginBottom: 20,
-    flex: 1
+    flex: 1,
   },
   classItem: {
     flexDirection: "column",
@@ -133,20 +142,7 @@ const styles = StyleSheet.create({
   studentInfo: {
     alignItems: "flex-start", // Garante que os textos fiquem à esquerda
     marginBottom: 10, // Espaço entre os dados da turma e o botão
-    width: '90%'
-  },
-  BtnDelete: {
-    marginTop: 10,
-    backgroundColor: "#ff4d4d",
-    padding: 10,
-    borderRadius: 10,
-    width: 100,
-    alignSelf: "center", // Centraliza o botão no item
-  },
-  TxtDelete: {
-    color: "white",
-    textAlign: "center",
-    fontWeight: "bold",
+    width: "90%",
   },
   BtnAdd: {
     width: 60,
@@ -176,5 +172,5 @@ const styles = StyleSheet.create({
     color: "black",
     fontSize: 30,
     fontWeight: "bold",
-  }
+  },
 });

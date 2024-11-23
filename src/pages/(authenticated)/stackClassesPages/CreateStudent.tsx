@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Alert } from "react-native";
 import styled from "styled-components/native";
-
-import { auth, db } from "../../../../firebase"; // Importando a instância do Firestore e auth
+import { auth, db } from "../../../../firebase"; // Instância do Firebase
 import { collection, addDoc, doc, query, where, getDocs } from "firebase/firestore"; // Funções do Firestore
-
 import BackBtn from "../../../components/Buttons/BackBtn";
 import Input from "../../../components/Input/Input";
 import Btn from "../../../components/Buttons/Btn";
@@ -30,64 +28,29 @@ export default function CreateStudent({ navigation }) {
   const [studentName, setStudentName] = useState("");
   const [birthStudent, setBirthStudent] = useState("");
   const [rmAluno, setRmAluno] = useState("");
-  const [classId, setClassId] = useState("");  // Aqui você armazena o ID da turma
 
-  // Função para pegar o ID da turma
-  const getClassId = async () => {
-    try {
-      // Exemplo de consulta à coleção 'tblTurma', aqui você pode filtrar a turma conforme necessário
-      const q = query(collection(db, "tblTurma"));
-      const querySnapshot = await getDocs(q);
-
-      // Pegando o ID da primeira turma (ou a que você desejar)
-      if (!querySnapshot.empty) {
-        const doc = querySnapshot.docs[0]; // Aqui você pode aplicar algum filtro se necessário
-        setClassId(doc.id);  // Armazena o ID da turma
-      } else {
-        console.error("Nenhuma turma encontrada!");
-        Alert.alert("Erro", "Nenhuma turma encontrada no banco de dados.");
-      }
-    } catch (error) {
-      console.error("Erro ao buscar turma:", error);
-      Alert.alert("Erro", "Ocorreu um erro ao buscar a turma.");
-    }
-  };
-
-  // Chama a função getClassId quando o componente for montado
-  useEffect(() => {
-    getClassId();
-  }, []);
-
+  // Função para pegar a turma automaticamente
   const handleAddClass = async () => {
     try {
+      // Verificando se o usuário está autenticado
       const user = auth.currentUser;
       if (!user) {
         console.error("Usuário não autenticado!");
-        Alert.alert("Erro", "Você precisa estar logado para criar um aluno.");
+        Alert.alert("Erro", "Você precisa estar logado para criar uma turma.");
         return;
       }
-
-      if (!classId) {
-        console.error("ID da turma não encontrado!");
-        Alert.alert("Erro", "Não foi possível associar o aluno à turma.");
-        return;
-      }
-
-      // Referência à turma que o aluno será associado (usando o ID encontrado)
-      const classRef = doc(db, "tblTurma", classId);  // Referência ao documento da turma pela ID
-
-      // Referência ao aluno que será adicionado
-      const studentCollectionRef = collection(db, "tblAluno");
-
-      // Adicionando os dados do aluno à coleção 'tblAluno', associando à turma pela referência
-      await addDoc(studentCollectionRef, {
+      // Referência do usuário na coleção 'users' (a referência ao documento do usuário)
+      const userRef = doc(db, 'users', user.uid);  // Criação da referência ao documento do usuário
+      // Obtendo a referência da coleção 'tblTurma' para adicionar uma nova turma
+      const classCollectionRef = collection(db, 'tblAluno');
+      // Adicionando os dados da turma à coleção 'tblTurma', associando o documento do usuário ao campo 'userRef'
+      await addDoc(classCollectionRef, {
         nomeAluno: studentName,
         nascimentoAluno: birthStudent,
         rmAluno: rmAluno,
-        classRef: classRef, // Associando a turma pela referência
+        userRef: userRef,  // A referência ao documento do usuário
       });
-
-      // Navegar de volta para os detalhes da turma (caso você queira mostrar detalhes após o cadastro)
+      // Navegar de volta para a lista de turmas, passando os dados da turma
       navigation.navigate("ClassDetails", {
         classData: {
           name: studentName,
@@ -97,25 +60,22 @@ export default function CreateStudent({ navigation }) {
       });
     } catch (error) {
       console.error("Erro ao adicionar aluno: ", error);
-      Alert.alert(
-        "Erro",
-        "Ocorreu um erro ao adicionar o aluno. Tente novamente."
-      );
+      Alert.alert("Erro", "Ocorreu um erro ao adicionar a aluno. Tente novamente.");
     }
   };
 
   return (
     <Container>
       <View style={styles.header}>
-        <BackBtn onPress={() => navigation.navigate("ClassDetails")} />
+        <BackBtn onPress={() => navigation.goBack()} />
       </View>
       <Title>Cadastrar Aluno</Title>
       <View style={styles.inputContainer}>
-        <View>
-          <Input text="Nome do aluno" onChangeText={setStudentName} />
-          <Input text="Nascimento aluno" onChangeText={setBirthStudent} />
-          <Input text="RM Aluno" onChangeText={setRmAluno} />
-        </View>
+        <Input text="Nome do aluno" value={studentName} onChangeText={setStudentName} />
+        <Input text="Nascimento aluno" value={birthStudent} onChangeText={setBirthStudent} />
+        <Input text="RM Aluno" value={rmAluno} onChangeText={setRmAluno} />
+
+        {/* A turma será associada automaticamente ao aluno */}
         <Btn onPress={handleAddClass} texto="Cadastrar" />
       </View>
     </Container>
