@@ -44,13 +44,10 @@ export default function RegisterClasses({ navigation }) {
         Alert.alert("Erro", "Você precisa estar logado para criar uma turma.");
         return;
       }
-
       // Referência do usuário na coleção 'users' (a referência ao documento do usuário)
       const userRef = doc(db, 'users', user.uid);  // Criação da referência ao documento do usuário
-
       // Obtendo a referência da coleção 'tblTurma' para adicionar uma nova turma
       const classCollectionRef = collection(db, 'tblTurma');
-
       // Adicionando os dados da turma à coleção 'tblTurma', associando o documento do usuário ao campo 'userRef'
       await addDoc(classCollectionRef, {
         nomeTurma: className,
@@ -59,7 +56,6 @@ export default function RegisterClasses({ navigation }) {
         school: school,
         userRef: userRef,  // A referência ao documento do usuário
       });
-
       // Navegar de volta para a lista de turmas, passando os dados da turma
       navigation.navigate("Classes", {
         classData: {
