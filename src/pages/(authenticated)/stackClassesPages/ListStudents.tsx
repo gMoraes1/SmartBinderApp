@@ -8,7 +8,7 @@ import {
   Text,
 } from "react-native";
 import styled from "styled-components/native";
-import { collection, onSnapshot, query, where,deleteDoc, doc } from "firebase/firestore";
+import { collection, onSnapshot, query, where, orderBy, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../../../firebase";
 
 interface StudentData {
@@ -40,9 +40,10 @@ export default function ListStudents({ navigation, route }) {
   async function deleteAluno(id: string) {
     try {
       await deleteDoc(doc(db, "tblAluno", id));
-      Alert.alert("Turma deletada.");
+      Alert.alert("Aluno deletado.");
     } catch (error) {
-      console.error("Erro ao deletar turma.", error);
+      console.error("Erro ao deletar aluno.", error);
+      Alert.alert("Erro ao deletar aluno.");
     }
   }
 
@@ -50,7 +51,8 @@ export default function ListStudents({ navigation, route }) {
     const unsubscribe = onSnapshot(
       query(
         collection(db, "tblAluno"),
-        where("turmaRef", "==", doc(db, "tblTurma", turmaId))
+        where("turmaRef", "==", doc(db, "tblTurma", turmaId)),
+        orderBy("nomeAluno")  // Ordenando pela propriedade nomeAluno
       ),
       (querySnapshot) => {
         const studentList: StudentData[] = [];
@@ -148,8 +150,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#6939E9",
     borderRadius: 30,
     position: "absolute",
-    top:'82%',
-    right: '6.2%',
+    top: "82%",
+    right: "6.2%",
     alignItems: "center",
     justifyContent: "center",
     elevation: 5,
@@ -159,17 +161,17 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     color: "white",
     textAlign: "center",
-    top:-2
+    top: -2,
   },
   deleteButton: {
-    backgroundColor: '#FF5050',
+    backgroundColor: "#FF5050",
     borderRadius: 5,
     paddingVertical: 5,
     paddingHorizontal: 10,
   },
   deleteText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: "800",
   },
 });
