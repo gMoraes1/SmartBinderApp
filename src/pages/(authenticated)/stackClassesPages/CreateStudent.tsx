@@ -1,96 +1,103 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Alert } from "react-native";
-import styled from "styled-components/native";
-import { auth, db } from "../../../../firebase"; // Instância do Firebase
-import { collection, addDoc, doc, query, where, getDocs } from "firebase/firestore"; // Funções do Firestore
-import BackBtn from "../../../components/Buttons/BackBtn";
-import Input from "../../../components/Input/Input";
-import Btn from "../../../components/Buttons/Btn";
+import React, { useState } from "react";
+import { View, TextInput, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { db } from "../../../../firebase";
+import { addDoc, collection, doc } from "firebase/firestore";
 
-const Container = styled.View`
-  background-color: ${(props) => props.theme.background};
-  width: 100%;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
-`;
+export default function CreateStudent({ navigation, route }) {
+  const { turmaId } = route.params; // Obtendo a turmaId passada da tela anterior
 
-const Title = styled.Text`
-  font-size: 32px;
-  font-weight: 600;
-  text-align: center;
-  flex: 1;
-  padding-top: 12%;
-  color: ${(props) => props.theme.color};
-`;
-
-export default function CreateStudent({ navigation }) {
-  const [studentName, setStudentName] = useState("");
-  const [birthStudent, setBirthStudent] = useState("");
+  // Definir os estados para os campos de entrada
+  const [nomeAluno, setNomeAluno] = useState("");
+  const [nascimentoAluno, setNascimentoAluno] = useState("");
   const [rmAluno, setRmAluno] = useState("");
 
-  // Função para pegar a turma automaticamente
-  const handleAddClass = async () => {
+  // Função para registrar o aluno no Firestore
+  const handleRegister = async () => {
     try {
-      // Verificando se o usuário está autenticado
-      const user = auth.currentUser;
-      if (!user) {
-        console.error("Usuário não autenticado!");
-        Alert.alert("Erro", "Você precisa estar logado para criar uma turma.");
-        return;
-      }
-      // Referência do usuário na coleção 'users' (a referência ao documento do usuário)
-      const userRef = doc(db, 'users', user.uid);  // Criação da referência ao documento do usuário
-      // Obtendo a referência da coleção 'tblTurma' para adicionar uma nova turma
-      const classCollectionRef = collection(db, 'tblAluno');
-      // Adicionando os dados da turma à coleção 'tblTurma', associando o documento do usuário ao campo 'userRef'
-      await addDoc(classCollectionRef, {
-        nomeAluno: studentName,
-        nascimentoAluno: birthStudent,
-        rmAluno: rmAluno,
-        userRef: userRef,  // A referência ao documento do usuário
-      });
-      // Navegar de volta para a lista de turmas, passando os dados da turma
-      navigation.navigate("ClassDetails", {
-        classData: {
-          name: studentName,
-          birthStudent,
+      if (nomeAluno && nascimentoAluno && rmAluno) {
+        // Adicionar aluno na coleção 'tblAlunos'
+        await addDoc(collection(db, "tblAluno"), {
+          nomeAluno,
+          nascimentoAluno,
           rmAluno,
-        },
-      });
+          turmaRef: doc(db, "tblTurma", turmaId), // Referência da turma
+        });
+
+        // Navegar de volta para a lista de alunos
+        navigation.goBack();
+      } else {
+        alert("Por favor, preencha todos os campos.");
+      }
     } catch (error) {
-      console.error("Erro ao adicionar aluno: ", error);
-      Alert.alert("Erro", "Ocorreu um erro ao adicionar a aluno. Tente novamente.");
+      console.error("Erro ao cadastrar aluno: ", error);
+      alert("Erro ao cadastrar aluno, tente novamente.");
     }
   };
 
   return (
-    <Container>
-      <View style={styles.header}>
-        <BackBtn onPress={() => navigation.goBack()} />
-      </View>
-      <Title>Cadastrar Aluno</Title>
-      <View style={styles.inputContainer}>
-        <Input text="Nome do aluno" value={studentName} onChangeText={setStudentName} />
-        <Input text="Nascimento aluno" value={birthStudent} onChangeText={setBirthStudent} />
-        <Input text="RM Aluno" value={rmAluno} onChangeText={setRmAluno} />
+    <View style={styles.container}>
+      <Text style={styles.title}>Cadastrar Aluno</Text>
 
-        {/* A turma será associada automaticamente ao aluno */}
-        <Btn onPress={handleAddClass} texto="Cadastrar" />
-      </View>
-    </Container>
+      <TextInput
+        style={styles.input}
+        placeholder="Nome do Aluno"
+        value={nomeAluno}
+        onChangeText={setNomeAluno}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Data de Nascimento (DD/MM/AAAA)"
+        value={nascimentoAluno}
+        onChangeText={setNascimentoAluno}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="RM do Aluno"
+        value={rmAluno}
+        onChangeText={setRmAluno}
+        keyboardType="numeric"
+      />
+
+      <TouchableOpacity style={styles.btnRegister} onPress={handleRegister}>
+        <Text style={styles.txtBtnRegister}>Cadastrar</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    right: "41%",
-    top: "5%",
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#f0f0f0",
   },
-  inputContainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-    marginBottom: 300,
+  title: {
+    fontSize: 24,
+    fontWeight: "600",
+    marginBottom: 20,
+  },
+  input: {
+    width: "100%",
+    padding: 10,
+    marginVertical: 8,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 4,
+    backgroundColor: "#fff",
+  },
+  btnRegister: {
+    marginTop: 20,
+    backgroundColor: "#6939E9",
+    padding: 12,
+    borderRadius: 4,
+    width: "100%",
+    alignItems: "center",
+  },
+  txtBtnRegister: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
