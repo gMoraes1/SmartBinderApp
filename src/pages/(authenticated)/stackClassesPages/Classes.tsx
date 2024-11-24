@@ -17,7 +17,7 @@ import {
   where,
   doc,
 } from "firebase/firestore";
-import { db, auth } from "../../../../firebase"; // Importando o Firebase
+import { db, auth } from "../../../../firebase"; // Ajuste para seu caminho do Firebase
 
 interface ClassData {
   id: string;
@@ -42,15 +42,15 @@ const Title = styled.Text`
   color: ${(props) => props.theme.color};
 `;
 
-export default function Classes({navigation}) {
-  const [turma, setTurma] = useState<ClassData[]>([]); // Alterado para o tipo ClassData
-  // Função para deletar turma
+export default function Classes({ navigation }) {
+  const [turma, setTurma] = useState<ClassData[]>([]);
+
   async function deleteTurma(id: string) {
     try {
       await deleteDoc(doc(db, "tblTurma", id));
       Alert.alert("Turma deletada.");
     } catch (error) {
-      console.error("Erro ao deletar.", error);
+      console.error("Erro ao deletar turma.", error);
     }
   }
 
@@ -68,7 +68,6 @@ export default function Classes({navigation}) {
             id: docSnap.id,
             nomeTurma: data.nomeTurma,
             periodoTurma: data.periodoTurma,
-
             educationLevel: data.educationLevel,
             school: data.school,
           });
@@ -92,16 +91,14 @@ export default function Classes({navigation}) {
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.classItem}
-            onPress={() => navigation.navigate("ClassDetails")}
+            onPress={() =>
+              navigation.navigate("ListStudents", { turmaId: item.id })
+            }
           >
             <View style={styles.classInfo}>
-              <Text style={styles.textData}>
-                Nome da turma: {item.nomeTurma}
-              </Text>
+              <Text style={styles.textData}>Nome da turma: {item.nomeTurma}</Text>
               <Text style={styles.textData}>Período: {item.periodoTurma}</Text>
-              <Text style={styles.textData}>
-                Nível escolar: {item.educationLevel}
-              </Text>
+              <Text style={styles.textData}>Nível escolar: {item.educationLevel}</Text>
               <Text style={styles.textData}>Escola: {item.school}</Text>
             </View>
 
@@ -128,11 +125,6 @@ export default function Classes({navigation}) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    height: "100%",
-    padding: 16,
-  },
   title: {
     fontSize: 32,
     fontWeight: "600",
@@ -145,7 +137,6 @@ const styles = StyleSheet.create({
   classItem: {
     flexDirection: "column",
     justifyContent: "space-between",
-    alignItems: "flex-start", // Alinha o conteúdo à esquerda
     padding: 15,
     marginVertical: 8,
     borderWidth: 2,
@@ -155,8 +146,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   classInfo: {
-    alignItems: "flex-start", // Garante que os textos fiquem à esquerda
-    marginBottom: 10, // Espaço entre os dados da turma e o botão
+    alignItems: "flex-start",
+    marginBottom: 10,
   },
   BtnDelete: {
     marginTop: 10,
@@ -164,7 +155,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     width: 100,
-    alignSelf: "center", // Centraliza o botão no item
+    alignSelf: "center",
   },
   TxtDelete: {
     color: "white",

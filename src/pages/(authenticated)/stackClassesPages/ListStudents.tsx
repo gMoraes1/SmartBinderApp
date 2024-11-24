@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert } from "react-native";
-import styled from "styled-components/native";
 import {
-  collection,
-  onSnapshot,
-  deleteDoc,
-  query,
-  where,
-  doc,
-} from "firebase/firestore";
-import { db, auth } from "../../../../firebase"; // Ajuste para seu caminho do Firebase
+  View,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+  Text,
+} from "react-native";
+import styled from "styled-components/native";
+import { collection, onSnapshot, query, where, orderBy, deleteDoc, doc } from "firebase/firestore";
+import { db } from "../../../../firebase";
 
-// Interface para o tipo dos dados
 interface StudentData {
   id: string;
-  name: string;
-  age: number;
-  grade: string;
+  nomeAluno: string;
+  nascimentoAluno: string;
+  rmAluno: string;
 }
 
 const Container = styled.View`
@@ -34,25 +33,26 @@ const Title = styled.Text`
   color: ${(props) => props.theme.color};
 `;
 
-export default function ListStudents({ navigation }) {
+export default function ListStudents({ navigation, route }) {
   const [students, setStudents] = useState<StudentData[]>([]);
+  const { turmaId } = route.params; // Obtendo o parâmetro turmaId
 
-  // Função para deletar aluno
-  async function deleteStudent(id: string) {
+  async function deleteAluno(id: string) {
     try {
-      await deleteDoc(doc(db, "tblAlunos", id)); // Substitua "tblStudents" pelo nome correto da coleção
+      await deleteDoc(doc(db, "tblAluno", id));
       Alert.alert("Aluno deletado.");
     } catch (error) {
-      console.error("Erro ao deletar aluno:", error);
+      console.error("Erro ao deletar aluno.", error);
+      Alert.alert("Erro ao deletar aluno.");
     }
   }
 
-  // Carregando dados em tempo real
   useEffect(() => {
     const unsubscribe = onSnapshot(
       query(
-        collection(db, "tblAlunos"),
-        where("userRef", "==", doc(db, "users", auth.currentUser?.uid)) // Ajuste conforme a estrutura
+        collection(db, "tblAluno"),
+        where("turmaRef", "==", doc(db, "tblTurma", turmaId)),
+        orderBy("nomeAluno")  // Ordenando pela propriedade nomeAluno
       ),
       (querySnapshot) => {
         const studentList: StudentData[] = [];
@@ -60,9 +60,9 @@ export default function ListStudents({ navigation }) {
           const data = docSnap.data();
           studentList.push({
             id: docSnap.id,
-            name: data.name,
-            age: data.age,
-            grade: data.grade,
+            nomeAluno: data.nomeAluno,
+            nascimentoAluno: data.nascimentoAluno,
+            rmAluno: data.rmAluno,
           });
         });
 
@@ -71,30 +71,45 @@ export default function ListStudents({ navigation }) {
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [turmaId]);
 
   return (
     <Container>
-      <Title style={styles.title}>Alunos</Title>
+      <Title style={styles.title}>Alunos da Turma</Title>
 
       <FlatList
         data={students}
         keyExtractor={(item) => item.id}
         style={styles.list}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.studentItem}
-            onPress={() => navigation.navigate("StudentDetails", { studentId: item.id })}
-          >
+          <TouchableOpacity style={styles.studentItem}>
             <View style={styles.studentInfo}>
-              <Text style={styles.textData}>Nome: {item.name}</Text>
-              <Text style={styles.textData}>Idade: {item.age}</Text>
-              <Text style={styles.textData}>Série: {item.grade}</Text>
+              <Text style={styles.textData}>Nome: {item.nomeAluno}</Text>
+              <Text style={styles.textData}>
+                Nascimento: {item.nascimentoAluno}
+              </Text>
+              <Text style={styles.textData}>RM: {item.rmAluno}</Text>
             </View>
-            
+
+            <TouchableOpacity
+              onPress={() => deleteAluno(item.id)}
+              style={styles.deleteButton}
+            >
+              <Text style={styles.deleteText}>x</Text>
+            </TouchableOpacity>
           </TouchableOpacity>
         )}
       />
+
+      {/* Botão para registrar alunos */}
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate("CreateStudent", { turmaId: turmaId })
+        }
+        style={styles.BtnAdd}
+      >
+        <Text style={styles.TxtBtn1}>+</Text>
+      </TouchableOpacity>
     </Container>
   );
 }
@@ -106,11 +121,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingVertical: 20,
   },
-
   list: {
     marginBottom: 20,
   },
-
   studentItem: {
     flexDirection: "column",
     justifyContent: "space-between",
@@ -122,51 +135,43 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     elevation: 5,
   },
-
   studentInfo: {
     alignItems: "flex-start",
     marginBottom: 10,
   },
-
-  BtnDelete: {
-    marginTop: 10,
-    backgroundColor: "#ff4d4d",
-    padding: 10,
-    borderRadius: 10,
-    width: 100,
-    alignSelf: "center",
-  },
-
-  TxtDelete: {
-    color: "white",
-    textAlign: "center",
+  textData: {
+    color: "black",
+    fontSize: 15,
     fontWeight: "bold",
   },
-
   BtnAdd: {
     width: 60,
     height: 60,
     backgroundColor: "#6939E9",
     borderRadius: 30,
     position: "absolute",
-    bottom: 30,
-    right: 30,
+    top: "82%",
+    right: "6.2%",
     alignItems: "center",
     justifyContent: "center",
     elevation: 5,
   },
-
   TxtBtn1: {
     fontSize: 40,
     fontWeight: "900",
     color: "white",
     textAlign: "center",
-    lineHeight: 60,
+    top: -2,
   },
-
-  textData: {
-    color: "black",
-    fontSize: 15,
-    fontWeight: "bold",
+  deleteButton: {
+    backgroundColor: "#FF5050",
+    borderRadius: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  deleteText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "800",
   },
 });

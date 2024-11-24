@@ -53,7 +53,7 @@ export default function ClassDetails({ navigation }) {
     // Consulta no Firestore para pegar os alunos do usuário logado
     const unsubscribe = onSnapshot(
       query(
-        collection(db, "tblAlunos"), // Coleção de alunos
+        collection(db, "tblAluno"), // Coleção de alunos
         where("userRef", "==", doc(db, "users", auth.currentUser?.uid)) // Associe os alunos ao usuário logado
       ),
       (querySnapshot) => {
