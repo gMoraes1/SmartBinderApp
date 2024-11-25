@@ -3,8 +3,9 @@ import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { StyleSheet, Text, View, useColorScheme } from 'react-native';
 import styled from 'styled-components/native';
-import { Checkbox } from 'react-native-paper';
+import { Checkbox, CheckboxIOSProps } from 'react-native-paper';
 import Globais from '../../../components/GlobalConsts/global'; // Importa o arquivo de variáveis globais
+import CheckboxIOS from 'react-native-paper/lib/typescript/components/Checkbox/CheckboxIOS';
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
