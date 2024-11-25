@@ -86,7 +86,7 @@ export default function ClassDetails({ navigation }) {
     <Container>
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
-        <Title>Detalhes da Turma</Title>
+        <Title>Editar Turma</Title>
       </View>
 
       {/* Exibe a lista de alunos */}
