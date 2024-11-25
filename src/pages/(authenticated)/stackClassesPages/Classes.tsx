@@ -18,6 +18,8 @@ import {
   doc,
 } from "firebase/firestore";
 import { db, auth } from "../../../../firebase"; // Ajuste para seu caminho do Firebase
+import LtBtn from "../../../components/Buttons/LittleBtn";
+import DeleteBtn from "../../../components/Buttons/DeleteBtn";
 
 interface ClassData {
   id: string;
@@ -96,18 +98,27 @@ export default function Classes({ navigation }) {
             }
           >
             <View style={styles.classInfo}>
-              <Text style={styles.textData}>Nome da turma: {item.nomeTurma}</Text>
+              <Text style={styles.textData}>
+                Nome da turma: {item.nomeTurma}
+              </Text>
               <Text style={styles.textData}>Período: {item.periodoTurma}</Text>
-              <Text style={styles.textData}>Nível escolar: {item.educationLevel}</Text>
+              <Text style={styles.textData}>
+                Nível escolar: {item.educationLevel}
+              </Text>
               <Text style={styles.textData}>Escola: {item.school}</Text>
             </View>
 
-            <TouchableOpacity
-              onPress={() => deleteTurma(item.id)}
-              style={styles.BtnDelete}
-            >
-              <Text style={styles.TxtDelete}>Deletar</Text>
-            </TouchableOpacity>
+            <View style={styles.Buttons}>
+              <DeleteBtn onPress={() => deleteTurma(item.id)}>
+                Deletar
+              </DeleteBtn>
+              <LtBtn onPress={() => navigation.navigate("ClassDetails")}>
+                Editar
+              </LtBtn>
+              <LtBtn onPress={() => navigation.navigate("ExportDoc")}>
+                Sondagem
+              </LtBtn>
+            </View>
           </TouchableOpacity>
         )}
       />
@@ -168,8 +179,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#6939E9",
     borderRadius: 30,
     position: "absolute",
-    top:'82%',
-    right: '6.2%',
+    top: "82%",
+    right: "6.2%",
     alignItems: "center",
     justifyContent: "center",
     elevation: 5,
@@ -179,11 +190,29 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     color: "white",
     textAlign: "center",
-    top:-2
+    top: -2,
   },
   textData: {
     color: "black",
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "bold",
+  },
+  BtnEdit: {
+    marginTop: 10,
+    backgroundColor: "#6939E9",
+    padding: 10,
+    borderRadius: 10,
+    width: 100,
+    alignSelf: "center",
+  },
+  TxtEdit: {
+    color: "white",
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  Buttons: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
   },
 });
