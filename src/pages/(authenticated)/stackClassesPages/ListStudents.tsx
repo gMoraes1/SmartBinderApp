@@ -82,7 +82,7 @@ export default function ListStudents({ navigation, route }) {
         keyExtractor={(item) => item.id}
         style={styles.list}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.studentItem}>
+          <TouchableOpacity style={styles.studentItem} onPress={() => {navigation.navigate('StudentDetails')}}>
             <View style={styles.studentInfo}>
               <Text style={styles.textData}>Nome: {item.nomeAluno}</Text>
               <Text style={styles.textData}>
