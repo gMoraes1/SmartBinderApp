@@ -2,6 +2,7 @@ import styled, { useTheme } from "styled-components/native";
 import { StyleSheet, TextInput, View } from 'react-native'
 import { useState } from "react";
 import {AutoGrowingTextInput} from 'react-native-autogrow-textinput'
+import Btn from "../../../components/Buttons/Btn";
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -22,6 +23,10 @@ export default function StudentDetails() {
     const theme = useTheme()
     const [faltas, setFaltas] = useState('');
     const [obs, setObs] = useState('');
+
+    function handleCreateSondagem(){
+
+    };
 
     return (
         <Container>
@@ -58,6 +63,7 @@ export default function StudentDetails() {
                     onChangeText={setObs}
                     value={obs} />
             </View>
+            <Btn onPress={handleCreateSondagem}/>
         </Container>
     )
 };
@@ -69,5 +75,7 @@ const styles = StyleSheet.create({
     },
 
     InputView: {
+        top:30,
+        marginBottom:30,
     },
 })
