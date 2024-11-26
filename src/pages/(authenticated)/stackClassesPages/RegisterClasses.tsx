@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Alert } from "react-native";
 import styled from 'styled-components/native';
+import { TextInputIconProps } from 'react-native-paper'
 
 import { db, auth } from "../../../../firebase"; // Importando a instância do Firestore e auth
 import { collection, addDoc, doc } from 'firebase/firestore'; // Funções do Firestore
@@ -8,6 +9,7 @@ import BackBtn from "../../../components/Buttons/BackBtn";
 import Input from "../../../components/Input/Input";
 
 import Btn from "../../../components/Buttons/Btn";
+import TextInputIcon from "react-native-paper/lib/typescript/components/TextInput/Adornment/TextInputIcon";
 
 // Definindo o estilo para os componentes
 const Container = styled.View`

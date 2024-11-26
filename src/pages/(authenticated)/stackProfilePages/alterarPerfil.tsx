@@ -206,6 +206,7 @@ const updateProfile = async () => {
           text="Nome"
           value={username}
           onChangeText={(text) => setUsername(formatUsername(text))}
+          placeholder={'Nome Completo'}
         />
         <TextInputMask
           type={'cpf'}
