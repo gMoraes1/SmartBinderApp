@@ -8,8 +8,19 @@ import {
   Text,
 } from "react-native";
 import styled from "styled-components/native";
-import { collection, onSnapshot, query, where, orderBy, deleteDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+  orderBy,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "../../../../firebase";
+import DeleteBtn from "../../../components/Buttons/DeleteBtn";
+import LtBtn from "../../../components/Buttons/LittleBtn";
+import BackBtn from "../../../components/Buttons/BackBtn";
 
 interface StudentData {
   id: string;
@@ -52,7 +63,7 @@ export default function ListStudents({ navigation, route }) {
       query(
         collection(db, "tblAluno"),
         where("turmaRef", "==", doc(db, "tblTurma", turmaId)),
-        orderBy("nomeAluno")  // Ordenando pela propriedade nomeAluno
+        orderBy("nomeAluno") // Ordenando pela propriedade nomeAluno
       ),
       (querySnapshot) => {
         const studentList: StudentData[] = [];
@@ -71,18 +82,26 @@ export default function ListStudents({ navigation, route }) {
     );
 
     return () => unsubscribe();
-  }, [turmaId]);
+  }, [turmaId]);''
 
   return (
     <Container>
-      <Title style={styles.title}>Alunos da Turma</Title>
+      <View style={styles.header}>
+        <BackBtn onPress={() => navigation.goBack()} />
+        <Title>Alunos da turma</Title>
+      </View>
 
       <FlatList
         data={students}
         keyExtractor={(item) => item.id}
         style={styles.list}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.studentItem} onPress={() => {navigation.navigate('StudentDetails')}}>
+          <TouchableOpacity
+            style={styles.studentItem}
+            onPress={() => {
+              navigation.navigate("StudentDetails");
+            }}
+          >
             <View style={styles.studentInfo}>
               <Text style={styles.textData}>Nome: {item.nomeAluno}</Text>
               <Text style={styles.textData}>
@@ -90,13 +109,14 @@ export default function ListStudents({ navigation, route }) {
               </Text>
               <Text style={styles.textData}>RM: {item.rmAluno}</Text>
             </View>
-
-            <TouchableOpacity
-              onPress={() => deleteAluno(item.id)}
-              style={styles.deleteButton}
-            >
-              <Text style={styles.deleteText}>x</Text>
-            </TouchableOpacity>
+            <View style={styles.buttonsContainer}>
+              <DeleteBtn onPress={() => deleteAluno(item.id)}>
+                Deletar
+              </DeleteBtn>
+              <LtBtn onPress={() => navigation.navigate("StudentDetails")}>
+                Editar
+              </LtBtn>
+            </View>
           </TouchableOpacity>
         )}
       />
@@ -108,6 +128,7 @@ export default function ListStudents({ navigation, route }) {
         }
         style={styles.BtnAdd}
       >
+        
         <Text style={styles.TxtBtn1}>+</Text>
       </TouchableOpacity>
     </Container>
@@ -115,6 +136,13 @@ export default function ListStudents({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 110,
+    paddingHorizontal: 16,
+  },
   title: {
     fontSize: 32,
     fontWeight: "600",
@@ -141,7 +169,7 @@ const styles = StyleSheet.create({
   },
   textData: {
     color: "black",
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "bold",
   },
   BtnAdd: {
@@ -174,4 +202,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "800",
   },
+  buttonsContainer: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+    justifyContent: "center"
+  }
 });
