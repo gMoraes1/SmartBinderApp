@@ -12,6 +12,7 @@ import { Feather } from "@expo/vector-icons"; // Importando o Feather para o íc
 import BackBtn from "../../../components/Buttons/BackBtn";
 import * as ImagePicker from 'expo-image-picker'; // Importando o ImagePicker
 import * as FileSystem from 'expo-file-system'; // Para manipular arquivos
+import { Asset } from 'expo-asset'; // Importando o Asset
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -64,6 +65,7 @@ export default function EditProfile({ navigation, route }) {
   const [isValidCpf, setIsValidCpf] = useState(true); // Estado para validação do CPF
   const [image, setImage] = useState<string | null>(null);
   const [dadosPerfil, setDadosPerfil] = useState(null); // Initialize with null
+  const defaultProfileImageUri = require("../../../../assets/Perfil.jpg"); // Caminho da imagem na pasta assets
 
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
@@ -72,7 +74,11 @@ export default function EditProfile({ navigation, route }) {
         const userRef = doc(db, "tblProfessor", user.uid);
         const unsubscribe = onSnapshot(userRef, (docSnapshot) => {
           if (docSnapshot.exists()) {
-            setDadosPerfil(docSnapshot.data()); // Carrega os dados do usuário no estado
+            const userData = docSnapshot.data();
+            // Definir a imagem de perfil corretamente
+            const profileImage = userData.imagemPerfil || defaultProfileImage;
+            setImage(profileImage); // Atualiza a imagem de perfil com a imagem do banco
+            setDadosPerfil(userData); // Carrega os dados do usuário no estado
           } else {
             setDadosPerfil(null); // Caso o perfil não exista no Firestore
           }
@@ -93,7 +99,6 @@ export default function EditProfile({ navigation, route }) {
     return text.toUpperCase(); // Garante que o nome seja em maiúsculas
   };
 
-  // Função para escolher a imagem e convertê-la para base64
   const pickImage = async () => {
     // Mostra um alerta com duas opções para o usuário escolher
     Alert.alert(
@@ -155,14 +160,34 @@ export default function EditProfile({ navigation, route }) {
         },
         {
           text: "Padrão",
-          onPress: () => {
-            // Definir imagem padrão com require
-            setImage(defaultProfileImage);
+          onPress: async () => {
+            try {
+              // Carregar a imagem de assets usando Asset.fromModule
+              const asset = Asset.fromModule(defaultProfileImageUri);
+              await asset.downloadAsync(); // Certifique-se de que o recurso foi carregado no dispositivo
+  
+              const fileUri = asset.localUri || asset.uri; // Garantir que estamos usando o caminho local
+  
+              if (fileUri) {
+                // Converte a imagem para base64 usando o caminho local
+                const base64Image = await FileSystem.readAsStringAsync(fileUri, {
+                  encoding: FileSystem.EncodingType.Base64,
+                });
+                setImage(base64Image); // Atualiza a imagem para a imagem padrão convertida para base64
+              } else {
+                console.error("Erro: URI local não encontrada para a imagem padrão.");
+                Alert.alert("Erro", "Não foi possível carregar a imagem padrão.");
+              }
+            } catch (error) {
+              console.error("Erro ao converter imagem padrão para base64: ", error);
+              Alert.alert("Erro", "Ocorreu um erro ao definir a imagem padrão.");
+            }
           }
         }
       ]
     );
   };
+
   
   // Função para validar o CPF
   const validateCpf = (cpf) => {
@@ -214,7 +239,7 @@ export default function EditProfile({ navigation, route }) {
         cpf: cpf,
         nascimentoProfessor: date,
         telefone: telefone,
-        imagemPerfil: image || defaultProfileImage, // Usando require diretamente
+        imagemPerfil: image === defaultProfileImage ? defaultProfileImage : image, // Verifica se é a imagem padrão ou não
       };
 
       // Atualiza os dados do usuário no Firestore
@@ -227,6 +252,7 @@ export default function EditProfile({ navigation, route }) {
     }
   };
 
+
   return (
     <Container>
       <StatusBar style="auto" />
@@ -237,7 +263,7 @@ export default function EditProfile({ navigation, route }) {
       <View style={styles.imageBlock}>
         <Image
           style={styles.image}
-          source={image ? { uri: `data:image/jpeg;base64,${image}` } : image || defaultProfileImage }
+          source={image ? { uri: `data:image/jpeg;base64,${image}` } : image || defaultProfileImage}
         />
         <IconPencil onPress={pickImage}>
           <Ionicons name="camera" size={26} color={theme.colorIconStyle} />
