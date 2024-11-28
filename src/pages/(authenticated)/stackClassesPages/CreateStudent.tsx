@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { db } from "../../../../firebase";
 import { addDoc, collection, doc } from "firebase/firestore";
+import BackBtn from "../../../components/Buttons/BackBtn";
 
 export default function CreateStudent({ navigation, route }) {
   const { turmaId } = route.params; // Obtendo a turmaId passada da tela anterior
@@ -36,7 +37,8 @@ export default function CreateStudent({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Cadastrar Aluno</Text>
+      
+      <Text style={styles.title}> <BackBtn onPress={() => navigation.goBack()}/> Cadastrar Aluno</Text>
 
       <TextInput
         style={styles.input}
