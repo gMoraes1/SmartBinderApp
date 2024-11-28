@@ -112,13 +112,13 @@ export default function EditProfile({ navigation, route }) {
               mediaTypes: ImagePicker.MediaTypeOptions.Images,
               allowsEditing: true,
               aspect: [4, 3],
-              quality: 1,
+              quality: 0.6,
             });
-  
+
             if (!result.canceled) {
               const imageUri = result.assets[0].uri;
               setImage(imageUri); // Armazena a URI da imagem selecionada
-  
+
               try {
                 // Converte a imagem para base64
                 const base64Image = await FileSystem.readAsStringAsync(imageUri, {
@@ -138,13 +138,13 @@ export default function EditProfile({ navigation, route }) {
             let result = await ImagePicker.launchCameraAsync({
               allowsEditing: true,
               aspect: [4, 3],
-              quality: 1,
+              quality: 0.6,
             });
-  
+
             if (!result.canceled) {
               const imageUri = result.assets[0].uri;
               setImage(imageUri); // Armazena a URI da imagem tirada
-  
+
               try {
                 // Converte a imagem para base64
                 const base64Image = await FileSystem.readAsStringAsync(imageUri, {
@@ -165,9 +165,9 @@ export default function EditProfile({ navigation, route }) {
               // Carregar a imagem de assets usando Asset.fromModule
               const asset = Asset.fromModule(defaultProfileImageUri);
               await asset.downloadAsync(); // Certifique-se de que o recurso foi carregado no dispositivo
-  
+
               const fileUri = asset.localUri || asset.uri; // Garantir que estamos usando o caminho local
-  
+
               if (fileUri) {
                 // Converte a imagem para base64 usando o caminho local
                 const base64Image = await FileSystem.readAsStringAsync(fileUri, {
@@ -188,7 +188,7 @@ export default function EditProfile({ navigation, route }) {
     );
   };
 
-  
+
   // Função para validar o CPF
   const validateCpf = (cpf) => {
     const cleanedCpf = cpf.replace(/\D/g, ''); // Remove tudo o que não for número
