@@ -41,7 +41,7 @@ const Title = styled.Text`
   font-size: 32px;
   font-weight: 600;
   text-align: center;
-  padding-bottom: 3%;
+  padding-bottom: 8%;
   color: ${(props) => props.theme.color};
 `;
 
@@ -89,8 +89,8 @@ export default function ListStudents({ navigation, route }) {
     <Container>
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
-      </View>
       <Title>Alunos da turma</Title>
+      </View>
 
       <FlatList
         data={students}

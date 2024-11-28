@@ -10,7 +10,7 @@ const StyleInput = styled.TextInput`
   font-size: 18px;
   padding-left: 20px;
   border-radius: 2px;
-  elevation: 16;
+  elevation: 8;
 `;
 
 const Input = ({ text, onChangeText, ...props }) => {
