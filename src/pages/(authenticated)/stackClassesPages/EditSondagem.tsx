@@ -133,6 +133,7 @@ export default function EditSondagem({ route }) {
               <Btnm texto="Editar" onPress={() => setEditedSondagem(item)} />
             </View>
           )}
+          style={styles.flatlist}
         />
       </View>
 
@@ -183,10 +184,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     height: 130,
+    elevation:3,
   },
-alignList:{
-  bottom:'5.5%',
-},
+
+  flatlist: {
+  },
+
+  alignList: {
+    bottom: '5.5%',
+  },
 
   text: {
     fontSize: 16,
