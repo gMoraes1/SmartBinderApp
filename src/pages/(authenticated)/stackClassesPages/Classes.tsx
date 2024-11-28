@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  TextInput,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components/native";
@@ -13,9 +14,11 @@ import {
   collection,
   onSnapshot,
   deleteDoc,
+  updateDoc,
   query,
   where,
   doc,
+  getDocs,
 } from "firebase/firestore";
 import { db, auth } from "../../../../firebase"; // Ajuste para seu caminho do Firebase
 import LtBtn from "../../../components/Buttons/LittleBtn";
@@ -46,15 +49,7 @@ const Title = styled.Text`
 
 export default function Classes({ navigation }) {
   const [turma, setTurma] = useState<ClassData[]>([]);
-
-  async function deleteTurma(id: string) {
-    try {
-      await deleteDoc(doc(db, "tblTurma", id));
-      Alert.alert("Turma deletada.");
-    } catch (error) {
-      console.error("Erro ao deletar turma.", error);
-    }
-  }
+  const [editedTurma, setEditedTurma] = useState<ClassData | null>(null);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -82,22 +77,129 @@ export default function Classes({ navigation }) {
     return () => unsubscribe();
   }, []);
 
+  // Função para deletar alunos e sondagens associadas à turma
+  async function deleteAssociatedData(turmaId: string) {
+    try {
+      // Deletar alunos associados à turma
+      const alunosQuery = query(
+        collection(db, "tblAluno"),
+        where("turmaRef", "==", doc(db, "tblTurma", turmaId)) // Consultando alunos com a referência da turma
+      );
+      const alunosSnapshot = await getDocs(alunosQuery);
+      if (alunosSnapshot.empty) {
+        console.log("Nenhum aluno encontrado para esta turma.");
+      } else {
+        const alunoDeletePromises = alunosSnapshot.docs.map((docSnap) =>
+          deleteDoc(doc(db, "tblAluno", docSnap.id))
+        );
+        await Promise.all(alunoDeletePromises);
+        console.log("Alunos deletados com sucesso.");
+      }
+
+      // Deletar sondagens associadas à turma
+      const sondagensQuery = query(
+        collection(db, "tblSondagem"),
+        where("turmaRef", "==", doc(db, "tblTurma", turmaId)) // Consultando sondagens com a referência da turma
+      );
+      const sondagensSnapshot = await getDocs(sondagensQuery);
+      if (sondagensSnapshot.empty) {
+        console.log("Nenhuma sondagem encontrada para esta turma.");
+      } else {
+        const sondagemDeletePromises = sondagensSnapshot.docs.map((docSnap) =>
+          deleteDoc(doc(db, "tblSondagem", docSnap.id))
+        );
+        await Promise.all(sondagemDeletePromises);
+        console.log("Sondagens deletadas com sucesso.");
+      }
+    } catch (error) {
+      console.error("Erro ao deletar dados relacionados:", error);
+      throw new Error("Erro ao deletar dados relacionados.");
+    }
+  }
+
+  // Função de exclusão da turma com confirmação em duas etapas
+  function handleDeleteTurma(turmaId: string) {
+    Alert.alert(
+      "Confirmar Exclusão",
+      "Você tem certeza de que deseja deletar esta turma?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Sim",
+          onPress: () => {
+            Alert.alert(
+              "Confirmação Final",
+              "Tem certeza absoluta de que deseja deletar esta turma? Isso apagará todos os dados relacionados.",
+              [
+                {
+                  text: "Cancelar",
+                  style: "cancel",
+                },
+                {
+                  text: "Deletar",
+                  style: "destructive",
+                  onPress: async () => {
+                    try {
+                      // Primeiro, deletar dados relacionados (alunos e sondagens)
+                      await deleteAssociatedData(turmaId);
+
+                      // Depois, deletar a turma
+                      await deleteDoc(doc(db, "tblTurma", turmaId));
+                      Alert.alert("Sucesso", "Turma e dados relacionados deletados com sucesso.");
+                    } catch (error) {
+                      Alert.alert("Erro", "Não foi possível deletar a turma e os dados relacionados.");
+                    }
+                  },
+                },
+              ]
+            );
+          },
+        },
+      ]
+    );
+  }
+
+  const handleEdit = (turmaData: ClassData) => {
+    setEditedTurma(turmaData);
+  };
+
+  const handleSave = async () => {
+    if (editedTurma) {
+      try {
+        await updateDoc(doc(db, "tblTurma", editedTurma.id), {
+          nomeTurma: editedTurma.nomeTurma,
+          periodoTurma: editedTurma.periodoTurma,
+          educationLevel: editedTurma.educationLevel,
+          school: editedTurma.school,
+        });
+        Alert.alert("Sucesso", "Turma atualizada com sucesso!");
+        setEditedTurma(null); // Fecha a caixa de edição
+      } catch (error) {
+        console.error("Erro ao atualizar a turma:", error);
+        Alert.alert("Erro", "Não foi possível atualizar a turma.");
+      }
+    }
+  };
+
   return (
     <Container>
-      <Title style={styles.title}>Turmas</Title>
+      <Title>Turmas</Title>
 
       <FlatList
         data={turma}
         keyExtractor={(item) => item.id}
         style={styles.list}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.classItem}
-            onPress={() =>
-              navigation.navigate("ListStudents", { turmaId: item.id })
-            }
-          >
-            <View style={styles.classInfo}>
+          <View style={styles.classItem}>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("ListStudents", { turmaId: item.id })
+              }
+              style={styles.classInfo}
+            >
               <Text style={styles.textData}>
                 Nome da turma: {item.nomeTurma}
               </Text>
@@ -106,42 +208,77 @@ export default function Classes({ navigation }) {
                 Nível escolar: {item.educationLevel}
               </Text>
               <Text style={styles.textData}>Escola: {item.school}</Text>
-            </View>
+            </TouchableOpacity>
 
             <View style={styles.Buttons}>
-              <DeleteBtn onPress={() => deleteTurma(item.id)}>
+              <DeleteBtn onPress={() => handleDeleteTurma(item.id)}>
                 Deletar
               </DeleteBtn>
-              <LtBtn onPress={() => navigation.navigate("ClassDetails")}>
-                Editar
-              </LtBtn>
-              <LtBtn onPress={() => navigation.navigate("ExportDoc")}>
+              <LtBtn onPress={() => handleEdit(item)}>Editar</LtBtn>
+              <LtBtn
+                onPress={() =>
+                  navigation.navigate("ExportDoc", { turmaId: item.id })
+                }
+              >
                 Sondagem
               </LtBtn>
             </View>
-          </TouchableOpacity>
+          </View>
         )}
       />
 
-      <TouchableOpacity
+      {editedTurma && (
+        <View style={styles.editContainer}>
+          <Text style={styles.editTitle}>Editar Turma</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Nome da Turma"
+            value={editedTurma.nomeTurma}
+            onChangeText={(value) =>
+              setEditedTurma({ ...editedTurma, nomeTurma: value })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Período Turma"
+            value={editedTurma.periodoTurma}
+            onChangeText={(value) =>
+              setEditedTurma({ ...editedTurma, periodoTurma: value })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Nível Escolar"
+            value={editedTurma.educationLevel}
+            onChangeText={(value) =>
+              setEditedTurma({ ...editedTurma, educationLevel: value })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Escola"
+            value={editedTurma.school}
+            onChangeText={(value) =>
+              setEditedTurma({ ...editedTurma, school: value })
+            }
+          />
+          <View style={styles.btnGroup}>
+            <LtBtn onPress={handleSave}>Salvar</LtBtn>
+            <LtBtn onPress={() => setEditedTurma(null)}>Cancelar</LtBtn>
+          </View>
+        </View>
+      )}
+       <TouchableOpacity
         onPress={() => navigation.navigate("RegisterClasses")}
         style={styles.BtnAdd}
       >
         <Text style={styles.TxtBtn1}>+</Text>
       </TouchableOpacity>
-
-      <StatusBar style="auto" />
     </Container>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 32,
-    fontWeight: "600",
-    textAlign: "center",
-    paddingVertical: 20,
-  },
   list: {
     marginBottom: 20,
   },
@@ -197,22 +334,40 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  BtnEdit: {
-    marginTop: 10,
-    backgroundColor: "#6939E9",
-    padding: 10,
-    borderRadius: 10,
-    width: 100,
-    alignSelf: "center",
-  },
-  TxtEdit: {
-    color: "white",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
   Buttons: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-evenly",
+  },
+  editContainer: {
+    position: "absolute",
+    top: "30%",
+    left: "10%",
+    right: "10%",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 8,
+    elevation: 5,
+    alignItems: "center",
+  },
+  editTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  input: {
+    width: "100%",
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingLeft: 8,
+    marginBottom: 10,
+  },
+  btnGroup: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+    width: "100%",
   },
 });

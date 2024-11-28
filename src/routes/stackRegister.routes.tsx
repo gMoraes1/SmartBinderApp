@@ -12,6 +12,7 @@ import ConfigurationClass from "../pages/(authenticated)/stackClassesPages/Confi
 import ClassDetails from "../pages/(authenticated)/stackClassesPages/ClassDetails";
 import ClassOptions from "../pages/(authenticated)/stackClassesPages/ClassOptions";
 import StudentDetails from "../pages/(authenticated)/stackClassesPages/StudentDetails";
+import EditSondagem from "../pages/(authenticated)/stackClassesPages/EditSondagem";
 
 const Stack = createStackNavigator();
 
@@ -28,6 +29,7 @@ function StackRegister() {
       <Stack.Screen name="ListStudents" component={ListStudents} />
       <Stack.Screen name="ConfigurationClass" component={ConfigurationClass} />
       <Stack.Screen name="ExportDoc" component={ExportDoc} />
+      <Stack.Screen name="EditSondagem" component={EditSondagem} />
       <Stack.Screen name="ClassOptions" component={ClassOptions} />
       <Stack.Screen name="StudentDetails" component={StudentDetails} />
     </Stack.Navigator>
