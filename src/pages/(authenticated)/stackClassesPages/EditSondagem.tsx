@@ -21,6 +21,8 @@ const Container = styled.View`
   width: 100%;
   height: 100%;
   padding: 16px;
+  text-align:center;
+  align-items:center
 `;
 
 const Title = styled.Text`
@@ -28,7 +30,9 @@ const Title = styled.Text`
   font-weight: 600;
   text-align: center;
   padding-top: 12%;
+  width:255px;
   color: ${(props) => props.theme.color};
+  bottom:5%;
 `;
 
 interface Sondagem {
@@ -112,24 +116,25 @@ export default function EditSondagem({ route }) {
 
   return (
     <Container>
-      <Title>
+      <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
-        Editar Sondagens
-      </Title>
+      </View>
+      <Title>Editar Sondagens</Title>
+      <View style={styles.alignList}>
+        <FlatList
+          data={sondagens}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.item}>
+              <Text style={styles.text}>{item.nomeSondagem}</Text>
+              <Text style={styles.text}>Período Inicial: {item.periodoInicial}</Text>
+              <Text style={styles.text}>Período Final: {item.periodoFinal}</Text>
 
-      <FlatList
-        data={sondagens}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.text}>{item.nomeSondagem}</Text>
-            <Text style={styles.text}>Período Inicial: {item.periodoInicial}</Text>
-            <Text style={styles.text}>Período Final: {item.periodoFinal}</Text>
-
-            <Btnm texto="Editar" onPress={() => setEditedSondagem(item)} />
-          </View>
-        )}
-      />
+              <Btnm texto="Editar" onPress={() => setEditedSondagem(item)} />
+            </View>
+          )}
+        />
+      </View>
 
       {editedSondagem && (
         <View style={styles.editContainer}>
@@ -179,6 +184,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     height: 130,
   },
+alignList:{
+  bottom:'5.5%',
+},
+
   text: {
     fontSize: 16,
     marginBottom: 5,
@@ -203,5 +212,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
+  },
+
+  header: {
+    right: '44.7%',
+    top: '2.73%',
   },
 });

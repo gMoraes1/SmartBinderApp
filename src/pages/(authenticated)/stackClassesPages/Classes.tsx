@@ -9,7 +9,7 @@ import {
   TextInput,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import styled from "styled-components/native";
+import styled, { useTheme } from "styled-components/native";
 import {
   collection,
   onSnapshot,
@@ -23,6 +23,8 @@ import {
 import { db, auth } from "../../../../firebase"; // Ajuste para seu caminho do Firebase
 import LtBtn from "../../../components/Buttons/LittleBtn";
 import DeleteBtn from "../../../components/Buttons/DeleteBtn";
+import RNPickerSelect from 'react-native-picker-select';
+import Input from "../../../components/Input/Input";
 
 interface ClassData {
   id: string;
@@ -48,6 +50,7 @@ const Title = styled.Text`
 `;
 
 export default function Classes({ navigation }) {
+  const theme = useTheme();
   const [turma, setTurma] = useState<ClassData[]>([]);
   const [editedTurma, setEditedTurma] = useState<ClassData | null>(null);
 
@@ -230,33 +233,99 @@ export default function Classes({ navigation }) {
       {editedTurma && (
         <View style={styles.editContainer}>
           <Text style={styles.editTitle}>Editar Turma</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Nome da Turma"
+          <Input
+            text="Escola"
             value={editedTurma.nomeTurma}
             onChangeText={(value) =>
               setEditedTurma({ ...editedTurma, nomeTurma: value })
             }
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Período Turma"
-            value={editedTurma.periodoTurma}
-            onChangeText={(value) =>
-              setEditedTurma({ ...editedTurma, periodoTurma: value })
-            }
+          <RNPickerSelect
+            value={editedTurma.periodoTurma} // Passando o valor atual da turma
+            onValueChange={(value) => {
+              setEditedTurma({ ...editedTurma, periodoTurma: value }); // Atualizando o estado com o valor selecionado
+            }}
+            items={[
+              { label: 'Manhã', value: 'manhã' },
+              { label: 'Tarde', value: 'tarde' },
+              { label: 'Noite', value: 'noite' },
+            ]}
+            style={{
+              inputIOS: {
+                backgroundColor: theme.inputBackground || "#D2DFDA",
+                color: theme.color || "#000",
+                height: 50,
+                width: 255,
+                margin: 8,
+                fontSize: 18,
+                paddingLeft: 20,
+                borderRadius: 10,
+                elevation: 3,
+              },
+              inputAndroid: {
+                backgroundColor: theme.inputBackground || "#D2DFDA",
+                color: theme.color || "#000",
+                height: 50,
+                width: 255,
+                margin: 8,
+                fontSize: 18,
+                paddingLeft: 20,
+                borderRadius: 10,
+                elevation: 3,
+              }
+            }}
+            placeholder={{
+              label: 'Escolha um Período',
+              value: null,
+              color: theme.placeholderColor,
+            }}
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Nível Escolar"
-            value={editedTurma.educationLevel}
-            onChangeText={(value) =>
-              setEditedTurma({ ...editedTurma, educationLevel: value })
-            }
+
+          <RNPickerSelect
+            value={editedTurma.educationLevel} // Passando o valor atual do nível escolar
+            onValueChange={(value) => {
+              setEditedTurma({ ...editedTurma, educationLevel: value }); // Atualizando o estado com o valor selecionado
+            }}
+            items={[
+              { label: '1° série', value: '1° série' },
+              { label: '2° série', value: '2° série' },
+              { label: '3° série', value: '3° série' },
+              { label: '4° série', value: '4° série' },
+              { label: '5° série', value: '5° série' },
+            ]}
+            style={{
+              inputIOS: {
+                backgroundColor: theme.inputBackground || "#D2DFDA",
+                color: theme.color || "#000",
+                height: 50,
+                width: 255,
+                margin: 8,
+                fontSize: 18,
+                paddingLeft: 20,
+                borderRadius: 10,
+                elevation: 3,
+              },
+              inputAndroid: {
+                backgroundColor: theme.inputBackground || "#D2DFDA",
+                color: theme.color || "#000",
+                height: 50,
+                width: 255,
+                margin: 8,
+                fontSize: 18,
+                paddingLeft: 20,
+                borderRadius: 10,
+                elevation: 3,
+              }
+            }}
+            placeholder={{
+              label: 'Escolha uma Série',
+              value: null,
+              color: theme.placeholderColor,
+            }}
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Escola"
+
+          <Input
+            text="Escola"
             value={editedTurma.school}
             onChangeText={(value) =>
               setEditedTurma({ ...editedTurma, school: value })
@@ -268,7 +337,7 @@ export default function Classes({ navigation }) {
           </View>
         </View>
       )}
-       <TouchableOpacity
+      <TouchableOpacity
         onPress={() => navigation.navigate("RegisterClasses")}
         style={styles.BtnAdd}
       >
