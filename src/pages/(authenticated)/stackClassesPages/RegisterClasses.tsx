@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Alert } from "react-native";
-import styled from 'styled-components/native';
+import styled, { useTheme } from 'styled-components/native';
 import { TextInputIconProps } from 'react-native-paper'
 
 import { db, auth } from "../../../../firebase"; // Importando a instância do Firestore e auth
 import { collection, addDoc, doc } from 'firebase/firestore'; // Funções do Firestore
 import BackBtn from "../../../components/Buttons/BackBtn";
 import Input from "../../../components/Input/Input";
+import RNPickerSelect from 'react-native-picker-select';
 
 import Btn from "../../../components/Buttons/Btn";
-import TextInputIcon from "react-native-paper/lib/typescript/components/TextInput/Adornment/TextInputIcon";
 
 // Definindo o estilo para os componentes
 const Container = styled.View`
@@ -31,6 +31,7 @@ const Title = styled.Text`
 `;
 
 export default function RegisterClasses({ navigation }) {
+  const theme = useTheme();
   const [className, setClassName] = useState("");
   const [period, setPeriod] = useState("");
   const [educationLevel, setEducationLevel] = useState("");
@@ -82,8 +83,87 @@ export default function RegisterClasses({ navigation }) {
 
       <View style={styles.inputContainer}>
         <Input text="Nome da turma" onChangeText={setClassName} />
-        <Input text="Período" onChangeText={setPeriod} />
-        <Input text="Nível de escolaridade" onChangeText={setEducationLevel} />
+
+        <RNPickerSelect
+          onValueChange={(value) => console.log(value)}
+          items={[
+            { label: 'Manhã', value: 'manhã' },
+            { label: 'Tarde', value: 'tarde' },
+            { label: 'Noite', value: 'noite' },
+          ]}
+          style={{
+            inputIOS: {
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 255,
+              margin: 8,
+              fontSize: 18,
+              paddingLeft: 20,
+              borderRadius: 10,
+              elevation: 5,
+            },
+            inputAndroid: {
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 255,
+              margin: 8,
+              fontSize: 18,
+              paddingLeft: 20,
+              borderRadius: 10,
+              elevation: 5,
+            }
+          }}
+
+          placeholder={{
+            label: 'Escolha um Periodo',
+            value: null,
+            color: theme.placeholderColor,
+          }}
+        />
+
+        <RNPickerSelect
+          onValueChange={(value) => console.log(value)}
+          items={[
+            { label: '1° série', value: '1° série' },
+            { label: '2° série', value: '2° série' },
+            { label: '3° série', value: '3° série' },
+            { label: '4° série', value: '4° série' },
+            { label: '5° série', value: '5° série' },
+          ]}
+          style={{
+            inputIOS: {
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 255,
+              margin: 8,
+              fontSize: 18,
+              paddingLeft: 20,
+              borderRadius: 10,
+              elevation: 5,
+            },
+            inputAndroid: {
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 255,
+              margin: 8,
+              fontSize: 18,
+              paddingLeft: 20,
+              borderRadius: 10,
+              elevation: 5,
+            }
+          }}
+
+          placeholder={{
+            label: 'Escolha uma Série',
+            value: null,
+            color: theme.placeholderColor,
+          }}
+        />
+
         <Input text="Escola" onChangeText={setSchool} />
       </View>
 
