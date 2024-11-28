@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Alert } from "react-native";
-import styled, { useTheme } from 'styled-components/native';
-import { TextInputIconProps } from 'react-native-paper'
+
 
 import { db, auth } from "../../../../firebase"; // Importando a instância do Firestore e auth
-import { collection, addDoc, doc } from 'firebase/firestore'; // Funções do Firestore
+import { collection, addDoc, doc, writeBatch } from "firebase/firestore"; // Funções do Firestore
 import BackBtn from "../../../components/Buttons/BackBtn";
 import Input from "../../../components/Input/Input";
-import RNPickerSelect from 'react-native-picker-select';
 
 import Btn from "../../../components/Buttons/Btn";
 
@@ -37,28 +35,55 @@ export default function RegisterClasses({ navigation }) {
   const [educationLevel, setEducationLevel] = useState("");
   const [school, setSchool] = useState("");
 
-  // Função para adicionar a turma ao Firestore
+  // Função para adicionar a turma e as sondagens ao Firestore
   const handleAddClass = async () => {
     try {
-      // Verificando se o usuário está autenticado
       const user = auth.currentUser;
       if (!user) {
         console.error("Usuário não autenticado!");
         Alert.alert("Erro", "Você precisa estar logado para criar uma turma.");
         return;
       }
-      // Referência do usuário na coleção 'users' (a referência ao documento do usuário)
-      const userRef = doc(db, 'users', user.uid);  // Criação da referência ao documento do usuário
-      // Obtendo a referência da coleção 'tblTurma' para adicionar uma nova turma
-      const classCollectionRef = collection(db, 'tblTurma');
-      // Adicionando os dados da turma à coleção 'tblTurma', associando o documento do usuário ao campo 'userRef'
-      await addDoc(classCollectionRef, {
+
+      // Referência do usuário na coleção 'users'
+      const userRef = doc(db, "users", user.uid);
+
+      // Criando batch para operações em lote
+      const batch = writeBatch(db);
+
+      // Referência da nova turma
+      const classCollectionRef = collection(db, "tblTurma");
+      const turmaDocRef = doc(classCollectionRef);
+
+      // Adicionando a turma ao batch
+      batch.set(turmaDocRef, {
         nomeTurma: className,
         periodoTurma: period,
-        educationLevel: educationLevel,
-        school: school,
-        userRef: userRef,  // A referência ao documento do usuário
+        educationLevel,
+        school,
+        userRef,
       });
+
+      // Criando as sondagens relacionadas à turma
+      const sondagens = [
+        { nomeSondagem: "3° Bimestre", periodoInicial: "", periodoFinal: "" },
+        { nomeSondagem: "4° Bimestre", periodoInicial: "", periodoFinal: "" },
+        { nomeSondagem: "2° Bimestre", periodoInicial: "", periodoFinal: "" },
+        { nomeSondagem: "1° Bimestre", periodoInicial: "", periodoFinal: "" },
+      ];
+
+      const sondagemCollectionRef = collection(db, "tblSondagem");
+      sondagens.forEach((sondagem) => {
+        const sondagemDocRef = doc(sondagemCollectionRef);
+        batch.set(sondagemDocRef, {
+          ...sondagem,
+          turmaRef: turmaDocRef, // Referência da turma
+        });
+      });
+
+      // Commit das operações em lote
+      await batch.commit();
+
       // Navegar de volta para a lista de turmas, passando os dados da turma
       navigation.navigate("Classes", {
         classData: {
@@ -185,4 +210,3 @@ const styles = StyleSheet.create({
     gap: 10,
   },
 });
-

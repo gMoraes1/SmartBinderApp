@@ -22,6 +22,7 @@ import DeleteBtn from "../../../components/Buttons/DeleteBtn";
 import LtBtn from "../../../components/Buttons/LittleBtn";
 import BackBtn from "../../../components/Buttons/BackBtn";
 
+
 interface StudentData {
   id: string;
   nomeAluno: string;
