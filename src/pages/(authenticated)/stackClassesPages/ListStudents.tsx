@@ -41,7 +41,7 @@ const Title = styled.Text`
   font-size: 32px;
   font-weight: 600;
   text-align: center;
-  padding-bottom: 8%;
+  padding-top: 12%;
   color: ${(props) => props.theme.color};
 `;
 
@@ -83,13 +83,13 @@ export default function ListStudents({ navigation, route }) {
     );
 
     return () => unsubscribe();
-  }, [turmaId]); ''
+  }, [turmaId]);''
 
   return (
     <Container>
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
-      <Title>Alunos da turma</Title>
+        <Title>Alunos da turma</Title>
       </View>
 
       <FlatList
@@ -129,7 +129,7 @@ export default function ListStudents({ navigation, route }) {
         }
         style={styles.BtnAdd}
       >
-
+        
         <Text style={styles.TxtBtn1}>+</Text>
       </TouchableOpacity>
     </Container>
@@ -138,8 +138,11 @@ export default function ListStudents({ navigation, route }) {
 
 const styles = StyleSheet.create({
   header: {
-    right: '0%',
-    top: '2.8%',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 110,
+    paddingHorizontal: 16,
   },
   title: {
     fontSize: 32,

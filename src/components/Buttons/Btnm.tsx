@@ -16,11 +16,10 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     width: 100,
-    alignSelf: "flex-end",
-    bottom:'80%',
-    margin:'3%',
+    position:'absolute',
+    bottom: '60%',             // Move o botão um pouco para cima
+    left: '70%',             // Posiciona no canto direito
     zIndex: 10,           // Garante que o botão fique sobre outros elementos
-    elevation:5,
   },
   textButton: {
     color: "white",
