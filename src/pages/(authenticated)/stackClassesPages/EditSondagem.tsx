@@ -21,8 +21,6 @@ const Container = styled.View`
   width: 100%;
   height: 100%;
   padding: 16px;
-  text-align:center;
-  align-items:center
 `;
 
 const Title = styled.Text`
@@ -30,9 +28,8 @@ const Title = styled.Text`
   font-weight: 600;
   text-align: center;
   padding-top: 12%;
-  width:255px;
   color: ${(props) => props.theme.color};
-  bottom:5%;
+  bottom:10%;
 `;
 
 interface Sondagem {
@@ -117,27 +114,29 @@ export default function EditSondagem({ route }) {
   return (
     <Container>
       <View style={styles.header}>
-        <BackBtn onPress={() => navigation.goBack()} />
-      </View>
+      <BackBtn onPress={() => navigation.goBack()} />
       <Title>Editar Sondagens</Title>
-      <View style={styles.alignList}>
-        <FlatList
-          data={sondagens}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.item}>
-              <Text style={styles.text}>{item.nomeSondagem}</Text>
-              <Text style={styles.text}>Período Inicial: {item.periodoInicial}</Text>
-              <Text style={styles.text}>Período Final: {item.periodoFinal}</Text>
-
-              <Btnm texto="Editar" onPress={() => setEditedSondagem(item)} />
-            </View>
-          )}
-        />
       </View>
+
+      <FlatList
+        data={sondagens}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.item}>
+            <Text style={styles.text}>{item.nomeSondagem}</Text>
+            <Text style={styles.text}>Período Inicial: {item.periodoInicial}</Text>
+            <Text style={styles.text}>Período Final: {item.periodoFinal}</Text>
+
+            <Btnm texto="Editar" onPress={() => setEditedSondagem(item)} />
+          </View>
+        )}
+      />
 
       {editedSondagem && (
         <View style={styles.editContainer}>
+          <View style={styles.header}>
+            <BackBtn onPress={() => navigation.goBack()} />
+          </View>
           <Text style={styles.editTitle}>Editar Sondagem</Text>
           <Input
             text="Nome da Sondagem"
@@ -179,19 +178,24 @@ export default function EditSondagem({ route }) {
 const styles = StyleSheet.create({
   item: {
     marginVertical: 10,
+    top:'10%',
     padding: 15,
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
-    height: 130,
+    height: 110,
+    width: '90%',
+    alignSelf: 'center',
   },
-alignList:{
-  bottom:'5.5%',
-},
-
   text: {
     fontSize: 16,
     marginBottom: 5,
   },
+
+  header: {
+    right: '0.1%',
+    top: '2.7%',
+  },
+
   editContainer: {
     position: 'absolute',
     top: '20%',
@@ -212,10 +216,5 @@ alignList:{
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
-  },
-
-  header: {
-    right: '44.7%',
-    top: '2.73%',
   },
 });

@@ -13,6 +13,7 @@ import ClassDetails from "../pages/(authenticated)/stackClassesPages/ClassDetail
 import ClassOptions from "../pages/(authenticated)/stackClassesPages/ClassOptions";
 import StudentDetails from "../pages/(authenticated)/stackClassesPages/StudentDetails";
 import EditSondagem from "../pages/(authenticated)/stackClassesPages/EditSondagem";
+import StatusSondagem from "../pages/(authenticated)/stackClassesPages/statusSondagem";
 
 const Stack = createStackNavigator();
 
@@ -32,6 +33,7 @@ function StackRegister() {
       <Stack.Screen name="EditSondagem" component={EditSondagem} />
       <Stack.Screen name="ClassOptions" component={ClassOptions} />
       <Stack.Screen name="StudentDetails" component={StudentDetails} />
+      <Stack.Screen name="StatusSondagem" component={StatusSondagem} />
     </Stack.Navigator>
   );
 }

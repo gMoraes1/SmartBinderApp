@@ -16,12 +16,13 @@ import {
   orderBy,
   deleteDoc,
   doc,
+  updateDoc
 } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import DeleteBtn from "../../../components/Buttons/DeleteBtn";
 import LtBtn from "../../../components/Buttons/LittleBtn";
 import BackBtn from "../../../components/Buttons/BackBtn";
-
+import Input from "../../../components/Input/Input"; // Ensure Input component is available for form fields
 
 interface StudentData {
   id: string;
@@ -41,13 +42,14 @@ const Title = styled.Text`
   font-size: 32px;
   font-weight: 600;
   text-align: center;
-  padding-bottom: 8%;
+  padding-top: 12%;
   color: ${(props) => props.theme.color};
 `;
 
 export default function ListStudents({ navigation, route }) {
   const [students, setStudents] = useState<StudentData[]>([]);
-  const { turmaId } = route.params; // Obtendo o parâmetro turmaId
+  const [editedStudent, setEditedStudent] = useState<StudentData | null>(null);
+  const { turmaId } = route.params; // Obtaining turmaId from route params
 
   async function deleteAluno(id: string) {
     try {
@@ -64,7 +66,7 @@ export default function ListStudents({ navigation, route }) {
       query(
         collection(db, "tblAluno"),
         where("turmaRef", "==", doc(db, "tblTurma", turmaId)),
-        orderBy("nomeAluno") // Ordenando pela propriedade nomeAluno
+        orderBy("nomeAluno") // Ordering by student name
       ),
       (querySnapshot) => {
         const studentList: StudentData[] = [];
@@ -83,14 +85,35 @@ export default function ListStudents({ navigation, route }) {
     );
 
     return () => unsubscribe();
-  }, [turmaId]); ''
+  }, [turmaId]);
+
+  const handleEditStudent = (studentData: StudentData) => {
+    setEditedStudent(studentData);
+  };
+
+  const handleSaveStudent = async () => {
+    if (editedStudent) {
+      try {
+        await updateDoc(doc(db, "tblAluno", editedStudent.id), {
+          nomeAluno: editedStudent.nomeAluno,
+          nascimentoAluno: editedStudent.nascimentoAluno,
+          rmAluno: editedStudent.rmAluno,
+        });
+        Alert.alert("Sucesso", "Aluno atualizado com sucesso!");
+        setEditedStudent(null); // Close edit form
+      } catch (error) {
+        console.error("Erro ao atualizar aluno:", error);
+        Alert.alert("Erro", "Não foi possível atualizar o aluno.");
+      }
+    }
+  };
 
   return (
     <Container>
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
-      <Title>Alunos da turma</Title>
       </View>
+        <Title>Alunos da turma</Title>
 
       <FlatList
         data={students}
@@ -114,22 +137,56 @@ export default function ListStudents({ navigation, route }) {
               <DeleteBtn onPress={() => deleteAluno(item.id)}>
                 Deletar
               </DeleteBtn>
-              <LtBtn onPress={() => navigation.navigate("StudentDetails")}>
+              <LtBtn onPress={() => handleEditStudent(item)}>
                 Editar
+              </LtBtn>
+              <LtBtn onPress={() => navigation.navigate("StatusSondagem")}>
+                Progresso
               </LtBtn>
             </View>
           </TouchableOpacity>
         )}
       />
 
-      {/* Botão para registrar alunos */}
+      {/* Add/Edit student form */}
+      {editedStudent && (
+        <View style={styles.editContainer}>
+          <Text style={styles.editTitle}>Editar Aluno</Text>
+          <Input
+            text="Nome"
+            value={editedStudent.nomeAluno}
+            onChangeText={(value) =>
+              setEditedStudent({ ...editedStudent, nomeAluno: value })
+            }
+          />
+          <Input
+            text="Nascimento"
+            value={editedStudent.nascimentoAluno}
+            onChangeText={(value) =>
+              setEditedStudent({ ...editedStudent, nascimentoAluno: value })
+            }
+          />
+          <Input
+            text="RM"
+            value={editedStudent.rmAluno}
+            onChangeText={(value) =>
+              setEditedStudent({ ...editedStudent, rmAluno: value })
+            }
+          />
+          <View style={styles.btnGroup}>
+            <LtBtn onPress={handleSaveStudent}>Salvar</LtBtn>
+            <LtBtn onPress={() => setEditedStudent(null)}>Cancelar</LtBtn>
+          </View>
+        </View>
+      )}
+
+      {/* Button to register new students */}
       <TouchableOpacity
         onPress={() =>
           navigation.navigate("CreateStudent", { turmaId: turmaId })
         }
         style={styles.BtnAdd}
       >
-
         <Text style={styles.TxtBtn1}>+</Text>
       </TouchableOpacity>
     </Container>
@@ -138,15 +195,8 @@ export default function ListStudents({ navigation, route }) {
 
 const styles = StyleSheet.create({
   header: {
-    right: '0%',
     top: '2.8%',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "600",
-    textAlign: "center",
-    paddingVertical: 20,
-  },
+},
   list: {
     marginBottom: 20,
   },
@@ -189,22 +239,33 @@ const styles = StyleSheet.create({
     textAlign: "center",
     top: -2,
   },
-  deleteButton: {
-    backgroundColor: "#FF5050",
-    borderRadius: 5,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-  },
-  deleteText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "800",
-  },
   buttonsContainer: {
     display: "flex",
     flexDirection: "row",
     gap: 10,
     alignItems: "center",
-    justifyContent: "center"
-  }
+    justifyContent: "center",
+  },
+  editContainer: {
+    position: "absolute",
+    top: "30%",
+    left: "10%",
+    right: "10%",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 8,
+    elevation: 5,
+    alignItems: "center",
+  },
+  editTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  btnGroup: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+    width: "100%",
+  },
 });
