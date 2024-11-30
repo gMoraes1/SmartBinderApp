@@ -46,7 +46,7 @@ const Title = styled.Text`
   font-weight: 600;
   text-align: center;
   padding-top: 12%;
-  color: ${(props) => props.theme.color};
+  color: ${(props) => props.theme.color}; 
 `;
 
 export default function Classes({ navigation }) {
