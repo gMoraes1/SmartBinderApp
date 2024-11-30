@@ -29,6 +29,7 @@ const Title = styled.Text`
   text-align: center;
   padding-top: 12%;
   color: ${(props) => props.theme.color};
+  bottom:10%;
 `;
 
 interface Sondagem {
@@ -112,10 +113,10 @@ export default function EditSondagem({ route }) {
 
   return (
     <Container>
-      <Title>
-        <BackBtn onPress={() => navigation.goBack()} />
-        Editar Sondagens
-      </Title>
+      <View style={styles.header}>
+      <BackBtn onPress={() => navigation.goBack()} />
+      <Title>Editar Sondagens</Title>
+      </View>
 
       <FlatList
         data={sondagens}
@@ -133,6 +134,9 @@ export default function EditSondagem({ route }) {
 
       {editedSondagem && (
         <View style={styles.editContainer}>
+          <View style={styles.header}>
+            <BackBtn onPress={() => navigation.goBack()} />
+          </View>
           <Text style={styles.editTitle}>Editar Sondagem</Text>
           <Input
             text="Nome da Sondagem"
@@ -174,15 +178,24 @@ export default function EditSondagem({ route }) {
 const styles = StyleSheet.create({
   item: {
     marginVertical: 10,
+    top:'10%',
     padding: 15,
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
-    height: 130,
+    height: 110,
+    width: '90%',
+    alignSelf: 'center',
   },
   text: {
     fontSize: 16,
     marginBottom: 5,
   },
+
+  header: {
+    right: '0.1%',
+    top: '2.7%',
+  },
+
   editContainer: {
     position: 'absolute',
     top: '20%',

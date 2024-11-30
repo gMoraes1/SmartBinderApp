@@ -8,6 +8,5 @@ export default {
     inputBackground: '#fff',
     borderColor: '#ccc',
     placeholderColor:"rgba(0,0,0,0.6)",
-
   };
   

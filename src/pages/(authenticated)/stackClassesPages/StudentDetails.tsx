@@ -1,8 +1,9 @@
 import styled, { useTheme } from "styled-components/native";
 import { StyleSheet, TextInput, View } from 'react-native'
 import { useState } from "react";
-import {AutoGrowingTextInput} from 'react-native-autogrow-textinput'
+import { AutoGrowingTextInput } from 'react-native-autogrow-textinput'
 import Btn from "../../../components/Buttons/Btn";
+import BackBtn from "../../../components/Buttons/BackBtn";
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -19,17 +20,20 @@ const Title = styled.Text`
   color: ${(props) => props.theme.color};
 `;
 
-export default function StudentDetails() {
+export default function StudentDetails({ navigation }) {
     const theme = useTheme()
     const [faltas, setFaltas] = useState('');
     const [obs, setObs] = useState('');
 
-    function handleCreateSondagem(){
+    function handleCreateSondagem() {
 
     };
 
     return (
         <Container>
+            <View style={styles.header}>
+                <BackBtn onPress={() => navigation.goBack()} />
+            </View>
             <Title>Informações do aluno</Title>
             <View style={styles.InputView}>
                 <TextInput
@@ -63,7 +67,7 @@ export default function StudentDetails() {
                     onChangeText={setObs}
                     value={obs} />
             </View>
-            <Btn onPress={handleCreateSondagem}/>
+            <Btn onPress={handleCreateSondagem} />
         </Container>
     )
 };
@@ -75,7 +79,11 @@ const styles = StyleSheet.create({
     },
 
     InputView: {
-        top:30,
-        marginBottom:30,
+        top: 30,
+        marginBottom: 30,
+    },
+    header: {
+        right: '41%',
+        top: '4.7%',
     },
 })

@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         textAlign:'center',
         padding:20,
-        top:'26%',
+        top:'24%',
         display:'flex',
         flexDirection:'row',
     },

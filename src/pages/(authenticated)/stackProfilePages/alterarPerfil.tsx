@@ -192,6 +192,7 @@ export default function EditProfile({ navigation, route }) {
   // Função para validar o CPF
   const validateCpf = (cpf) => {
     const cleanedCpf = cpf.replace(/\D/g, ''); // Remove tudo o que não for número
+    if (cleanedCpf.length == '') return true;
     if (cleanedCpf.length !== 11) return false;
 
     let sum = 0;
@@ -291,8 +292,8 @@ export default function EditProfile({ navigation, route }) {
           }]}
           value={cpf}
           onChangeText={handleCpfChange}
-          placeholder="CPF"
-          placeholderTextColor={"rgba(255,255,255,0.6)"}
+          placeholder={'CPF'}
+          placeholderTextColor={theme.placeholderColor}
         />
         {!isValidCpf && (
           <Feather style={styles.errorIcon} name="x-circle" color={'#ff0000'} size={26} />
@@ -313,8 +314,8 @@ export default function EditProfile({ navigation, route }) {
           }]}
           value={date}
           onChangeText={setDate}
-          placeholder="Data de Nascimento"
-          placeholderTextColor={"rgba(255,255,255,0.6)"}
+          placeholder={'Data de Nascimento'}
+          placeholderTextColor={theme.placeholderColor}
         />
         <TextInputMask
           type={'cel-phone'}
@@ -333,8 +334,8 @@ export default function EditProfile({ navigation, route }) {
           }]}
           value={telefone}
           onChangeText={setTelefone}
-          placeholder="Número de Celular"
-          placeholderTextColor={"rgba(255,255,255,0.6)"}
+          placeholder={'Número de Telefone'}
+          placeholderTextColor={theme.placeholderColor}
         />
         <Btn onPress={updateProfile} disabled={!isValidCpf} />
       </View>
