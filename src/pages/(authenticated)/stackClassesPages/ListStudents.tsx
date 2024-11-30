@@ -140,7 +140,7 @@ export default function ListStudents({ navigation, route }) {
               <LtBtn onPress={() => handleEditStudent(item)}>
                 Editar
               </LtBtn>
-              <LtBtn onPress={() => navigation.navigate("StatusSondagem")}>
+              <LtBtn onPress={() => navigation.navigate("StatusSondagem", { turmaId})}>
                 Progresso
               </LtBtn>
             </View>
