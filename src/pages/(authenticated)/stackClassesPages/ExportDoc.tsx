@@ -16,7 +16,7 @@ interface StudentData {
   nomeAluno: string;
   nascimentoAluno: string;
   rmAluno: string;
-  turmaId: string; // Adicionei turmaId para associar o aluno à turma
+  turmaId: string; // Adiciona turmaId para associar o aluno à turma
 }
 
 interface ClassData {
@@ -49,6 +49,7 @@ export default function ExportDoc({ navigation, route }) {
   const [turmas, setTurmas] = useState<ClassData[]>([]);
   const turmaId = route.params?.turmaId; // Obtendo turmaId diretamente de route.params
 
+  // Carrega a turma selecionada
   useEffect(() => {
     if (!turmaId) {
       console.error("turmaId não encontrado");
@@ -60,7 +61,7 @@ export default function ExportDoc({ navigation, route }) {
       (docSnapshot) => {
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
-          setTurmas([
+          setTurmas([ // Alteração para setar turmas como um array
             {
               id: docSnapshot.id,
               nomeTurma: data.nomeTurma,
@@ -102,81 +103,88 @@ export default function ExportDoc({ navigation, route }) {
     return () => unsubscribeAuth();
   }, []); // Esse useEffect só executa uma vez após o componente ser montado
 
+  // Carrega os alunos da turma selecionada
   useEffect(() => {
-    if (turmas.length > 0) {
-      const turmaIds = turmas.map(turma => turma.id);
-      const unsubscribe = onSnapshot(
-        query(
-          collection(db, "tblAluno"),
-          where("turmaRef", "in", turmaIds),
-          orderBy("nomeAluno") // Ordenando pela propriedade nomeAluno
-        ),
-        (querySnapshot) => {
-          const studentList: StudentData[] = [];
-          querySnapshot.forEach((docSnap) => {
-            const data = docSnap.data();
-            studentList.push({
-              id: docSnap.id,
-              nomeAluno: data.nomeAluno,
-              nascimentoAluno: data.nascimentoAluno,
-              rmAluno: data.rmAluno,
-              turmaId: data.turmaRef.id // Adiciona o turmaId ao aluno
-            });
+    if (!turmaId) return;
+
+    const unsubscribe = onSnapshot(
+      query(
+        collection(db, "tblAluno"),
+        where("turmaRef", "==", doc(db, "tblTurma", turmaId)), // Verifique se o filtro é feito pela turmaRef
+        orderBy("nomeAluno") // Ordenando pela propriedade nomeAluno
+      ),
+      (querySnapshot) => {
+        const studentList: StudentData[] = [];
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          studentList.push({
+            id: docSnap.id,
+            nomeAluno: data.nomeAluno,
+            nascimentoAluno: data.nascimentoAluno,
+            rmAluno: data.rmAluno,
+            turmaId: data.turmaRef.id, // Atribuindo a turmaId para cada aluno
           });
+        });
 
-          setStudents(studentList);
-        }
-      );
+        setStudents(studentList); // Atualiza a lista de alunos
+      }
+    );
 
-      return () => unsubscribe();
-    }
-  }, [turmas]);
+    return () => unsubscribe();
+  }, [turmaId]);
 
+
+
+  // Gera o arquivo Excel com os dados dos alunos
   const generateExcel = () => {
-    if (turmas.length === 0) {
-      console.error('Turmas não encontradas');
+    if (students.length === 0) {
+      console.error('Nenhum aluno encontrado para esta turma');
       return;
     }
 
-    const wb = XLSX.utils.book_new();
+    const wb = XLSX.utils.book_new(); // Criação de uma nova planilha Excel
 
-    turmas.forEach((turma) => {
-      // Cabeçalho da planilha
-      const header = ['Nome do Aluno', 'RM', '1° Bimestre', '2° Bimestre', '3° Bimestre', '4° Bimestre'];
+    // Filtrando alunos pela turma
+    const filteredStudents = students.filter(student => student.turmaId === turmaId);
 
-      // Usando o nome da turma que foi corretamente obtida
-      const turmaName = turma?.nomeTurma || 'Turma Desconhecida';
+    // Verificando se há alunos para a turma
+    if (filteredStudents.length === 0) {
+      console.error('Nenhum aluno encontrado para esta turma');
+      return;
+    }
 
-      // Adiciona uma linha para o nome do professor e da turma
-      const professorRow = ['', '', (dadosPerfil?.nomeProfessor + " - " + turmaName) || ''];
+    // Cabeçalho da planilha
+    const header = ['Nome do Aluno', 'RM', '1° Bimestre', '2° Bimestre', '3° Bimestre', '4° Bimestre'];
 
-      // Adiciona uma linha em branco
-      const emptyRow = ['', '', ''];
+    // Criar a linha para o nome da turma e nome do professor
+    const turmaInfo = [
+      [`Professor: ${dadosPerfil?.nomeProfessor}`], // Nome do professor
+      [`Turma: ${turmas[0]?.school}`], // Nome da turma
+      [`Turma: ${turmas[0]?.nomeTurma}`], // Nome da turma
+    ];
 
-      // Filtra os alunos da turma atual
-      const studentsData = students
-        .filter(student => student.turmaId === turma.id)
-        .map(student => [
-          student.nomeAluno,
-          student.rmAluno
-        ]);
+    // Dados dos alunos
+    const studentsData = filteredStudents.map(student => [
+      student.nomeAluno,
+      student.rmAluno,
+      '', '', '', '' // Campos para as notas (que podem ser preenchidos depois)
+    ]);
 
-      // Cria a planilha com o nome do professor, linhas vazias e os dados dos alunos
-      const ws = XLSX.utils.aoa_to_sheet([
-        professorRow,   // Linha com o nome do professor e turma
-        emptyRow,       // Linha em branco
-        header,         // Cabeçalho
-        ...studentsData // Dados dos alunos
-      ]);
+    // Adicionando as informações da turma e do professor ao Excel
+    const ws = XLSX.utils.aoa_to_sheet([
+      ...turmaInfo,  // Linhas com nome da turma e nome do professor
+      [], // Linha vazia para separação
+      header, // Cabeçalho
+      ...studentsData // Dados dos alunos
+    ]);
 
-      // Adiciona a planilha ao arquivo
-      XLSX.utils.book_append_sheet(wb, ws, turmaName);
-    });
+    // Adiciona a planilha ao arquivo Excel
+    XLSX.utils.book_append_sheet(wb, ws, 'Alunos');
 
     // Converte o arquivo para base64
     const base64 = XLSX.write(wb, { type: 'base64' });
 
-    // Cria o caminho do arquivo
+    // Caminho do arquivo
     const filename = FileSystem.documentDirectory + `${namefile}.xlsx`;
 
     // Salva o arquivo no sistema de arquivos
@@ -187,6 +195,8 @@ export default function ExportDoc({ navigation, route }) {
       Sharing.shareAsync(filename);
     });
   };
+
+
 
   return (
     <Container>
@@ -233,5 +243,10 @@ const styles = StyleSheet.create({
   header: {
     right: '41%',
     top: '4.7%',
+  },
+
+  studentList: {
+    marginTop: 20,
+    width: '90%',
   },
 });

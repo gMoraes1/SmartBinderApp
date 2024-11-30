@@ -3,6 +3,23 @@ import { View, TextInput, TouchableOpacity, Text, StyleSheet } from "react-nativ
 import { db } from "../../../../firebase";
 import { addDoc, collection, doc } from "firebase/firestore";
 import BackBtn from "../../../components/Buttons/BackBtn";
+import styled from "styled-components/native";
+
+
+const Container = styled.View`
+  background-color: ${(props) => props.theme.background};
+  width: 100%;
+  padding: 16px;
+  height: 100%;
+`;
+
+const Title = styled.Text`
+  font-size: 32px;
+  font-weight: 600;
+  text-align: center;
+  padding-top: 12%;
+  color: ${(props) => props.theme.color}; 
+`;
 
 export default function CreateStudent({ navigation, route }) {
   const { turmaId } = route.params; // Obtendo a turmaId passada da tela anterior
@@ -36,9 +53,11 @@ export default function CreateStudent({ navigation, route }) {
   };
 
   return (
-    <View style={styles.container}>
-      
-      <Text style={styles.title}> <BackBtn onPress={() => navigation.goBack()}/> Cadastrar Aluno</Text>
+    <Container>
+      <View style={styles.header}>
+        <BackBtn onPress={() => navigation.goBack()} />
+      </View>
+      <Title>Cadastrar Aluno</Title>
 
       <TextInput
         style={styles.input}
@@ -63,7 +82,7 @@ export default function CreateStudent({ navigation, route }) {
       <TouchableOpacity style={styles.btnRegister} onPress={handleRegister}>
         <Text style={styles.txtBtnRegister}>Cadastrar</Text>
       </TouchableOpacity>
-    </View>
+    </Container>
   );
 }
 
@@ -102,4 +121,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
+
+  header: {
+    top: '2.7%',
+  },
+
 });
