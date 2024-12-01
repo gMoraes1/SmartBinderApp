@@ -1,19 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, Alert } from 'react-native';
+import { StyleSheet, View, Text, FlatList, Modal, Alert } from 'react-native';
 import styled from 'styled-components/native';
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-  updateDoc,
-  doc,
-} from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../../../firebase';
-import Input from '../../../components/Input/Input';
 import Btnm from '../../../components/Buttons/Btnm';
 import Btnms from '../../../components/Buttons/BtnmS';
-import BackBtn from "../../../components/Buttons/BackBtn";
+import Input from '../../../components/Input/Input';
+import BackBtn from '../../../components/Buttons/BackBtn';
 import { useNavigation } from '@react-navigation/native';
 
 const Container = styled.View`
@@ -27,87 +20,94 @@ const Title = styled.Text`
   font-size: 32px;
   font-weight: 600;
   text-align: center;
-  padding-top: 12%;
   color: ${(props) => props.theme.color};
-  bottom:10%;
 `;
 
-interface Sondagem {
+interface ObsSondagem {
   id: string;
-  nomeSondagem: string;
-  periodoInicial: string;
-  periodoFinal: string;
+  obs: string;
+  qntFaltas: string;
+  status: string;
+  sondagemRef: any; // Referência para tblSondagem
+  nomeSondagem: string; // Nome da sondagem a ser carregado
+  periodoInicial: string; // Período inicial
+  periodoFinal: string; // Período final
 }
 
-export default function EditSondagem({ route }) {
+export default function StatusSondagem({ route }) {
   const navigation = useNavigation();
-  const turmaId = route?.params?.turmaId;
-
-  if (!turmaId) {
-    console.warn('Parâmetro turmaId não encontrado!');
-    return (
-      <View>
-        <Text>Erro: turmaId não foi fornecido.</Text>
-      </View>
-    );
-  }
-
-  const [sondagens, setSondagens] = useState<Sondagem[]>([]);
-  const [editedSondagem, setEditedSondagem] = useState<any | null>(null); // Alterado para qualquer tipo (any) para flexibilidade
+  const { turmaId, alunoId } = route.params; // Pegando turmaId e alunoId dos parâmetros da rota
+  
+  const [obsSondagens, setObsSondagens] = useState<ObsSondagem[]>([]);
+  const [editingItem, setEditingItem] = useState<ObsSondagem | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    const fetchSondagens = () => {
-      const q = query(
-        collection(db, 'tblSondagem'),
-        where('turmaRef', '==', doc(db, 'tblTurma', turmaId))
-      );
+    if (!alunoId) {
+      console.error("ID do aluno não fornecido.");
+      return;
+    }
 
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const lista: Sondagem[] = [];
-        querySnapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          lista.push({
-            id: docSnap.id,
-            nomeSondagem: data.nomeSondagem,
-            periodoInicial: data.periodoInicial,
-            periodoFinal: data.periodoFinal,
-          });
+    const q = query(
+      collection(db, 'tblObsSondagem'),
+      where('alunoRef', '==', doc(db, 'tblAluno', alunoId))
+    );
+
+    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
+      const lista: ObsSondagem[] = [];
+      for (const docSnap of querySnapshot.docs) {
+        const data = docSnap.data();
+        const sondagemRef = data.sondagemRef; // Pega a referência para a sondagem
+
+        // Agora busque os dados da sondagem correspondente
+        const sondagemDoc = await getDoc(sondagemRef);
+        const nomeSondagem = sondagemDoc.exists() ? (sondagemDoc.data() as { nomeSondagem: string }).nomeSondagem : 'Sem nome';
+        const periodoInicial = sondagemDoc.exists() ? (sondagemDoc.data() as { periodoInicial: string }).periodoInicial : 'Sem nome';
+        const periodoFinal = sondagemDoc.exists() ? (sondagemDoc.data() as { periodoFinal: string }).periodoFinal : 'Sem nome';
+        
+        lista.push({
+          id: docSnap.id,
+          status: data.status,
+          qntFaltas: data.qntFaltas,
+          obs: data.obs,
+         
+          sondagemRef, // Incluindo a referência
+          nomeSondagem, // Armazenando o nome da sondagem
+          periodoInicial, // Armazenando o periodo inicial
+          periodoFinal, // Armazenando o periodo final
         });
+      }
 
-        // Ordena as sondagens por período inicial (convertido para data)
-        lista.sort((a, b) => {
-          const dateA = new Date(a.periodoInicial.split('/').reverse().join('-')); // Converte "DD/MM/YYYY" para "YYYY-MM-DD"
-          const dateB = new Date(b.periodoInicial.split('/').reverse().join('-'));
-          return dateA.getTime() - dateB.getTime(); // Ordena de forma crescente
-        });
-
-        setSondagens(lista);
+      // Ordena a lista por 'periodoInicial' de forma crescente
+      lista.sort((a, b) => {
+        const dateA = new Date(a.periodoInicial.split('/').reverse().join('-')); // Converte "DD/MM/YYYY" para "YYYY-MM-DD"
+        const dateB = new Date(b.periodoInicial.split('/').reverse().join('-'));
+        return dateA.getTime() - dateB.getTime(); // Ordena do menor para o maior
       });
 
-      return unsubscribe;
-    };
+      setObsSondagens(lista);
+    });
 
-    return fetchSondagens();
-  }, [turmaId]);
+    return () => unsubscribe();
+  }, [alunoId]);
 
   const handleSave = async () => {
-    if (editedSondagem) {
-      setIsSaving(true); // Indica que a operação está em progresso
+    if (editingItem) {
+      setIsSaving(true);
       try {
-        // Atualiza os dados da tblObsSondagem
-        await updateDoc(doc(db, 'tblObsSondagem', editedSondagem.id), {
-          status: editedSondagem.status,
-          qntFaltas: editedSondagem.qntFaltas,
-          obs: editedSondagem.obs,
+        await updateDoc(doc(db, 'tblObsSondagem', editingItem.id), {
+          status: editingItem.status,
+          qntFaltas: editingItem.qntFaltas,
+          obs: editingItem.obs,
+          
         });
-        Alert.alert('Sucesso', 'Observação atualizada com sucesso!');
-        setEditedSondagem(null); // Fecha a caixa de edição
+        Alert.alert('Sucesso', 'Dados atualizados com sucesso!');
+        setEditingItem(null); // Fecha o modal
       } catch (error) {
-        console.error('Erro ao atualizar a observação:', error);
-        Alert.alert('Erro', 'Não foi possível atualizar a observação.');
+        console.error('Erro ao atualizar os dados:', error);
+        Alert.alert('Erro', 'Não foi possível atualizar os dados.');
       } finally {
-        setIsSaving(false); // Restaura o estado de carregamento
+        setIsSaving(false);
       }
     }
   };
@@ -117,95 +117,92 @@ export default function EditSondagem({ route }) {
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
       </View>
-      <Title>Progresso do aluno</Title>
+      <Title>Status Sondagem</Title>
 
       <FlatList
-        data={sondagens}
+        data={obsSondagens}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.item}>
-            <Text style={styles.text}>{item.nomeSondagem}</Text>
-            <Text style={styles.text}>Período Inicial: {item.periodoInicial}</Text>
-            <Text style={styles.text}>Período Final: {item.periodoFinal}</Text>
+            <Text style={styles.text}>{item.nomeSondagem}: {item.periodoInicial} __{item.periodoFinal}</Text>
+            <Text style={styles.text}>Status: {item.status}</Text>
+            <Text style={styles.text}>Faltas: {item.qntFaltas}</Text>
+            <Text style={styles.text}>Observação: {item.obs}</Text>
 
-            <Btnm texto="Editar" onPress={() => setEditedSondagem(item)} />
+            <Btnm texto="Editar" onPress={() => setEditingItem(item)} />
           </View>
         )}
       />
 
-      {editedSondagem && (
-        <View style={styles.editContainer}>
-          <Text style={styles.editTitle}>Editar Observação</Text>
-          
-          {/* Editando os campos de tblObsSondagem */}
-          <Input
-            text="Status"
-            value={editedSondagem.status}
-            onChangeText={(value) =>
-              setEditedSondagem({ ...editedSondagem, status: value })
-            }
-          />
-          <Input
-            text="Quantidade de Faltas"
-            value={editedSondagem.qntFaltas}
-            onChangeText={(value) =>
-              setEditedSondagem({ ...editedSondagem, qntFaltas: value })
-            }
-          />
-          <Input
-            text="Observação"
-            value={editedSondagem.obs}
-            onChangeText={(value) =>
-              setEditedSondagem({ ...editedSondagem, obs: value })
-            }
-          />
-          
-          <View style={styles.btnGroup}>
-            <Btnms
-              texto={isSaving ? 'Salvando...' : 'Salvar'}
-              onPress={handleSave}
-              disabled={isSaving}
+      <Modal visible={!!editingItem} animationType="slide" transparent>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Editar Dados</Text>
+            <Input
+              text="Observação"
+              value={editingItem?.status}
+              onChangeText={(value) =>
+                setEditingItem({ ...editingItem, status: value })
+              }
             />
-            <Btnms texto="Cancelar" onPress={() => setEditedSondagem(null)} />
+            <Input
+              text="Quantidade de Faltas"
+              value={editingItem?.qntFaltas}
+              onChangeText={(value) =>
+                setEditingItem({ ...editingItem, qntFaltas: value })
+              }
+            />
+            <Input
+              text="Status"
+              value={editingItem?.obs}
+              onChangeText={(value) =>
+                setEditingItem({ ...editingItem, obs: value })
+              }
+            />
+            <View style={styles.btnGroup}>
+              <Btnms
+                texto={isSaving ? 'Salvando...' : 'Salvar'}
+                onPress={handleSave}
+                disabled={isSaving}
+              />
+              <Btnms texto="Cancelar" onPress={() => setEditingItem(null)} />
+            </View>
           </View>
         </View>
-      )}
+      </Modal>
     </Container>
   );
 }
 
 const styles = StyleSheet.create({
+  header: {
+    marginBottom: 20,
+  },
   item: {
     marginVertical: 10,
-    top: '10%',
     padding: 15,
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
-    height: 110,
-    width: '90%',
-    alignSelf: 'center',
+    height: 160, // Aumentando a altura para acomodar os novos campos
   },
   text: {
     fontSize: 16,
     marginBottom: 5,
   },
-
-  header: {
-    right: '0.1%',
-    top: '2.7%',
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
-
-  editContainer: {
-    position: 'absolute',
-    top: '20%',
-    left: '10%',
-    right: '10%',
+  modalContent: {
+    width: '80%',
     backgroundColor: '#fff',
     padding: 20,
     borderRadius: 8,
     elevation: 5,
   },
-  editTitle: {
+  modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,

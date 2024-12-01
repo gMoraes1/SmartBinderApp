@@ -16,7 +16,7 @@ import {
   orderBy,
   deleteDoc,
   doc,
-  updateDoc
+  getDocs
 } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import DeleteBtn from "../../../components/Buttons/DeleteBtn";
@@ -49,17 +49,66 @@ const Title = styled.Text`
 export default function ListStudents({ navigation, route }) {
   const [students, setStudents] = useState<StudentData[]>([]);
   const [editedStudent, setEditedStudent] = useState<StudentData | null>(null);
-  const { turmaId } = route.params; // Obtaining turmaId from route params
+  const { turmaId } = route.params; 
+  const { alunoId } = route.params;
 
-  async function deleteAluno(id: string) {
-    try {
-      await deleteDoc(doc(db, "tblAluno", id));
-      Alert.alert("Aluno deletado.");
-    } catch (error) {
-      console.error("Erro ao deletar aluno.", error);
-      Alert.alert("Erro ao deletar aluno.");
-    }
-  }
+  // Função para excluir as observações associadas ao aluno
+  const deleteObservacoes = async (alunoId: string) => {
+    const collectionRef = collection(db, "tblObsSondagem");
+    const q = query(
+      collectionRef,
+      where("alunoRef", "==", doc(db, "tblAluno", alunoId))
+    );
+
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((docSnap) => {
+      deleteDoc(doc(db, "tblObsSondagem", docSnap.id)); // Excluir cada observação
+    });
+  };
+
+  // Função para excluir o aluno
+  const deleteAluno = async (id: string) => {
+    Alert.alert(
+      "Confirmar Exclusão",
+      "Você tem certeza que deseja excluir este aluno?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Sim",
+          onPress: () => {
+            Alert.alert(
+              "Confirmar Exclusão Final",
+              "Esta ação é irreversível. Você tem certeza que deseja excluir?",
+              [
+                {
+                  text: "Cancelar",
+                  style: "cancel",
+                },
+                {
+                  text: "Sim",
+                  onPress: async () => {
+                    try {
+                      // Excluir observações do aluno
+                      await deleteObservacoes(id);
+                      // Excluir aluno
+                      await deleteDoc(doc(db, "tblAluno", id));
+                      Alert.alert("Aluno deletado com sucesso.");
+                    } catch (error) {
+                      console.error("Erro ao deletar aluno.", error);
+                      Alert.alert("Erro ao deletar aluno.");
+                    }
+                  },
+                },
+              ]
+            );
+          },
+        },
+      ]
+    );
+  };
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -115,38 +164,33 @@ export default function ListStudents({ navigation, route }) {
       </View>
         <Title>Alunos da turma</Title>
 
-      <FlatList
-        data={students}
-        keyExtractor={(item) => item.id}
-        style={styles.list}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.studentItem}
-            onPress={() => {
-              navigation.navigate("StudentDetails");
-            }}
-          >
-            <View style={styles.studentInfo}>
-              <Text style={styles.textData}>Nome: {item.nomeAluno}</Text>
-              <Text style={styles.textData}>
-                Nascimento: {item.nascimentoAluno}
-              </Text>
-              <Text style={styles.textData}>RM: {item.rmAluno}</Text>
+        <FlatList
+          data={students}
+          keyExtractor={(item) => item.id}
+          style={styles.list}
+          renderItem={({ item }) => (
+            <View style={styles.studentItem}>
+              <View style={styles.studentInfo}>
+                <Text style={styles.textData}>Nome: {item.nomeAluno}</Text>
+                <Text style={styles.textData}>
+                  Nascimento: {item.nascimentoAluno}
+                </Text>
+                <Text style={styles.textData}>RM: {item.rmAluno}</Text>
+              </View>
+              <View style={styles.buttonsContainer}>
+                <DeleteBtn onPress={() => deleteAluno(item.id)}>
+                  Deletar
+                </DeleteBtn>
+                <LtBtn onPress={() => handleEditStudent(item)}>
+                  Editar
+                </LtBtn>
+                <LtBtn onPress={() => navigation.navigate("StatusSondagem", { alunoId: item.id, turmaId })}>
+                  Progresso
+                </LtBtn>
+              </View>
             </View>
-            <View style={styles.buttonsContainer}>
-              <DeleteBtn onPress={() => deleteAluno(item.id)}>
-                Deletar
-              </DeleteBtn>
-              <LtBtn onPress={() => handleEditStudent(item)}>
-                Editar
-              </LtBtn>
-              <LtBtn onPress={() => navigation.navigate("StatusSondagem", { turmaId})}>
-                Progresso
-              </LtBtn>
-            </View>
-          </TouchableOpacity>
-        )}
-      />
+          )}
+        />
 
       {/* Add/Edit student form */}
       {editedStudent && (
@@ -183,7 +227,7 @@ export default function ListStudents({ navigation, route }) {
       {/* Button to register new students */}
       <TouchableOpacity
         onPress={() =>
-          navigation.navigate("CreateStudent", { turmaId: turmaId })
+          navigation.navigate("CreateStudent", { turmaId: turmaId,  })
         }
         style={styles.BtnAdd}
       >
@@ -196,7 +240,7 @@ export default function ListStudents({ navigation, route }) {
 const styles = StyleSheet.create({
   header: {
     top: '2.8%',
-},
+  },
   list: {
     marginBottom: 20,
   },
