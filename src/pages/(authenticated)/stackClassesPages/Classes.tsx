@@ -277,7 +277,7 @@ async function deleteAssociatedData(turmaId: string) {
                 fontSize: 18,
                 paddingLeft: 20,
                 borderRadius: 10,
-                elevation: 3,
+                elevation: 2,
               },
               inputAndroid: {
                 backgroundColor: theme.inputBackground || "#D2DFDA",
@@ -288,7 +288,7 @@ async function deleteAssociatedData(turmaId: string) {
                 fontSize: 18,
                 paddingLeft: 20,
                 borderRadius: 10,
-                elevation: 3,
+                elevation: 2,
               }
             }}
             placeholder={{
@@ -320,7 +320,7 @@ async function deleteAssociatedData(turmaId: string) {
                 fontSize: 18,
                 paddingLeft: 20,
                 borderRadius: 10,
-                elevation: 3,
+                elevation: 2,
               },
               inputAndroid: {
                 backgroundColor: theme.inputBackground || "#D2DFDA",
@@ -331,7 +331,7 @@ async function deleteAssociatedData(turmaId: string) {
                 fontSize: 18,
                 paddingLeft: 20,
                 borderRadius: 10,
-                elevation: 3,
+                elevation: 2,
               }
             }}
             placeholder={{

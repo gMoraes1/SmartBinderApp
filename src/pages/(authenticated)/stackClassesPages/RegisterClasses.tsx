@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Alert } from "react-native";
-import styled, { useTheme } from 'styled-components/native';
-import { TextInputIconProps } from 'react-native-paper'
+import styled, { useTheme } from "styled-components/native";
+import { TextInputIconProps } from "react-native-paper";
 
 import { db, auth } from "../../../../firebase"; // Importando a instância do Firestore e auth
 import { collection, addDoc, doc, writeBatch } from "firebase/firestore"; // Funções do Firestore
@@ -9,7 +9,7 @@ import BackBtn from "../../../components/Buttons/BackBtn";
 import Input from "../../../components/Input/Input";
 
 import Btn from "../../../components/Buttons/Btn";
-import RNPickerSelect from 'react-native-picker-select';
+import RNPickerSelect from "react-native-picker-select";
 
 // Definindo o estilo para os componentes
 const Container = styled.View`
@@ -97,7 +97,10 @@ export default function RegisterClasses({ navigation }) {
       });
     } catch (error) {
       console.error("Erro ao adicionar turma: ", error);
-      Alert.alert("Erro", "Ocorreu um erro ao adicionar a turma. Tente novamente.");
+      Alert.alert(
+        "Erro",
+        "Ocorreu um erro ao adicionar a turma. Tente novamente."
+      );
     }
   };
 
@@ -112,11 +115,11 @@ export default function RegisterClasses({ navigation }) {
         <Input text="Nome da turma" onChangeText={setClassName} />
 
         <RNPickerSelect
-          onValueChange={(value) => console.log(value)}
+          onValueChange={setPeriod}
           items={[
-            { label: 'Manhã', value: 'manhã' },
-            { label: 'Tarde', value: 'tarde' },
-            { label: 'Noite', value: 'noite' },
+            { label: "Manhã", value: "manhã" },
+            { label: "Tarde", value: "tarde" },
+            { label: "Noite", value: "noite" },
           ]}
           style={{
             inputIOS: {
@@ -128,7 +131,7 @@ export default function RegisterClasses({ navigation }) {
               fontSize: 18,
               paddingLeft: 20,
               borderRadius: 10,
-              elevation: 5,
+              elevation: 2.5,
             },
             inputAndroid: {
               backgroundColor: theme.inputBackground || "#D2DFDA",
@@ -139,25 +142,24 @@ export default function RegisterClasses({ navigation }) {
               fontSize: 18,
               paddingLeft: 20,
               borderRadius: 10,
-              elevation: 5,
-            }
+              elevation: 2.5,
+            },
           }}
-
           placeholder={{
-            label: 'Escolha um Periodo',
+            label: "Escolha um Periodo",
             value: null,
             color: theme.placeholderColor,
           }}
         />
 
         <RNPickerSelect
-          onValueChange={(value) => console.log(value)}
+          onValueChange={setEducationLevel}
           items={[
-            { label: '1° série', value: '1° série' },
-            { label: '2° série', value: '2° série' },
-            { label: '3° série', value: '3° série' },
-            { label: '4° série', value: '4° série' },
-            { label: '5° série', value: '5° série' },
+            { label: "1° série", value: "1° série" },
+            { label: "2° série", value: "2° série" },
+            { label: "3° série", value: "3° série" },
+            { label: "4° série", value: "4° série" },
+            { label: "5° série", value: "5° série" },
           ]}
           style={{
             inputIOS: {
@@ -169,7 +171,7 @@ export default function RegisterClasses({ navigation }) {
               fontSize: 18,
               paddingLeft: 20,
               borderRadius: 10,
-              elevation: 5,
+              elevation: 2.5,
             },
             inputAndroid: {
               backgroundColor: theme.inputBackground || "#D2DFDA",
@@ -180,12 +182,11 @@ export default function RegisterClasses({ navigation }) {
               fontSize: 18,
               paddingLeft: 20,
               borderRadius: 10,
-              elevation: 5,
-            }
+              elevation: 2.5,
+            },
           }}
-
           placeholder={{
-            label: 'Escolha uma Série',
+            label: "Escolha uma Série",
             value: null,
             color: theme.placeholderColor,
           }}
