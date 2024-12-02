@@ -67,6 +67,7 @@ export default function ListStudents({ navigation, route }) {
     });
   };
 
+  //Delete para aluno e condsecutivamente apagar as tblObsSondagem
   const deleteAluno = async (id: string) => {
     Alert.alert(
       "Confirmar Exclusão",
