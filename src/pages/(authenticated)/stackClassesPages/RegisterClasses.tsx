@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Alert } from "react-native";
-import styled from 'styled-components/native';
+import styled, { useTheme } from 'styled-components/native';
 import { TextInputIconProps } from 'react-native-paper'
 
 import { db, auth } from "../../../../firebase"; // Importando a instância do Firestore e auth
-import { collection, addDoc, doc } from 'firebase/firestore'; // Funções do Firestore
+import { collection, addDoc, doc, writeBatch } from "firebase/firestore"; // Funções do Firestore
 import BackBtn from "../../../components/Buttons/BackBtn";
 import Input from "../../../components/Input/Input";
 
 import Btn from "../../../components/Buttons/Btn";
-import TextInputIcon from "react-native-paper/lib/typescript/components/TextInput/Adornment/TextInputIcon";
+import RNPickerSelect from 'react-native-picker-select';
 
 // Definindo o estilo para os componentes
 const Container = styled.View`
@@ -31,33 +31,61 @@ const Title = styled.Text`
 `;
 
 export default function RegisterClasses({ navigation }) {
+  const theme = useTheme();
   const [className, setClassName] = useState("");
   const [period, setPeriod] = useState("");
   const [educationLevel, setEducationLevel] = useState("");
   const [school, setSchool] = useState("");
 
-  // Função para adicionar a turma ao Firestore
+  // Função para adicionar a turma e as sondagens ao Firestore
   const handleAddClass = async () => {
     try {
-      // Verificando se o usuário está autenticado
       const user = auth.currentUser;
       if (!user) {
         console.error("Usuário não autenticado!");
         Alert.alert("Erro", "Você precisa estar logado para criar uma turma.");
         return;
       }
-      // Referência do usuário na coleção 'users' (a referência ao documento do usuário)
-      const userRef = doc(db, 'users', user.uid);  // Criação da referência ao documento do usuário
-      // Obtendo a referência da coleção 'tblTurma' para adicionar uma nova turma
-      const classCollectionRef = collection(db, 'tblTurma');
-      // Adicionando os dados da turma à coleção 'tblTurma', associando o documento do usuário ao campo 'userRef'
-      await addDoc(classCollectionRef, {
+
+      // Referência do usuário na coleção 'users'
+      const userRef = doc(db, "users", user.uid);
+
+      // Criando batch para operações em lote
+      const batch = writeBatch(db);
+
+      // Referência da nova turma
+      const classCollectionRef = collection(db, "tblTurma");
+      const turmaDocRef = doc(classCollectionRef);
+
+      // Adicionando a turma ao batch
+      batch.set(turmaDocRef, {
         nomeTurma: className,
         periodoTurma: period,
-        educationLevel: educationLevel,
-        school: school,
-        userRef: userRef,  // A referência ao documento do usuário
+        educationLevel,
+        school,
+        userRef,
       });
+
+      // Criando as sondagens relacionadas à turma
+      const sondagens = [
+        { nomeSondagem: "3° Bimestre", periodoInicial: "", periodoFinal: "" },
+        { nomeSondagem: "4° Bimestre", periodoInicial: "", periodoFinal: "" },
+        { nomeSondagem: "2° Bimestre", periodoInicial: "", periodoFinal: "" },
+        { nomeSondagem: "1° Bimestre", periodoInicial: "", periodoFinal: "" },
+      ];
+
+      const sondagemCollectionRef = collection(db, "tblSondagem");
+      sondagens.forEach((sondagem) => {
+        const sondagemDocRef = doc(sondagemCollectionRef);
+        batch.set(sondagemDocRef, {
+          ...sondagem,
+          turmaRef: turmaDocRef, // Referência da turma
+        });
+      });
+
+      // Commit das operações em lote
+      await batch.commit();
+
       // Navegar de volta para a lista de turmas, passando os dados da turma
       navigation.navigate("Classes", {
         classData: {
@@ -82,8 +110,87 @@ export default function RegisterClasses({ navigation }) {
 
       <View style={styles.inputContainer}>
         <Input text="Nome da turma" onChangeText={setClassName} />
-        <Input text="Período" onChangeText={setPeriod} />
-        <Input text="Nível de escolaridade" onChangeText={setEducationLevel} />
+
+        <RNPickerSelect
+          onValueChange={(value) => console.log(value)}
+          items={[
+            { label: 'Manhã', value: 'manhã' },
+            { label: 'Tarde', value: 'tarde' },
+            { label: 'Noite', value: 'noite' },
+          ]}
+          style={{
+            inputIOS: {
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 255,
+              margin: 8,
+              fontSize: 18,
+              paddingLeft: 20,
+              borderRadius: 10,
+              elevation: 5,
+            },
+            inputAndroid: {
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 255,
+              margin: 8,
+              fontSize: 18,
+              paddingLeft: 20,
+              borderRadius: 10,
+              elevation: 5,
+            }
+          }}
+
+          placeholder={{
+            label: 'Escolha um Periodo',
+            value: null,
+            color: theme.placeholderColor,
+          }}
+        />
+
+        <RNPickerSelect
+          onValueChange={(value) => console.log(value)}
+          items={[
+            { label: '1° série', value: '1° série' },
+            { label: '2° série', value: '2° série' },
+            { label: '3° série', value: '3° série' },
+            { label: '4° série', value: '4° série' },
+            { label: '5° série', value: '5° série' },
+          ]}
+          style={{
+            inputIOS: {
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 255,
+              margin: 8,
+              fontSize: 18,
+              paddingLeft: 20,
+              borderRadius: 10,
+              elevation: 5,
+            },
+            inputAndroid: {
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 255,
+              margin: 8,
+              fontSize: 18,
+              paddingLeft: 20,
+              borderRadius: 10,
+              elevation: 5,
+            }
+          }}
+
+          placeholder={{
+            label: 'Escolha uma Série',
+            value: null,
+            color: theme.placeholderColor,
+          }}
+        />
+
         <Input text="Escola" onChangeText={setSchool} />
       </View>
 
@@ -105,4 +212,3 @@ const styles = StyleSheet.create({
     gap: 10,
   },
 });
-

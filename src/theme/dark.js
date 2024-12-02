@@ -7,5 +7,6 @@ export default {
     colorIconStyle: "#fff",
     inputBackground: '#808080',
     borderColor: '#333',
+    placeholderColor:"rgba(255,255,255,0.8)",
   };
   

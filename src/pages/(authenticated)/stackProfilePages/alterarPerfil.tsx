@@ -10,8 +10,9 @@ import { db, auth } from "../../../../firebase"; // Importando o Firebase
 import { TextInputMask } from "react-native-masked-text";
 import { Feather } from "@expo/vector-icons"; // Importando o Feather para o ícone de erro
 import BackBtn from "../../../components/Buttons/BackBtn";
-import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system'; // Para converter a imagem em base64
+import * as ImagePicker from 'expo-image-picker'; // Importando o ImagePicker
+import * as FileSystem from 'expo-file-system'; // Para manipular arquivos
+import { Asset } from 'expo-asset'; // Importando o Asset
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -53,6 +54,8 @@ const IconPencil = styled.TouchableOpacity`
   padding: 12px;
 `;
 
+const defaultProfileImage = require("../../../../assets/Perfil.jpg"); // Imagem padrão
+
 export default function EditProfile({ navigation, route }) {
   const theme = useTheme();
   const [username, setUsername] = useState(route.params.nomeProfessor || "");
@@ -62,6 +65,7 @@ export default function EditProfile({ navigation, route }) {
   const [isValidCpf, setIsValidCpf] = useState(true); // Estado para validação do CPF
   const [image, setImage] = useState<string | null>(null);
   const [dadosPerfil, setDadosPerfil] = useState(null); // Initialize with null
+  const defaultProfileImageUri = require("../../../../assets/Perfil.jpg"); // Caminho da imagem na pasta assets
 
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
@@ -70,7 +74,11 @@ export default function EditProfile({ navigation, route }) {
         const userRef = doc(db, "tblProfessor", user.uid);
         const unsubscribe = onSnapshot(userRef, (docSnapshot) => {
           if (docSnapshot.exists()) {
-            setDadosPerfil(docSnapshot.data()); // Carrega os dados do usuário no estado
+            const userData = docSnapshot.data();
+            // Definir a imagem de perfil corretamente
+            const profileImage = userData.imagemPerfil || defaultProfileImage;
+            setImage(profileImage); // Atualiza a imagem de perfil com a imagem do banco
+            setDadosPerfil(userData); // Carrega os dados do usuário no estado
           } else {
             setDadosPerfil(null); // Caso o perfil não exista no Firestore
           }
@@ -91,35 +99,100 @@ export default function EditProfile({ navigation, route }) {
     return text.toUpperCase(); // Garante que o nome seja em maiúsculas
   };
 
-  // Função para escolher a imagem e convertê-la para base64
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    // Mostra um alerta com duas opções para o usuário escolher
+    Alert.alert(
+      "Escolher imagem",
+      "Escolha uma opção",
+      [
+        {
+          text: "Galeria",
+          onPress: async () => {
+            let result = await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+              allowsEditing: true,
+              aspect: [4, 3],
+              quality: 0.6,
+            });
 
-    if (!result.canceled) {
-      const imageUri = result.assets[0].uri;
-      setImage(imageUri); // Armazena a URI da imagem selecionada
+            if (!result.canceled) {
+              const imageUri = result.assets[0].uri;
+              setImage(imageUri); // Armazena a URI da imagem selecionada
 
-      try {
-        // Converte a imagem para base64
-        const base64Image = await FileSystem.readAsStringAsync(imageUri, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-        setImage(base64Image); // Atualiza a imagem com o conteúdo base64
-      } catch (error) {
-        console.error("Erro ao converter imagem para base64: ", error);
-        Alert.alert("Erro", "Ocorreu um erro ao converter a imagem.");
-      }
-    }
+              try {
+                // Converte a imagem para base64
+                const base64Image = await FileSystem.readAsStringAsync(imageUri, {
+                  encoding: FileSystem.EncodingType.Base64,
+                });
+                setImage(base64Image); // Atualiza a imagem com o conteúdo base64
+              } catch (error) {
+                console.error("Erro ao converter imagem para base64: ", error);
+                Alert.alert("Erro", "Ocorreu um erro ao converter a imagem.");
+              }
+            }
+          }
+        },
+        {
+          text: "Câmera",
+          onPress: async () => {
+            let result = await ImagePicker.launchCameraAsync({
+              allowsEditing: true,
+              aspect: [4, 3],
+              quality: 0.6,
+            });
+
+            if (!result.canceled) {
+              const imageUri = result.assets[0].uri;
+              setImage(imageUri); // Armazena a URI da imagem tirada
+
+              try {
+                // Converte a imagem para base64
+                const base64Image = await FileSystem.readAsStringAsync(imageUri, {
+                  encoding: FileSystem.EncodingType.Base64,
+                });
+                setImage(base64Image); // Atualiza a imagem com o conteúdo base64
+              } catch (error) {
+                console.error("Erro ao converter imagem para base64: ", error);
+                Alert.alert("Erro", "Ocorreu um erro ao converter a imagem.");
+              }
+            }
+          }
+        },
+        {
+          text: "Padrão",
+          onPress: async () => {
+            try {
+              // Carregar a imagem de assets usando Asset.fromModule
+              const asset = Asset.fromModule(defaultProfileImageUri);
+              await asset.downloadAsync(); // Certifique-se de que o recurso foi carregado no dispositivo
+
+              const fileUri = asset.localUri || asset.uri; // Garantir que estamos usando o caminho local
+
+              if (fileUri) {
+                // Converte a imagem para base64 usando o caminho local
+                const base64Image = await FileSystem.readAsStringAsync(fileUri, {
+                  encoding: FileSystem.EncodingType.Base64,
+                });
+                setImage(base64Image); // Atualiza a imagem para a imagem padrão convertida para base64
+              } else {
+                console.error("Erro: URI local não encontrada para a imagem padrão.");
+                Alert.alert("Erro", "Não foi possível carregar a imagem padrão.");
+              }
+            } catch (error) {
+              console.error("Erro ao converter imagem padrão para base64: ", error);
+              Alert.alert("Erro", "Ocorreu um erro ao definir a imagem padrão.");
+            }
+          }
+        }
+      ]
+    );
   };
+
 
   // Função para validar o CPF
   const validateCpf = (cpf) => {
     const cleanedCpf = cpf.replace(/\D/g, ''); // Remove tudo o que não for número
+    if (cleanedCpf.length == '') return true;
     if (cleanedCpf.length !== 11) return false;
 
     let sum = 0;
@@ -152,55 +225,51 @@ export default function EditProfile({ navigation, route }) {
   };
 
   // Função para atualizar o perfil
-const updateProfile = async () => {
-  const user = auth.currentUser;
-  if (!user) {
-    Alert.alert("Erro", "Usuário não autenticado.");
-    return;
-  }
+  const updateProfile = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      Alert.alert("Erro", "Usuário não autenticado.");
+      return;
+    }
 
-  const userRef = doc(db, "tblProfessor", user.uid);
+    const userRef = doc(db, "tblProfessor", user.uid);
 
-  try {
-    // Se a imagem foi escolhida, vamos atualizar a URL da imagem no Firestore
-    const imageUrl = image || dadosPerfil?.imagemPerfil; // Mantém a imagem atual se nenhuma nova imagem for escolhida
+    try {
+      const updatedData = {
+        nomeProfessor: username,
+        cpf: cpf,
+        nascimentoProfessor: date,
+        telefone: telefone,
+        imagemPerfil: image === defaultProfileImage ? defaultProfileImage : image, // Verifica se é a imagem padrão ou não
+      };
 
-    // Atualiza os dados no Firestore
-    await updateDoc(userRef, {
-      nomeProfessor: username,
-      cpf: cpf,
-      nascimentoProfessor: date,
-      telefone: telefone,
-      imagemPerfil: imageUrl, // Atualiza apenas se houver uma nova imagem
-    });
-    navigation.navigate("Profile");
-  } catch (error) {
-    console.error("Erro ao atualizar perfil:", error);
-    Alert.alert("Erro", "Erro ao atualizar perfil. Tente novamente.");
-  }
-};
+      // Atualiza os dados do usuário no Firestore
+      await updateDoc(userRef, updatedData);
+      Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
+      navigation.navigate("Profile"); // Navega de volta para a tela de perfil
+    } catch (error) {
+      console.error("Erro ao atualizar perfil: ", error);
+      Alert.alert("Erro", "Ocorreu um erro ao atualizar seu perfil.");
+    }
+  };
+
 
   return (
     <Container>
+      <StatusBar style="auto" />
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.navigate("Profile")} />
       </View>
       <Title>Editar Perfil</Title>
       <View style={styles.imageBlock}>
-        {image ? (
-          <Image style={styles.image} source={{ uri: `data:image/jpeg;base64,${image}` }} />
-        ) : (
-          dadosPerfil && dadosPerfil.imagemPerfil ? (
-            <Image style={styles.image} source={{ uri: `data:image/jpeg;base64,${dadosPerfil.imagemPerfil}` }} />
-          ) : (
-            <Image style={styles.image} source={require('../../../../assets/Perfil.jpg')} /> // Caso não haja imagem, use uma imagem padrão
-          )
-        )}
+        <Image
+          style={styles.image}
+          source={image ? { uri: `data:image/jpeg;base64,${image}` } : image || defaultProfileImage}
+        />
         <IconPencil onPress={pickImage}>
           <Ionicons name="camera" size={26} color={theme.colorIconStyle} />
         </IconPencil>
       </View>
-
       <View style={styles.alignInput}>
         <Input
           text="Nome"
@@ -223,8 +292,8 @@ const updateProfile = async () => {
           }]}
           value={cpf}
           onChangeText={handleCpfChange}
-          placeholder="CPF"
-          placeholderTextColor={"rgba(255,255,255,0.6)"}
+          placeholder={'CPF'}
+          placeholderTextColor={theme.placeholderColor}
         />
         {!isValidCpf && (
           <Feather style={styles.errorIcon} name="x-circle" color={'#ff0000'} size={26} />
@@ -245,8 +314,8 @@ const updateProfile = async () => {
           }]}
           value={date}
           onChangeText={setDate}
-          placeholder="Data de Nascimento"
-          placeholderTextColor={"rgba(255,255,255,0.6)"}
+          placeholder={'Data de Nascimento'}
+          placeholderTextColor={theme.placeholderColor}
         />
         <TextInputMask
           type={'cel-phone'}
@@ -265,10 +334,10 @@ const updateProfile = async () => {
           }]}
           value={telefone}
           onChangeText={setTelefone}
-          placeholder="Número de Celular"
-          placeholderTextColor={"rgba(255,255,255,0.6)"}
+          placeholder={'Número de Telefone'}
+          placeholderTextColor={theme.placeholderColor}
         />
-        <Btn onPress={updateProfile} disabled={!isValidCpf}/>
+        <Btn onPress={updateProfile} disabled={!isValidCpf} />
       </View>
     </Container>
   );
@@ -303,17 +372,5 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: '58%',
     top: '25.3%',
-  },
-  inputStyle: {
-    backgroundColor: "#D2DFDA",
-    color: "#000",
-    height: 50,
-    width: 255,
-    margin: 8,
-    marginBottom: '10%',
-    fontSize: 18,
-    paddingLeft: 20,
-    borderRadius: 10,
-    elevation: 5,
   },
 });

@@ -1,7 +1,24 @@
 import React, { useState } from "react";
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { db } from "../../../../firebase";
-import { addDoc, collection, doc } from "firebase/firestore";
+import { addDoc, collection, doc, getDocs, query, where } from "firebase/firestore";
+import BackBtn from "../../../components/Buttons/BackBtn";
+import styled from "styled-components/native";
+
+const Container = styled.View`
+  background-color: ${(props) => props.theme.background};
+  width: 100%;
+  padding: 16px;
+  height: 100%;
+`;
+
+const Title = styled.Text`
+  font-size: 32px;
+  font-weight: 600;
+  text-align: center;
+  padding-top: 12%;
+  color: ${(props) => props.theme.color}; 
+`;
 
 export default function CreateStudent({ navigation, route }) {
   const { turmaId } = route.params; // Obtendo a turmaId passada da tela anterior
@@ -11,17 +28,48 @@ export default function CreateStudent({ navigation, route }) {
   const [nascimentoAluno, setNascimentoAluno] = useState("");
   const [rmAluno, setRmAluno] = useState("");
 
+  // Função para criar observações (tblObsSondagem) automaticamente
+  const createObservationsForStudent = async (alunoId) => {
+    try {
+      // Obtendo as sondagens associadas à turma
+      const sondagensRef = collection(db, "tblSondagem");
+      const sondagensQuerySnapshot = await getDocs(
+        query(sondagensRef, where("turmaRef", "==", doc(db, "tblTurma", turmaId)))
+      );
+
+      // Criar uma coleção tblObsSondagem para cada sondagem
+      await Promise.all(
+        sondagensQuerySnapshot.docs.map((sondagemDoc) =>
+          addDoc(collection(db, "tblObsSondagem"), {
+            obs: "",
+            qntFaltas: "",
+            status: "",
+            alunoRef: doc(db, "tblAluno", alunoId), // Referência ao aluno
+            sondagemRef: doc(db, "tblSondagem", sondagemDoc.id), // Referência à sondagem
+          })
+        )
+      );
+
+      console.log("Observações criadas com sucesso!");
+    } catch (error) {
+      console.error("Erro ao criar observações:", error);
+    }
+  };
+
   // Função para registrar o aluno no Firestore
   const handleRegister = async () => {
     try {
       if (nomeAluno && nascimentoAluno && rmAluno) {
         // Adicionar aluno na coleção 'tblAlunos'
-        await addDoc(collection(db, "tblAluno"), {
+        const alunoRef = await addDoc(collection(db, "tblAluno"), {
           nomeAluno,
           nascimentoAluno,
           rmAluno,
           turmaRef: doc(db, "tblTurma", turmaId), // Referência da turma
         });
+
+        // Chamar a função para criar observações
+        await createObservationsForStudent(alunoRef.id);
 
         // Navegar de volta para a lista de alunos
         navigation.goBack();
@@ -35,8 +83,11 @@ export default function CreateStudent({ navigation, route }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Cadastrar Aluno</Text>
+    <Container>
+      <View style={styles.header}>
+        <BackBtn onPress={() => navigation.goBack()} />
+      </View>
+      <Title>Cadastrar Aluno</Title>
 
       <TextInput
         style={styles.input}
@@ -61,7 +112,7 @@ export default function CreateStudent({ navigation, route }) {
       <TouchableOpacity style={styles.btnRegister} onPress={handleRegister}>
         <Text style={styles.txtBtnRegister}>Cadastrar</Text>
       </TouchableOpacity>
-    </View>
+    </Container>
   );
 }
 
@@ -99,5 +150,8 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  header: {
+    top: "2.7%",
   },
 });

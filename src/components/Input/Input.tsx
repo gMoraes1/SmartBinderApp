@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components/native";
+import styled, { useTheme } from "styled-components/native";
 
 const StyleInput = styled.TextInput`
   background-color: ${(props) => props.theme.inputBackground || "#D2DFDA"};
@@ -9,15 +9,18 @@ const StyleInput = styled.TextInput`
   margin: 8px;
   font-size: 18px;
   padding-left: 20px;
-  border-radius: 10px;
-  elevation: 5;
+  border-radius: 2px;
+  elevation: 8;
 `;
 
 const Input = ({ text, onChangeText, ...props }) => {
+  const theme = useTheme()
+
   return (
     <StyleInput
       placeholder={text}
       onChangeText={onChangeText}
+      placeholderTextColor={theme.placeholderColor}
       {...props}
     />
   );
