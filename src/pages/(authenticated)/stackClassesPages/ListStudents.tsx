@@ -16,13 +16,14 @@ import {
   orderBy,
   deleteDoc,
   doc,
-  updateDoc
+  getDocs,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import DeleteBtn from "../../../components/Buttons/DeleteBtn";
 import LtBtn from "../../../components/Buttons/LittleBtn";
 import BackBtn from "../../../components/Buttons/BackBtn";
-import Input from "../../../components/Input/Input"; // Ensure Input component is available for form fields
+import Input from "../../../components/Input/Input";
 
 interface StudentData {
   id: string;
@@ -49,43 +50,65 @@ const Title = styled.Text`
 export default function ListStudents({ navigation, route }) {
   const [students, setStudents] = useState<StudentData[]>([]);
   const [editedStudent, setEditedStudent] = useState<StudentData | null>(null);
-  const { turmaId } = route.params; // Obtaining turmaId from route params
+  const [searchText, setSearchText] = useState("");
+  const { turmaId } = route.params;
 
-  async function deleteAluno(id: string) {
-    try {
-      await deleteDoc(doc(db, "tblAluno", id));
-      Alert.alert("Aluno deletado.");
-    } catch (error) {
-      console.error("Erro ao deletar aluno.", error);
-      Alert.alert("Erro ao deletar aluno.");
-    }
-  }
-
-  useEffect(() => {
-    const unsubscribe = onSnapshot(
-      query(
-        collection(db, "tblAluno"),
-        where("turmaRef", "==", doc(db, "tblTurma", turmaId)),
-        orderBy("nomeAluno") // Ordering by student name
-      ),
-      (querySnapshot) => {
-        const studentList: StudentData[] = [];
-        querySnapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          studentList.push({
-            id: docSnap.id,
-            nomeAluno: data.nomeAluno,
-            nascimentoAluno: data.nascimentoAluno,
-            rmAluno: data.rmAluno,
-          });
-        });
-
-        setStudents(studentList);
-      }
+  // Função para excluir as observações associadas ao aluno
+  const deleteObservacoes = async (alunoId: string) => {
+    const collectionRef = collection(db, "tblObsSondagem");
+    const q = query(
+      collectionRef,
+      where("alunoRef", "==", doc(db, "tblAluno", alunoId))
     );
 
-    return () => unsubscribe();
-  }, [turmaId]);
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((docSnap) => {
+      deleteDoc(doc(db, "tblObsSondagem", docSnap.id)); // Excluir cada observação
+    });
+  };
+
+  //Delete para aluno e condsecutivamente apagar as tblObsSondagem
+  const deleteAluno = async (id: string) => {
+    Alert.alert(
+      "Confirmar Exclusão",
+      "Você tem certeza que deseja excluir este aluno?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Sim",
+          onPress: () => {
+            // Segunda confirmação
+            Alert.alert(
+              "Atenção!",
+              "Esta ação é irreversível. Deseja realmente excluir este aluno?",
+              [
+                {
+                  text: "Não",
+                  style: "cancel",
+                },
+                {
+                  text: "Sim, excluir",
+                  onPress: async () => {
+                    try {
+                      await deleteObservacoes(id); // Excluir observações associadas
+                      await deleteDoc(doc(db, "tblAluno", id)); // Excluir aluno
+                      Alert.alert("Sucesso", "Aluno deletado com sucesso.");
+                    } catch (error) {
+                      console.error("Erro ao deletar aluno.", error);
+                      Alert.alert("Erro", "Não foi possível deletar o aluno.");
+                    }
+                  },
+                },
+              ]
+            );
+          },
+        },
+      ]
+    );
+  };
 
   const handleEditStudent = (studentData: StudentData) => {
     setEditedStudent(studentData);
@@ -100,7 +123,7 @@ export default function ListStudents({ navigation, route }) {
           rmAluno: editedStudent.rmAluno,
         });
         Alert.alert("Sucesso", "Aluno atualizado com sucesso!");
-        setEditedStudent(null); // Close edit form
+        setEditedStudent(null);
       } catch (error) {
         console.error("Erro ao atualizar aluno:", error);
         Alert.alert("Erro", "Não foi possível atualizar o aluno.");
@@ -108,24 +131,86 @@ export default function ListStudents({ navigation, route }) {
     }
   };
 
+  const fetchStudents = () => {
+    const studentQuery = query(
+      collection(db, "tblAluno"),
+      where("turmaRef", "==", doc(db, "tblTurma", turmaId)),
+      orderBy("nomeAluno")
+    );
+
+    onSnapshot(studentQuery, (querySnapshot) => {
+      const studentList: StudentData[] = [];
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        studentList.push({
+          id: docSnap.id,
+          nomeAluno: data.nomeAluno,
+          nascimentoAluno: data.nascimentoAluno,
+          rmAluno: data.rmAluno,
+        });
+      });
+      setStudents(studentList);
+    });
+  };
+
+  useEffect(() => {
+    fetchStudents();
+  }, [turmaId]);
+
+  // Função para buscar alunos pelo nome ou pela inicial
+  const handleSearch = () => {
+    if (searchText.trim() === "") {
+      fetchStudents(); // Se a busca estiver vazia, puxa todos os alunos
+      return;
+    }
+
+    const searchQuery = query(
+      collection(db, "tblAluno"),
+      where("turmaRef", "==", doc(db, "tblTurma", turmaId)),
+      where("nomeAluno", ">=", searchText),
+      where("nomeAluno", "<=", searchText + "\uf8ff"),
+      orderBy("nomeAluno")
+    );
+
+    onSnapshot(searchQuery, (querySnapshot) => {
+      const filteredList: StudentData[] = [];
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        filteredList.push({
+          id: docSnap.id,
+          nomeAluno: data.nomeAluno,
+          nascimentoAluno: data.nascimentoAluno,
+          rmAluno: data.rmAluno,
+        });
+      });
+      setStudents(filteredList);
+    });
+  };
+
   return (
     <Container>
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
       </View>
-        <Title>Alunos da turma</Title>
+      <Title>Alunos da turma</Title>
+
+      {/* Input e botão de busca */}
+      <View style={styles.searchContainer}>
+        <Input
+          text="Buscar Aluno"
+          value={searchText}
+          onChangeText={(text) => setSearchText(text)}
+          placeholder="Digite o nome ou inicial"
+        />
+        <LtBtn onPress={handleSearch}>Buscar</LtBtn>
+      </View>
 
       <FlatList
         data={students}
         keyExtractor={(item) => item.id}
         style={styles.list}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.studentItem}
-            onPress={() => {
-              navigation.navigate("StudentDetails");
-            }}
-          >
+          <View style={styles.studentItem}>
             <View style={styles.studentInfo}>
               <Text style={styles.textData}>Nome: {item.nomeAluno}</Text>
               <Text style={styles.textData}>
@@ -134,21 +219,23 @@ export default function ListStudents({ navigation, route }) {
               <Text style={styles.textData}>RM: {item.rmAluno}</Text>
             </View>
             <View style={styles.buttonsContainer}>
-              <DeleteBtn onPress={() => deleteAluno(item.id)}>
-                Deletar
-              </DeleteBtn>
-              <LtBtn onPress={() => handleEditStudent(item)}>
-                Editar
-              </LtBtn>
-              <LtBtn onPress={() => navigation.navigate("StatusSondagem")}>
+              <DeleteBtn onPress={() => deleteAluno(item.id)}>Deletar</DeleteBtn>
+              <LtBtn onPress={() => handleEditStudent(item)}>Editar</LtBtn>
+              <LtBtn
+                onPress={() =>
+                  navigation.navigate("StatusSondagem", {
+                    alunoId: item.id,
+                    turmaId,
+                  })
+                }
+              >
                 Progresso
               </LtBtn>
             </View>
-          </TouchableOpacity>
+          </View>
         )}
       />
 
-      {/* Add/Edit student form */}
       {editedStudent && (
         <View style={styles.editContainer}>
           <Text style={styles.editTitle}>Editar Aluno</Text>
@@ -180,7 +267,6 @@ export default function ListStudents({ navigation, route }) {
         </View>
       )}
 
-      {/* Button to register new students */}
       <TouchableOpacity
         onPress={() =>
           navigation.navigate("CreateStudent", { turmaId: turmaId })
@@ -195,10 +281,16 @@ export default function ListStudents({ navigation, route }) {
 
 const styles = StyleSheet.create({
   header: {
-    top: '2.8%',
-},
+    top: "2.8%",
+  },
   list: {
     marginBottom: 20,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
   },
   studentItem: {
     flexDirection: "column",
@@ -239,33 +331,29 @@ const styles = StyleSheet.create({
     textAlign: "center",
     top: -2,
   },
-  buttonsContainer: {
-    display: "flex",
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   editContainer: {
     position: "absolute",
     top: "30%",
     left: "10%",
-    right: "10%",
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 8,
+    width: "80%",
+    padding: 16,
+    backgroundColor: "white",
+    borderRadius: 10,
     elevation: 5,
-    alignItems: "center",
+    zIndex: 10,
   },
   editTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
   },
   btnGroup: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
-    width: "100%",
   },
+  buttonsContainer:{
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+  }
 });

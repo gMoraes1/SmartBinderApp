@@ -81,44 +81,61 @@ export default function Classes({ navigation }) {
   }, []);
 
   // Função para deletar alunos e sondagens associadas à turma
-  async function deleteAssociatedData(turmaId: string) {
-    try {
-      // Deletar alunos associados à turma
-      const alunosQuery = query(
-        collection(db, "tblAluno"),
-        where("turmaRef", "==", doc(db, "tblTurma", turmaId)) // Consultando alunos com a referência da turma
-      );
-      const alunosSnapshot = await getDocs(alunosQuery);
-      if (alunosSnapshot.empty) {
-        console.log("Nenhum aluno encontrado para esta turma.");
-      } else {
-        const alunoDeletePromises = alunosSnapshot.docs.map((docSnap) =>
-          deleteDoc(doc(db, "tblAluno", docSnap.id))
+  // Função para deletar dados associados (alunos, sondagens e observações)
+async function deleteAssociatedData(turmaId: string) {
+  try {
+    // Deletar alunos associados à turma
+    const alunosQuery = query(
+      collection(db, "tblAluno"),
+      where("turmaRef", "==", doc(db, "tblTurma", turmaId)) // Consultando alunos com a referência da turma
+    );
+    const alunosSnapshot = await getDocs(alunosQuery);
+    if (alunosSnapshot.empty) {
+      console.log("Nenhum aluno encontrado para esta turma.");
+    } else {
+      const alunoDeletePromises = alunosSnapshot.docs.map(async (docSnap) => {
+        // Deletar observações (tblObsSondagem) associadas ao aluno
+        const observacoesQuery = query(
+          collection(db, "tblObsSondagem"),
+          where("alunoRef", "==", doc(db, "tblAluno", docSnap.id)) // Consultando observações associadas ao aluno
         );
-        await Promise.all(alunoDeletePromises);
-        console.log("Alunos deletados com sucesso.");
-      }
+        const observacoesSnapshot = await getDocs(observacoesQuery);
+        if (!observacoesSnapshot.empty) {
+          const observacaoDeletePromises = observacoesSnapshot.docs.map((obsSnap) =>
+            deleteDoc(doc(db, "tblObsSondagem", obsSnap.id))
+          );
+          await Promise.all(observacaoDeletePromises);
+          console.log("Observações deletadas com sucesso.");
+        }
 
-      // Deletar sondagens associadas à turma
-      const sondagensQuery = query(
-        collection(db, "tblSondagem"),
-        where("turmaRef", "==", doc(db, "tblTurma", turmaId)) // Consultando sondagens com a referência da turma
-      );
-      const sondagensSnapshot = await getDocs(sondagensQuery);
-      if (sondagensSnapshot.empty) {
-        console.log("Nenhuma sondagem encontrada para esta turma.");
-      } else {
-        const sondagemDeletePromises = sondagensSnapshot.docs.map((docSnap) =>
-          deleteDoc(doc(db, "tblSondagem", docSnap.id))
-        );
-        await Promise.all(sondagemDeletePromises);
-        console.log("Sondagens deletadas com sucesso.");
-      }
-    } catch (error) {
-      console.error("Erro ao deletar dados relacionados:", error);
-      throw new Error("Erro ao deletar dados relacionados.");
+        // Deletar o aluno
+        await deleteDoc(doc(db, "tblAluno", docSnap.id));
+        console.log("Aluno deletado com sucesso.");
+      });
+      await Promise.all(alunoDeletePromises);
     }
+
+    // Deletar sondagens associadas à turma
+    const sondagensQuery = query(
+      collection(db, "tblSondagem"),
+      where("turmaRef", "==", doc(db, "tblTurma", turmaId)) // Consultando sondagens com a referência da turma
+    );
+    const sondagensSnapshot = await getDocs(sondagensQuery);
+    if (sondagensSnapshot.empty) {
+      console.log("Nenhuma sondagem encontrada para esta turma.");
+    } else {
+      const sondagemDeletePromises = sondagensSnapshot.docs.map((docSnap) =>
+        deleteDoc(doc(db, "tblSondagem", docSnap.id))
+      );
+      await Promise.all(sondagemDeletePromises);
+      console.log("Sondagens deletadas com sucesso.");
+    }
+  } catch (error) {
+    console.error("Erro ao deletar dados relacionados:", error);
+    throw new Error("Erro ao deletar dados relacionados.");
   }
+}
+
 
   // Função de exclusão da turma com confirmação em duas etapas
   function handleDeleteTurma(turmaId: string) {
