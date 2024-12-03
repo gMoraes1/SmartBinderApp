@@ -101,11 +101,15 @@ export default function EditProfile({ navigation, route }) {
   };
 
   const pickImage = async () => {
-    // Mostra um alerta com duas opções para o usuário escolher
+    // Mostra um alerta com várias opções para o usuário escolher
     Alert.alert(
       "Escolher imagem",
       "Escolha uma opção",
       [
+        {
+          text: "Cancelar",
+          style: "cancel",  // Adiciona a opção de cancelar
+        },
         {
           text: "Galeria",
           onPress: async () => {
@@ -115,21 +119,10 @@ export default function EditProfile({ navigation, route }) {
               aspect: [4, 3],
               quality: 0.6,
             });
-
+  
             if (!result.canceled) {
               const imageUri = result.assets[0].uri;
               setImage(imageUri); // Armazena a URI da imagem selecionada
-
-              try {
-                // Converte a imagem para base64
-                const base64Image = await FileSystem.readAsStringAsync(imageUri, {
-                  encoding: FileSystem.EncodingType.Base64,
-                });
-                setImage(base64Image); // Atualiza a imagem com o conteúdo base64
-              } catch (error) {
-                console.error("Erro ao converter imagem para base64: ", error);
-                Alert.alert("Erro", "Ocorreu um erro ao converter a imagem.");
-              }
             }
           }
         },
@@ -141,53 +134,20 @@ export default function EditProfile({ navigation, route }) {
               aspect: [4, 3],
               quality: 0.6,
             });
-
+  
             if (!result.canceled) {
               const imageUri = result.assets[0].uri;
               setImage(imageUri); // Armazena a URI da imagem tirada
-
-              try {
-                // Converte a imagem para base64
-                const base64Image = await FileSystem.readAsStringAsync(imageUri, {
-                  encoding: FileSystem.EncodingType.Base64,
-                });
-                setImage(base64Image); // Atualiza a imagem com o conteúdo base64
-              } catch (error) {
-                console.error("Erro ao converter imagem para base64: ", error);
-                Alert.alert("Erro", "Ocorreu um erro ao converter a imagem.");
-              }
             }
           }
         },
-        {
-          text: "Padrão",
-          onPress: async () => {
-            try {
-              // Carregar a imagem de assets usando Asset.fromModule
-              const asset = Asset.fromModule(defaultProfileImageUri);
-              await asset.downloadAsync(); // Certifique-se de que o recurso foi carregado no dispositivo
-
-              const fileUri = asset.localUri || asset.uri; // Garantir que estamos usando o caminho local
-
-              if (fileUri) {
-                // Converte a imagem para base64 usando o caminho local
-                const base64Image = await FileSystem.readAsStringAsync(fileUri, {
-                  encoding: FileSystem.EncodingType.Base64,
-                });
-                setImage(base64Image); // Atualiza a imagem para a imagem padrão convertida para base64
-              } else {
-                console.error("Erro: URI local não encontrada para a imagem padrão.");
-                Alert.alert("Erro", "Não foi possível carregar a imagem padrão.");
-              }
-            } catch (error) {
-              console.error("Erro ao converter imagem padrão para base64: ", error);
-              Alert.alert("Erro", "Ocorreu um erro ao definir a imagem padrão.");
-            }
-          }
-        }
       ]
     );
   };
+  
+  
+  
+  
 
 
   // Função para validar o CPF
