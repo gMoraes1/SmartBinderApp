@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
   Buttons: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-evenly",
+    justifyContent: "center",
   },
   editContainer: {
     position: "absolute",
