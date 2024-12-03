@@ -1,9 +1,21 @@
 import React, { useState } from "react";
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from "react-native";
+import {
+  View,
+  StyleSheet,
+} from "react-native";
 import { db } from "../../../../firebase";
-import { addDoc, collection, doc, getDocs, query, where } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import BackBtn from "../../../components/Buttons/BackBtn";
 import styled from "styled-components/native";
+import Btn from "../../../components/Buttons/Btn";
+import Input from "../../../components/Input/Input";
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -17,7 +29,7 @@ const Title = styled.Text`
   font-weight: 600;
   text-align: center;
   padding-top: 12%;
-  color: ${(props) => props.theme.color}; 
+  color: ${(props) => props.theme.color};
 `;
 
 export default function CreateStudent({ navigation, route }) {
@@ -34,7 +46,10 @@ export default function CreateStudent({ navigation, route }) {
       // Obtendo as sondagens associadas à turma
       const sondagensRef = collection(db, "tblSondagem");
       const sondagensQuerySnapshot = await getDocs(
-        query(sondagensRef, where("turmaRef", "==", doc(db, "tblTurma", turmaId)))
+        query(
+          sondagensRef,
+          where("turmaRef", "==", doc(db, "tblTurma", turmaId))
+        )
       );
 
       // Criar uma coleção tblObsSondagem para cada sondagem
@@ -87,31 +102,34 @@ export default function CreateStudent({ navigation, route }) {
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
       </View>
+
       <Title>Cadastrar Aluno</Title>
+      
+      <View style={styles.containerButtons}>
+        <View style={styles.containerInput}>
+          <Input
+            text="Nome do Aluno"
+            value={nomeAluno}
+            onChangeText={setNomeAluno}
+          />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Nome do Aluno"
-        value={nomeAluno}
-        onChangeText={setNomeAluno}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Data de Nascimento (DD/MM/AAAA)"
-        value={nascimentoAluno}
-        onChangeText={setNascimentoAluno}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="RM do Aluno"
-        value={rmAluno}
-        onChangeText={setRmAluno}
-        keyboardType="numeric"
-      />
+          <Input
+            text="Data de Nascimento"
+            value={nascimentoAluno}
+            onChangeText={setNascimentoAluno}
+            keyboardType="numeric"
+          />
 
-      <TouchableOpacity style={styles.btnRegister} onPress={handleRegister}>
-        <Text style={styles.txtBtnRegister}>Cadastrar</Text>
-      </TouchableOpacity>
+          <Input
+            text="RM do Aluno"
+            value={rmAluno}
+            onChangeText={setRmAluno}
+            keyboardType="numeric"
+          />
+        </View>
+
+        <Btn onPress={handleRegister} texto="Cadastrar"></Btn>
+      </View>
     </Container>
   );
 }
@@ -129,29 +147,18 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 20,
   },
-  input: {
-    width: "100%",
-    padding: 10,
-    marginVertical: 8,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    backgroundColor: "#fff",
-  },
-  btnRegister: {
-    marginTop: 20,
-    backgroundColor: "#6939E9",
-    padding: 12,
-    borderRadius: 4,
-    width: "100%",
-    alignItems: "center",
-  },
-  txtBtnRegister: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
   header: {
     top: "2.7%",
   },
+  containerButtons: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 50,
+    gap: 40,
+  },
+  containerInput: {
+    display: "flex",
+    gap: 10
+  }
 });

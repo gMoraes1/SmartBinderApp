@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
@@ -6,7 +5,6 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
-  TextInput,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import styled, { useTheme } from "styled-components/native";
@@ -38,7 +36,7 @@ const Container = styled.View`
   background-color: ${(props) => props.theme.background};
   width: 100%;
   padding: 16px;
-  height: 100%;
+  height: 95%;
 `;
 
 const Title = styled.Text`
@@ -366,7 +364,8 @@ async function deleteAssociatedData(turmaId: string) {
 
 const styles = StyleSheet.create({
   list: {
-    marginBottom: 20,
+    marginBottom: 30,
+    marginTop: 40,
   },
   classItem: {
     flexDirection: "column",
@@ -402,8 +401,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#6939E9",
     borderRadius: 30,
     position: "absolute",
-    top: "82%",
-    right: "6.2%",
+    top: "86.6%",
+    right: "6.5%",
     alignItems: "center",
     justifyContent: "center",
     elevation: 5,
