@@ -19,6 +19,7 @@ const Container = styled.View`
   width: 100%;
   height: 100%;
   align-items: center;
+  justify-content:center;
 `;
 
 const Title = styled.Text`
@@ -256,88 +257,90 @@ export default function EditProfile({ navigation, route }) {
 
   return (
     <Container>
-      <StatusBar style="auto" />
-      <View style={styles.header}>
-        <BackBtn onPress={() => navigation.navigate("Profile")} />
-      </View>
-      <Title>Editar Perfil</Title>
-      <View style={styles.imageBlock}>
-        <Image
-          style={styles.image}
-          source={image ? { uri: `data:image/jpeg;base64,${image}` } : image || defaultProfileImage}
-        />
-        <IconPencil onPress={pickImage}>
-          <Ionicons name="camera" size={26} color={theme.colorIconStyle} />
-        </IconPencil>
-      </View>
-      <View style={styles.alignInput}>
-        <Input
-          text="Nome"
-          value={username}
-          onChangeText={(text) => setUsername(formatUsername(text))}
-          placeholder={'Nome Completo'}
-        />
-        <TextInputMask
-          type={'cpf'}
-          style={[!isValidCpf && styles.invalidInput, {
-            backgroundColor: theme.inputBackground || "#D2DFDA",
-            color: theme.color || "#000",
-            height: 50,
-            width: 255,
-            margin: 8,
-            fontSize: 18,
-            paddingLeft: 20,
-            borderRadius: 10,
-            elevation: 5,
-          }]}
-          value={cpf}
-          onChangeText={handleCpfChange}
-          placeholder={'CPF'}
-          placeholderTextColor={theme.placeholderColor}
-        />
-        {!isValidCpf && (
-          <Feather style={styles.errorIcon} name="x-circle" color={'#ff0000'} size={26} />
-        )}
-        <TextInputMask
-          type={'datetime'}
-          options={{ format: 'DD/MM/YYYY' }}
-          style={[{
-            backgroundColor: theme.inputBackground || "#D2DFDA",
-            color: theme.color || "#000",
-            height: 50,
-            width: 255,
-            margin: 8,
-            fontSize: 18,
-            paddingLeft: 20,
-            borderRadius: 10,
-            elevation: 5,
-          }]}
-          value={date}
-          onChangeText={setDate}
-          placeholder={'Data de Nascimento'}
-          placeholderTextColor={theme.placeholderColor}
-        />
-        <TextInputMask
-          type={'cel-phone'}
-          options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
-          style={[{
-            backgroundColor: theme.inputBackground || "#D2DFDA",
-            color: theme.color || "#000",
-            height: 50,
-            width: 255,
-            margin: 8,
-            marginBottom: '10%',
-            fontSize: 18,
-            paddingLeft: 20,
-            borderRadius: 10,
-            elevation: 5,
-          }]}
-          value={telefone}
-          onChangeText={setTelefone}
-          placeholder={'Número de Telefone'}
-          placeholderTextColor={theme.placeholderColor}
-        />
-        <Btn onPress={updateProfile} disabled={!isValidCpf} />
+      <StatusBar style="auto"/>
+        <View style={styles.header}>
+          <BackBtn onPress={() => navigation.navigate("Profile")} />
+        </View>
+      <View style={styles.AlignAll}>
+        <Title>Editar Perfil</Title>
+        <View style={styles.imageBlock}>
+          <Image
+            style={styles.image}
+            source={image ? { uri: `data:image/jpeg;base64,${image}` } : image || defaultProfileImage}
+          />
+          <IconPencil onPress={pickImage}>
+            <Ionicons name="camera" size={26} color={theme.colorIconStyle} />
+          </IconPencil>
+        </View>
+        <View style={styles.alignInput}>
+          <Input
+            text="Nome"
+            value={username}
+            onChangeText={(text) => setUsername(formatUsername(text))}
+            placeholder={'Nome Completo'}
+          />
+          <TextInputMask
+            type={'cpf'}
+            style={[!isValidCpf && styles.invalidInput, {
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 255,
+              margin: 8,
+              fontSize: 18,
+              paddingLeft: 20,
+              borderRadius: 10,
+              elevation: 5,
+            }]}
+            value={cpf}
+            onChangeText={handleCpfChange}
+            placeholder={'CPF'}
+            placeholderTextColor={theme.placeholderColor}
+          />
+          {!isValidCpf && (
+            <Feather style={styles.errorIcon} name="x-circle" color={'#ff0000'} size={26} />
+          )}
+          <TextInputMask
+            type={'datetime'}
+            options={{ format: 'DD/MM/YYYY' }}
+            style={[{
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 255,
+              margin: 8,
+              fontSize: 18,
+              paddingLeft: 20,
+              borderRadius: 10,
+              elevation: 5,
+            }]}
+            value={date}
+            onChangeText={setDate}
+            placeholder={'Data de Nascimento'}
+            placeholderTextColor={theme.placeholderColor}
+          />
+          <TextInputMask
+            type={'cel-phone'}
+            options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
+            style={[{
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 255,
+              margin: 8,
+              marginBottom: '10%',
+              fontSize: 18,
+              paddingLeft: 20,
+              borderRadius: 10,
+              elevation: 5,
+            }]}
+            value={telefone}
+            onChangeText={setTelefone}
+            placeholder={'Número de Telefone'}
+            placeholderTextColor={theme.placeholderColor}
+          />
+          <Btn onPress={updateProfile} disabled={!isValidCpf} />
+        </View>
       </View>
     </Container>
   );
@@ -349,6 +352,11 @@ const styles = StyleSheet.create({
     height: 180,
     borderRadius: 115,
   },
+
+  AlignAll:{
+    position:'absolute',
+  },
+
   alignInput: {
     bottom: '6%',
     justifyContent: "center",
@@ -361,8 +369,9 @@ const styles = StyleSheet.create({
     bottom: '2%',
   },
   header: {
-    right: '41%',
-    top: '4.7%',
+    position:'absolute',
+    top:'5%',
+    left:'4%',
   },
   invalidInput: {
     borderColor: '#ff0000',
