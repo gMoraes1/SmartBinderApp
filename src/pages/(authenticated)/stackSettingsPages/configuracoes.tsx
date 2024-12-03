@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-nati
 import styled from 'styled-components/native';
 import { signOut } from "firebase/auth";
 import { auth } from "../../../../firebase"; // Certifique-se de importar corretamente
+import LtBtn from '../../../components/Buttons/LittleBtn';
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -62,9 +63,7 @@ export default function Configurations({ navigation }) {
         </View>
 
         <View style={styles.bottomButtonContainer}>
-          <TouchableOpacity style={styles.bottomButton} onPress={handleLogout}>
-            <Text style={styles.bottomButtonText}>Sair</Text>
-          </TouchableOpacity>
+          <LtBtn onPress={handleLogout} >Sair</LtBtn>
         </View>
       </ScrollView>
     </Container>
@@ -113,7 +112,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end', // Faz o botão ficar na parte inferior do container
     alignItems: 'center', // Centraliza o botão horizontalmente
     display: 'flex',
-    bottom: 90,
+    bottom: 170,
     alignContent: 'center',
     paddingTop: 100, // Ajusta a posição vertical do botão "Sair" (ajuste conforme necessário)
   },

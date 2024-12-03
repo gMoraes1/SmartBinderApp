@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Alert } from "react-native";
-import styled, { useTheme } from 'styled-components/native';
-import { TextInputIconProps } from 'react-native-paper'
+import styled, { useTheme } from "styled-components/native";
 
 import { db, auth } from "../../../../firebase"; // Importando a instância do Firestore e auth
 import { collection, addDoc, doc, writeBatch } from "firebase/firestore"; // Funções do Firestore
@@ -9,23 +8,20 @@ import BackBtn from "../../../components/Buttons/BackBtn";
 import Input from "../../../components/Input/Input";
 
 import Btn from "../../../components/Buttons/Btn";
-import RNPickerSelect from 'react-native-picker-select';
+import RNPickerSelect from "react-native-picker-select";
 
 // Definindo o estilo para os componentes
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
   width: 100%;
+  padding: 16px;
   height: 100%;
-  align-items: center;
-  display: flex;
-  gap: 30px;
 `;
 
 const Title = styled.Text`
   font-size: 32px;
   font-weight: 600;
   text-align: center;
-  flex: 1;
   padding-top: 12%;
   color: ${(props) => props.theme.color};
 `;
@@ -97,7 +93,10 @@ export default function RegisterClasses({ navigation }) {
       });
     } catch (error) {
       console.error("Erro ao adicionar turma: ", error);
-      Alert.alert("Erro", "Ocorreu um erro ao adicionar a turma. Tente novamente.");
+      Alert.alert(
+        "Erro",
+        "Ocorreu um erro ao adicionar a turma. Tente novamente."
+      );
     }
   };
 
@@ -105,108 +104,113 @@ export default function RegisterClasses({ navigation }) {
     <Container>
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
-        <Title>Cadastrar Turma</Title>
       </View>
 
-      <View style={styles.inputContainer}>
-        <Input text="Nome da turma" onChangeText={setClassName} />
+      <Title>Cadastrar Turma</Title>
+      
+      <View style={styles.containerButtons}>
+        <View style={styles.containerInput}>
+          <Input text="Nome da turma" onChangeText={setClassName} />
 
-        <RNPickerSelect
-          onValueChange={(value) => console.log(value)}
-          items={[
-            { label: 'Manhã', value: 'manhã' },
-            { label: 'Tarde', value: 'tarde' },
-            { label: 'Noite', value: 'noite' },
-          ]}
-          style={{
-            inputIOS: {
-              backgroundColor: theme.inputBackground || "#D2DFDA",
-              color: theme.color || "#000",
-              height: 50,
-              width: 255,
-              margin: 8,
-              fontSize: 18,
-              paddingLeft: 20,
-              borderRadius: 10,
-              elevation: 5,
-            },
-            inputAndroid: {
-              backgroundColor: theme.inputBackground || "#D2DFDA",
-              color: theme.color || "#000",
-              height: 50,
-              width: 255,
-              margin: 8,
-              fontSize: 18,
-              paddingLeft: 20,
-              borderRadius: 10,
-              elevation: 5,
-            }
-          }}
+          <RNPickerSelect
+            onValueChange={(value) => console.log(value)}
+            items={[
+              { label: "Manhã", value: "manhã" },
+              { label: "Tarde", value: "tarde" },
+              { label: "Noite", value: "noite" },
+            ]}
+            style={{
+              inputIOS: {
+                backgroundColor: theme.inputBackground || "#D2DFDA",
+                color: theme.color || "#000",
+                height: 50,
+                width: 255,
+                margin: 8,
+                fontSize: 18,
+                paddingLeft: 20,
+                borderRadius: 10,
+                elevation: 5,
+              },
+              inputAndroid: {
+                backgroundColor: theme.inputBackground || "#D2DFDA",
+                color: theme.color || "#000",
+                height: 50,
+                width: 255,
+                margin: 8,
+                fontSize: 18,
+                paddingLeft: 20,
+                borderRadius: 10,
+                elevation: 5,
+              },
+            }}
+            placeholder={{
+              label: "Escolha um Periodo",
+              value: null,
+              color: theme.placeholderColor,
+            }}
+          />
 
-          placeholder={{
-            label: 'Escolha um Periodo',
-            value: null,
-            color: theme.placeholderColor,
-          }}
-        />
+          <RNPickerSelect
+            onValueChange={(value) => console.log(value)}
+            items={[
+              { label: "1° série", value: "1° série" },
+              { label: "2° série", value: "2° série" },
+              { label: "3° série", value: "3° série" },
+              { label: "4° série", value: "4° série" },
+              { label: "5° série", value: "5° série" },
+            ]}
+            style={{
+              inputIOS: {
+                backgroundColor: theme.inputBackground || "#D2DFDA",
+                color: theme.color || "#000",
+                height: 50,
+                width: 255,
+                margin: 8,
+                fontSize: 18,
+                paddingLeft: 20,
+                borderRadius: 10,
+                elevation: 5,
+              },
+              inputAndroid: {
+                backgroundColor: theme.inputBackground || "#D2DFDA",
+                color: theme.color || "#000",
+                height: 50,
+                width: 255,
+                margin: 8,
+                fontSize: 18,
+                paddingLeft: 20,
+                borderRadius: 10,
+                elevation: 5,
+              },
+            }}
+            placeholder={{
+              label: "Escolha uma Série",
+              value: null,
+              color: theme.placeholderColor,
+            }}
+          />
 
-        <RNPickerSelect
-          onValueChange={(value) => console.log(value)}
-          items={[
-            { label: '1° série', value: '1° série' },
-            { label: '2° série', value: '2° série' },
-            { label: '3° série', value: '3° série' },
-            { label: '4° série', value: '4° série' },
-            { label: '5° série', value: '5° série' },
-          ]}
-          style={{
-            inputIOS: {
-              backgroundColor: theme.inputBackground || "#D2DFDA",
-              color: theme.color || "#000",
-              height: 50,
-              width: 255,
-              margin: 8,
-              fontSize: 18,
-              paddingLeft: 20,
-              borderRadius: 10,
-              elevation: 5,
-            },
-            inputAndroid: {
-              backgroundColor: theme.inputBackground || "#D2DFDA",
-              color: theme.color || "#000",
-              height: 50,
-              width: 255,
-              margin: 8,
-              fontSize: 18,
-              paddingLeft: 20,
-              borderRadius: 10,
-              elevation: 5,
-            }
-          }}
+          <Input text="Escola" onChangeText={setSchool} />
+        </View>
 
-          placeholder={{
-            label: 'Escolha uma Série',
-            value: null,
-            color: theme.placeholderColor,
-          }}
-        />
-
-        <Input text="Escola" onChangeText={setSchool} />
+        <Btn onPress={handleAddClass} texto="Cadastrar" />
       </View>
-
-      <Btn onPress={handleAddClass} texto="Cadastrar" />
     </Container>
   );
 }
 
 const styles = StyleSheet.create({
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: 120,
-    paddingHorizontal: 16,
+    top: "2.7%",
   },
-  inputContainer: {
+  containerButtons: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 50,
+    gap: 40,
+  },
+  containerInput: {
     display: "flex",
     flexDirection: "column",
     gap: 10,
