@@ -179,12 +179,11 @@ export default function ExportDoc({ navigation, route }) {
     return () => unsubscribeObservations();
   }, []);
 
-  // Função para gerar o arquivo Excel
   const generateExcel = () => {
     const wb = XLSX.utils.book_new();
-
+  
     const filteredStudents = students.filter((student) => student.turmaId === turmaId);
-
+  
     const header = [
       "Nome do Aluno",
       "RM",
@@ -197,54 +196,75 @@ export default function ExportDoc({ navigation, route }) {
       "4° Bimestre - Status",
       "4° Bimestre - Faltas",
     ];
-
-    // Usando os dados corretos de turma, escola e professor
+  
     const turmaInfo = [
-      [`Nome da escola: ${turmas[0]?.school || "Não disponível"}`],
-      [`Professor: ${dadosPerfil?.nomeProfessor || "Não disponível"}`],
-      [`Turma: ${turmas[0]?.nomeTurma || "Não disponível"}`],
+      [`Nome da escola: ${turmas[0]?.school || ""}`],
+      [`Professor: ${dadosPerfil?.nomeProfessor || ""}`],
+      [`Turma: ${turmas[0]?.nomeTurma || ""}`],
     ];
-
+  
+    // Ordenar as sondagens por bimestre
+    const orderedSondagens = sondagens.sort((a, b) => {
+      const bimestreOrder = {
+        "1° Bimestre": 1,
+        "2° Bimestre": 2,
+        "3° Bimestre": 3,
+        "4° Bimestre": 4,
+      };
+      return bimestreOrder[a.nomeSondagem] - bimestreOrder[b.nomeSondagem];
+    });
+  
     const studentsData = filteredStudents.map((student) => {
-      let bimestersData = [[], [], [], []];
-
-      sondagens.forEach((sondagem, index) => {
+      // Inicializar os dados de todos os bimestres como arrays vazias
+      const bimestersData = orderedSondagens.map(() => ["", ""]); // ["status", "faltas"]
+  
+      // Preencher os dados corretos para cada bimestre
+      orderedSondagens.forEach((sondagem, index) => {
         const observation = observations.find(
           (obs) => obs.sondagemRef.id === sondagem.id && obs.alunoRef.id === student.id
         );
         if (observation) {
-          bimestersData[index] = [observation.status|| "", observation.qntFaltas || 0];
+          bimestersData[index] = [
+            observation.status || "", // Status (pode ser vazio se não houver)
+            String(observation.qntFaltas || ""), // Faltas (pode ser vazio se não houver)
+          ];
         }
       });
-
-      const studentRow = [
+  
+      // Retornar os dados do aluno, excluindo qualquer dado vazio
+      return [
         student.nomeAluno,
         student.rmAluno,
-        ...bimestersData.flat(),
+        ...bimestersData.flat().filter(value => value !== ""), // Filtra valores vazios
       ];
-
-      return studentRow;
     });
-
+  
     const ws = XLSX.utils.aoa_to_sheet([
       ...turmaInfo,
       [],
       header,
       ...studentsData,
     ]);
-
+  
+    // Ajustar largura das colunas para evitar excesso de espaçamento
+    ws['!cols'] = Array(header.length).fill({ wch: 20 }); // Largura uniforme
+  
     XLSX.utils.book_append_sheet(wb, ws, "Alunos");
-
+  
     const base64 = XLSX.write(wb, { type: "base64" });
-
+  
     const filename = FileSystem.documentDirectory + `${namefile}.xlsx`;
-
+  
     FileSystem.writeAsStringAsync(filename, base64, {
       encoding: FileSystem.EncodingType.Base64,
     }).then(() => {
       Sharing.shareAsync(filename);
     });
   };
+  
+  
+
+
 
   return (
     <Container>
