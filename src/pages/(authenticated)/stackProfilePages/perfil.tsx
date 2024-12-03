@@ -11,13 +11,16 @@ const Container = styled.View`
   width: 100%;
   height: 100%;
   align-items: center;
+  justify-content:center;
+  text-align:center;
 `;
 
 const Title = styled.Text`
   font-size: 32px;
   font-weight: 600;
   text-align: center;
-  padding-top: 12%;
+  padding: 3%;
+  padding-top:6%;
   color: ${(props) => props.theme.color};
 `;
 
@@ -30,21 +33,17 @@ const TextProfile = styled.Text`
 `;
 
 const ProfileView = styled.View`
+  margin-bottom:12%;
   background-color: ${(props) => props.theme.backgroundProfile};
   width: 90%;
-  height: 82%;
-  position: relative;
-  top: 6%;
+  height: 76%;
   border-radius: 20px;
   border: solid gray 0.5px;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
 `;
 
 const IconPencil = styled.TouchableOpacity`
   position: relative;
-  top: 58%;
+  top: 74%;
   left: 38%;
   background-color: ${(props) => props.theme.backgroundIconStyle};
   border-radius: 100px;
@@ -146,5 +145,6 @@ const styles = StyleSheet.create({
   textBlock: {
     justifyContent: "center",
     alignItems: "center",
+    marginTop:'7.5%',
   },
 });
