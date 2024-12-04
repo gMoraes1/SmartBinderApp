@@ -192,6 +192,15 @@ export default function ListStudents({ navigation, route }) {
     });
   };
 
+  const handleSearchChange = (text) => {
+    // Converte a primeira letra de cada palavra para maiúscula
+    const formattedText = text
+      .split(" ")
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+    setSearchText(formattedText);
+  };
+
   return (
     <Container>
       <StatusBar style="auto" />
@@ -206,7 +215,7 @@ export default function ListStudents({ navigation, route }) {
         <Input
           text="Buscar Aluno"
           value={searchText}
-          onChangeText={(text) => setSearchText(text)}
+          onChangeText={handleSearchChange}
           placeholder="Digite o nome ou inicial"
         />
         <LtBtn onPress={handleSearch}>Buscar</LtBtn>
@@ -253,7 +262,7 @@ export default function ListStudents({ navigation, route }) {
               setEditedStudent({ ...editedStudent, nomeAluno: value })
             }
           />
-         
+
 
           <TextInputMask
             type={'datetime'}

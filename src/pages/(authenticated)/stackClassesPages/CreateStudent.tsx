@@ -43,6 +43,15 @@ export default function CreateStudent({ navigation, route }) {
   const [nascimentoAluno, setNascimentoAluno] = useState("");
   const [rmAluno, setRmAluno] = useState("");
 
+  const handleNomeAlunoChange = (text) => {
+    // Converte a primeira letra de cada palavra para maiúscula
+    const formattedText = text
+      .split(" ")
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+    setNomeAluno(formattedText);
+  };
+
   // Função para criar observações (tblObsSondagem) automaticamente
   const createObservationsForStudent = async (alunoId) => {
     try {
@@ -115,7 +124,7 @@ export default function CreateStudent({ navigation, route }) {
           <Input
             text="Nome do Aluno"
             value={nomeAluno}
-            onChangeText={setNomeAluno}
+            onChangeText={handleNomeAlunoChange}
           />
 
           <TextInputMask

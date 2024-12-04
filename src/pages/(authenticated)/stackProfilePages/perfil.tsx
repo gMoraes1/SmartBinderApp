@@ -43,7 +43,7 @@ const ProfileView = styled.View`
 
 const IconPencil = styled.TouchableOpacity`
   position: relative;
-  top: 74%;
+  top: 70%;
   left: 38%;
   background-color: ${(props) => props.theme.backgroundIconStyle};
   border-radius: 100px;

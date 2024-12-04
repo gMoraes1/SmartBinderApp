@@ -239,27 +239,31 @@ export default function EditProfile({ navigation, route }) {
             onChangeText={(text) => setUsername(formatUsername(text))}
             placeholder={'Nome Completo'}
           />
-          <TextInputMask
-            type={'cpf'}
-            style={[!isValidCpf && styles.invalidInput, {
-              backgroundColor: theme.inputBackground || "#D2DFDA",
-              color: theme.color || "#000",
-              height: 50,
-              width: 240,
-              margin: 8,
-              fontSize: 12,
-              paddingLeft: 20,
-              borderRadius: 10,
-              elevation: 5,
-            }]}
-            value={cpf}
-            onChangeText={handleCpfChange}
-            placeholder={'CPF'}
-            placeholderTextColor={theme.placeholderColor}
-          />
-          {!isValidCpf && (
-            <Feather style={styles.errorIcon} name="x-circle" color={'#ff0000'} size={26} />
-          )}
+
+
+            <TextInputMask
+              type={'cpf'}
+              style={[!isValidCpf && styles.invalidInput, {
+                backgroundColor: theme.inputBackground || "#D2DFDA",
+                color: theme.color || "#000",
+                height: 50,
+                width: 240,
+                margin: 8,
+                fontSize: 12,
+                paddingLeft: 20,
+                borderRadius: 10,
+                elevation: 5,
+              }]}
+              value={cpf}
+              onChangeText={handleCpfChange}
+              placeholder={'CPF'}
+              placeholderTextColor={theme.placeholderColor}
+            />
+            {!isValidCpf && (
+              <Feather style={styles.errorIcon} name="x-circle" color={'#ff0000'} size={26} />
+            )}
+
+
           <TextInputMask
             type={'datetime'}
             options={{ format: 'DD/MM/YYYY' }}
@@ -339,7 +343,8 @@ const styles = StyleSheet.create({
   },
   errorIcon: {
     position: 'absolute',
-    left: '58%',
-    top: '25.3%',
+    right:"10%",
+    top:'28.3%'
   },
+
 });
