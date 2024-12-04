@@ -96,7 +96,7 @@ export default function Home() {
       <StatusBar style="auto" />
       <Title>Home</Title>
       <Title>
-        <Text>Bem-Vindo {dadosPerfil ? getFirstName(dadosPerfil.nomeProfessor) : 'Usuário'}</Text>
+        <Text>Olá {dadosPerfil ? getFirstName(dadosPerfil.nomeProfessor) : 'Usuário'}</Text>
       </Title>
       <AvisosRecentes>
         <LinearGradient
