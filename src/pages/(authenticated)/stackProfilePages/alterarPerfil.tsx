@@ -97,8 +97,20 @@ export default function EditProfile({ navigation, route }) {
   }, []); // Esse useEffect só executa uma vez após o componente ser montado
 
   const formatUsername = (text) => {
-    return text.toUpperCase(); // Garante que o nome seja em maiúsculas
+    const names = text.split(" ");  // Divide o texto em partes (nomes)
+    const formattedNames = names.map((name, index) => {
+      if (index === 0) {
+        // Capitaliza a primeira letra do primeiro nome
+        return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+      } else {
+        // Mantém os outros nomes como o usuário digitar
+        return name;
+      }
+    });
+  
+    return formattedNames.join(" ");  // Junta os nomes novamente
   };
+  
 
   const pickImage = async () => {
     // Mostra um alerta com várias opções para o usuário escolher
@@ -241,27 +253,28 @@ export default function EditProfile({ navigation, route }) {
           />
 
 
-            <TextInputMask
-              type={'cpf'}
-              style={[!isValidCpf && styles.invalidInput, {
-                backgroundColor: theme.inputBackground || "#D2DFDA",
-                color: theme.color || "#000",
-                height: 50,
-                width: 240,
-                margin: 8,
-                fontSize: 12,
-                paddingLeft: 20,
-                borderRadius: 10,
-                elevation: 5,
-              }]}
-              value={cpf}
-              onChangeText={handleCpfChange}
-              placeholder={'CPF'}
-              placeholderTextColor={theme.placeholderColor}
-            />
-            {!isValidCpf && (
-              <Feather style={styles.errorIcon} name="x-circle" color={'#ff0000'} size={26} />
-            )}
+
+          <TextInputMask
+            type={'cpf'}
+            style={[!isValidCpf && styles.invalidInput, {
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 240,
+              margin: 8,
+              fontSize: 12,
+              paddingLeft: 20,
+              borderRadius: 10,
+              elevation: 5,
+            }]}
+            value={cpf}
+            onChangeText={handleCpfChange}
+            placeholder={'CPF'}
+            placeholderTextColor={theme.placeholderColor}
+          />
+          {!isValidCpf && (
+            <Feather style={styles.errorIcon} name="x-circle" color={'#ff0000'} size={26} />
+          )}
 
 
           <TextInputMask
@@ -343,8 +356,8 @@ const styles = StyleSheet.create({
   },
   errorIcon: {
     position: 'absolute',
-    right:"10%",
-    top:'28.3%'
+    right: "10%",
+    top: '28.3%'
   },
 
 });

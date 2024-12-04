@@ -192,12 +192,23 @@ export default function ListStudents({ navigation, route }) {
     });
   };
 
+  const formatUsername = (text) => {
+    const names = text.split(" ");  // Divide o texto em partes (nomes)
+    const formattedNames = names.map((name, index) => {
+      if (index === 0) {
+        // Capitaliza a primeira letra do primeiro nome
+        return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+      } else {
+        // Mantém os outros nomes como o usuário digitar
+        return name;
+      }
+    });
+
+    return formattedNames.join(" ");  // Junta os nomes novamente
+  };
+
   const handleSearchChange = (text) => {
-    // Converte a primeira letra de cada palavra para maiúscula
-    const formattedText = text
-      .split(" ")
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+    const formattedText = formatUsername(text); // Chamando a função formatUsername
     setSearchText(formattedText);
   };
 
