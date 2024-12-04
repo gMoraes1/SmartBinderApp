@@ -6,7 +6,7 @@ const StyleInput = styled.TextInput`
   color: ${(props) => props.theme.color || "#000"};
   width: 240px;
   height: 50px;
-  margin: 8px;
+  margin: 12px;
   font-size: 18px;
   padding-left: 20px;
   border-radius: 2px;

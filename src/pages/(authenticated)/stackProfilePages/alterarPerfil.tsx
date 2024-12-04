@@ -48,8 +48,8 @@ const ProfileView = styled.SafeAreaView`
 
 const IconPencil = styled.TouchableOpacity`
   position: relative;
-  bottom: 26%;
-  left: 20%;
+  bottom: 24%;
+  left: 24%;
   background-color: ${(props) => props.theme.backgroundIconStyle};
   border-radius: 100px;
   padding: 12px;
@@ -245,7 +245,7 @@ export default function EditProfile({ navigation, route }) {
               backgroundColor: theme.inputBackground || "#D2DFDA",
               color: theme.color || "#000",
               height: 50,
-              width: 255,
+              width: 240,
               margin: 8,
               fontSize: 18,
               paddingLeft: 20,
@@ -267,7 +267,7 @@ export default function EditProfile({ navigation, route }) {
               backgroundColor: theme.inputBackground || "#D2DFDA",
               color: theme.color || "#000",
               height: 50,
-              width: 255,
+              width: 240,
               margin: 8,
               fontSize: 18,
               paddingLeft: 20,
@@ -286,7 +286,7 @@ export default function EditProfile({ navigation, route }) {
               backgroundColor: theme.inputBackground || "#D2DFDA",
               color: theme.color || "#000",
               height: 50,
-              width: 255,
+              width: 240,
               margin: 8,
               marginBottom: '10%',
               fontSize: 18,

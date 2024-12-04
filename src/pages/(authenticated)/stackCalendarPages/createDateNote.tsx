@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Alert, FlatList, TextInput } 
 import { Calendar, DateData, LocaleConfig } from 'react-native-calendars';
 import { Feather } from "@expo/vector-icons";
 import { ptBR } from '../../../utils/localecalendarConfig';
-import styled from 'styled-components/native';
+import styled, { useTheme } from 'styled-components/native';
 import { db, auth } from '../../../../firebase';
 import { deleteDoc, doc, collection, getDocs, addDoc } from 'firebase/firestore';
 import BackBtn from '../../../components/Buttons/BackBtn';
@@ -31,6 +31,7 @@ const Title = styled.Text`
 `;
 
 export default function Calendars({ navigation }) {
+    const theme = useTheme();
     const [day, setDay] = useState<DateData>();
     const [description, setDescription] = useState("");
 
@@ -121,13 +122,18 @@ export default function Calendars({ navigation }) {
                 )}
             />
 
-
-            <View style={styles.inputView}>
-                <TextInput style={styles.textInput} onChangeText={() => { }} value={dataCompleta} />
-                <Input style={styles.input} text="Descrição do Evento" onChangeText={setDescription} value={description} />
-            </View>
-            <View style={styles.cadastrarView}>
-                <Cadastrar onPress={handleAddEvento} disabled={isDisabled} />
+            <View style={styles.alignView}>
+                <View style={styles.inputView}>
+                    <TextInput 
+                    style={{
+                      color:theme.color  
+                    }} 
+                    onChangeText={() => { }} value={dataCompleta} />
+                    <Input text="Descrição do Evento" onChangeText={setDescription} value={description} />
+                </View>
+                <View style={styles.cadastrarView}>
+                    <Cadastrar onPress={handleAddEvento} disabled={isDisabled} />
+                </View>
             </View>
         </Container>
     );
@@ -141,14 +147,16 @@ const styles = StyleSheet.create({
         top: '16%',
         width: '100%'
     },
+
+    alignView: {
+        position: 'absolute',
+        bottom:'24%',
+    },
+
     inputView: {
-        top: '12%',
         justifyContent: 'center',
         textAlign: 'center',
         alignItems: 'center',
-    },
-    input: {
-
     },
     textInput: {
         fontSize: 20,
@@ -159,15 +167,16 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         alignItems: 'center',
         top: '11%',
-        marginTop: 30
+        marginTop: '3%',
     },
     alignAll: {
         textAlign: 'center',
         alignItems: 'center',
     },
     header: {
-        right: '41%',
+        left: '4%',
         top: '5%',
+        position:'absolute'
     },
     monthHeader: {
         fontSize: 22,
