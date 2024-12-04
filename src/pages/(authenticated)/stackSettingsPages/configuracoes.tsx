@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import { signOut } from "firebase/auth";
 import { auth } from "../../../../firebase"; // Certifique-se de importar corretamente
 import LtBtn from '../../../components/Buttons/LittleBtn';
+import { StatusBar } from 'expo-status-bar';
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -44,6 +45,8 @@ export default function Configurations({ navigation }) {
 
   return (
     <Container>
+      <StatusBar style="auto" />
+
       <ScrollView contentContainerStyle={styles.scrollContainer}>
 
         <Title style={styles.title}>Configurações</Title>
@@ -124,7 +127,7 @@ const styles = StyleSheet.create({
     width: 90, // Largura menor do botão
     verticalAlign: 'middle',
     height: 40, // Altura do botão
-    top:-150
+    top: -150
   },
   bottomButtonText: {
     color: '#FFFFFF', // Cor do texto do botão

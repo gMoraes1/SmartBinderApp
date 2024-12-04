@@ -8,6 +8,7 @@ import Btnms from '../../../components/Buttons/BtnmS';
 import Input from '../../../components/Input/Input';
 import BackBtn from '../../../components/Buttons/BackBtn';
 import { useNavigation } from '@react-navigation/native';
+import { StatusBar } from 'expo-status-bar';
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -37,7 +38,7 @@ interface ObsSondagem {
 export default function StatusSondagem({ route }) {
   const navigation = useNavigation();
   const { turmaId, alunoId } = route.params; // Pegando turmaId e alunoId dos parâmetros da rota
-  
+
   const [obsSondagens, setObsSondagens] = useState<ObsSondagem[]>([]);
   const [editingItem, setEditingItem] = useState<ObsSondagem | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -64,13 +65,13 @@ export default function StatusSondagem({ route }) {
         const nomeSondagem = sondagemDoc.exists() ? (sondagemDoc.data() as { nomeSondagem: string }).nomeSondagem : 'Sem nome';
         const periodoInicial = sondagemDoc.exists() ? (sondagemDoc.data() as { periodoInicial: string }).periodoInicial : 'Sem nome';
         const periodoFinal = sondagemDoc.exists() ? (sondagemDoc.data() as { periodoFinal: string }).periodoFinal : 'Sem nome';
-        
+
         lista.push({
           id: docSnap.id,
           status: data.status,
           qntFaltas: data.qntFaltas,
           obs: data.obs,
-         
+
           sondagemRef, // Incluindo a referência
           nomeSondagem, // Armazenando o nome da sondagem
           periodoInicial, // Armazenando o periodo inicial
@@ -99,7 +100,7 @@ export default function StatusSondagem({ route }) {
           status: editingItem.status,
           qntFaltas: editingItem.qntFaltas,
           obs: editingItem.obs,
-          
+
         });
         Alert.alert('Sucesso', 'Dados atualizados com sucesso!');
         setEditingItem(null); // Fecha o modal
@@ -114,6 +115,8 @@ export default function StatusSondagem({ route }) {
 
   return (
     <Container>
+      <StatusBar style="auto" />
+
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
       </View>

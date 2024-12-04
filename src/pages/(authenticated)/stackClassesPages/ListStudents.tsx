@@ -24,6 +24,7 @@ import DeleteBtn from "../../../components/Buttons/DeleteBtn";
 import LtBtn from "../../../components/Buttons/LittleBtn";
 import BackBtn from "../../../components/Buttons/BackBtn";
 import Input from "../../../components/Input/Input";
+import { StatusBar } from "expo-status-bar";
 
 interface StudentData {
   id: string;
@@ -189,6 +190,8 @@ export default function ListStudents({ navigation, route }) {
 
   return (
     <Container>
+      <StatusBar style="auto" />
+
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
       </View>
@@ -351,7 +354,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  buttonsContainer:{
+  buttonsContainer: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-evenly",

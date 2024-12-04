@@ -15,6 +15,7 @@ import Btnm from '../../../components/Buttons/Btnm';
 import Btnms from '../../../components/Buttons/BtnmS';
 import BackBtn from "../../../components/Buttons/BackBtn";
 import { useNavigation } from '@react-navigation/native';
+import { StatusBar } from 'expo-status-bar';
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -113,9 +114,11 @@ export default function EditSondagem({ route }) {
 
   return (
     <Container>
+      <StatusBar style="auto" />
+
       <View style={styles.header}>
-      <BackBtn onPress={() => navigation.goBack()} />
-      <Title>Editar Sondagens</Title>
+        <BackBtn onPress={() => navigation.goBack()} />
+        <Title>Editar Sondagens</Title>
       </View>
 
       <FlatList
@@ -178,7 +181,7 @@ export default function EditSondagem({ route }) {
 const styles = StyleSheet.create({
   item: {
     marginVertical: 10,
-    top:'10%',
+    top: '10%',
     padding: 15,
     backgroundColor: '#f9f9f9',
     borderRadius: 8,

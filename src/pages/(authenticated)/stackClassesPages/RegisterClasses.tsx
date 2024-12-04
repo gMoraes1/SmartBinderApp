@@ -9,6 +9,7 @@ import Input from "../../../components/Input/Input";
 
 import Btn from "../../../components/Buttons/Btn";
 import RNPickerSelect from "react-native-picker-select";
+import { StatusBar } from "expo-status-bar";
 
 // Definindo o estilo para os componentes
 const Container = styled.View`
@@ -102,12 +103,14 @@ export default function RegisterClasses({ navigation }) {
 
   return (
     <Container>
+      <StatusBar style="auto" />
+
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
       </View>
 
       <Title>Cadastrar Turma</Title>
-      
+
       <View style={styles.containerButtons}>
         <View style={styles.containerInput}>
           <Input text="Nome da turma" onChangeText={setClassName} />
