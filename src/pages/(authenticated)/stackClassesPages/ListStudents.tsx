@@ -39,6 +39,7 @@ const Container = styled.View`
   padding: 16px;
   height: 100%;
   justify-content:center;
+  
 `;
 
 const Title = styled.Text`
@@ -296,6 +297,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+
     marginBottom:'5%',
     top:45
   },

@@ -15,6 +15,9 @@ const Container = styled.View`
   width: 100%;
   height: 100%;
   padding: 16px;
+  justify-content:center;   
+  
+ 
 `;
 
 const Title = styled.Text`
@@ -22,6 +25,8 @@ const Title = styled.Text`
   font-weight: 600;
   text-align: center;
   color: ${(props) => props.theme.color};
+  margin-bottom:-8%; 
+   
 `;
 
 interface ObsSondagem {
@@ -125,6 +130,7 @@ export default function StatusSondagem({ route }) {
       <FlatList
         data={obsSondagens}
         keyExtractor={(item) => item.id}
+        style={styles.list}
         renderItem={({ item }) => (
           <View style={styles.item}>
             <Text style={styles.text}>{item.nomeSondagem}: {item.periodoInicial} __{item.periodoFinal}</Text>
@@ -179,7 +185,13 @@ export default function StatusSondagem({ route }) {
 
 const styles = StyleSheet.create({
   header: {
-    marginBottom: 20,
+    top: '3%',
+    marginBottom:'10%'
+
+  },
+  list: {
+    marginBottom: 90,
+    marginTop: 40,
   },
   item: {
     marginVertical: 10,

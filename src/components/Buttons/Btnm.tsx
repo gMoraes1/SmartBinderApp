@@ -17,8 +17,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 100,
     position:'absolute',
-    bottom: '60%',             // Move o botão um pouco para cima
-    left: '70%',             // Posiciona no canto direito
+    bottom: '40%',             // Move o botão um pouco para cima
+    left: '78%',             // Posiciona no canto direito
     zIndex: 10,           // Garante que o botão fique sobre outros elementos
   },
   textButton: {
