@@ -65,10 +65,11 @@ export default function RegisterClasses({ navigation }) {
 
       // Criando as sondagens relacionadas à turma
       const sondagens = [
-        { nomeSondagem: "1° Bimestre", periodoInicial: "", periodoFinal: "" },
-        { nomeSondagem: "2° Bimestre", periodoInicial: "", periodoFinal: "" },
-        { nomeSondagem: "3° Bimestre", periodoInicial: "", periodoFinal: "" },
-        { nomeSondagem: "4° Bimestre", periodoInicial: "", periodoFinal: "" },
+        { label: "1° série Ensino Fundamental", value: "1° série Ensino Fundamental" },
+        { label: "2° série Ensino Fundamental", value: "2° série Ensino Fundamental" },
+        { label: "3° série Ensino Fundamental", value: "3° série Ensino Fundamental" },
+        { label: "4° série Ensino Fundamental", value: "4° série Ensino Fundamental" },
+        { label: "5° série Ensino Fundamental", value: "5° série Ensino Fundamental" },
       ];
 
       const sondagemCollectionRef = collection(db, "tblSondagem");
@@ -116,7 +117,7 @@ export default function RegisterClasses({ navigation }) {
           <Input text="Nome da turma" onChangeText={setClassName} />
 
           <RNPickerSelect
-            onValueChange={(value) => console.log(value)}
+            onValueChange={setPeriod}
             items={[
               { label: "Manhã", value: "manhã" },
               { label: "Tarde", value: "tarde" },
@@ -129,11 +130,11 @@ export default function RegisterClasses({ navigation }) {
                 height: 50,
                 width: 240,
                 margin: 8,
-                fontSize: 18,
+                fontSize: 12,
                 paddingLeft: 20,
                 borderRadius: 10,
                 elevation: 5,
-                alignSelf:'center',
+                alignSelf: 'center',
               },
               inputAndroid: {
                 backgroundColor: theme.inputBackground || "#D2DFDA",
@@ -141,11 +142,11 @@ export default function RegisterClasses({ navigation }) {
                 height: 50,
                 width: 240,
                 margin: 8,
-                fontSize: 18,
+                fontSize: 12,
                 paddingLeft: 20,
                 borderRadius: 10,
                 elevation: 5,
-                alignSelf:'center',
+                alignSelf: 'center',
               },
             }}
             placeholder={{
@@ -156,13 +157,13 @@ export default function RegisterClasses({ navigation }) {
           />
 
           <RNPickerSelect
-            onValueChange={(value) => console.log(value)}
+            onValueChange={setEducationLevel}
             items={[
-              { label: "1° série", value: "1° série" },
-              { label: "2° série", value: "2° série" },
-              { label: "3° série", value: "3° série" },
-              { label: "4° série", value: "4° série" },
-              { label: "5° série", value: "5° série" },
+              { label: "1° série Ensino Fundamental", value: "1° série Ensino Fundamental" },
+              { label: "2° série Ensino Fundamental", value: "2° série Ensino Fundamental" },
+              { label: "3° série Ensino Fundamental", value: "3° série Ensino Fundamental" },
+              { label: "4° série Ensino Fundamental", value: "4° série Ensino Fundamental" },
+              { label: "5° série Ensino Fundamental", value: "5° série Ensino Fundamental" },
             ]}
             style={{
               inputIOS: {
@@ -171,11 +172,11 @@ export default function RegisterClasses({ navigation }) {
                 height: 50,
                 width: 240,
                 margin: 8,
-                fontSize: 18,
+                fontSize: 12,
                 paddingLeft: 20,
                 borderRadius: 10,
                 elevation: 5,
-                alignSelf:'center',
+                alignSelf: 'center',
               },
               inputAndroid: {
                 backgroundColor: theme.inputBackground || "#D2DFDA",
@@ -183,11 +184,11 @@ export default function RegisterClasses({ navigation }) {
                 height: 50,
                 width: 240,
                 margin: 8,
-                fontSize: 18,
+                fontSize: 12,
                 paddingLeft: 20,
                 borderRadius: 10,
                 elevation: 5,
-                alignSelf:'center',
+                alignSelf: 'center',
               },
             }}
             placeholder={{

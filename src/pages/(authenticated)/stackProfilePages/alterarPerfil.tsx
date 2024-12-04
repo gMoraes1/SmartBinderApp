@@ -247,7 +247,7 @@ export default function EditProfile({ navigation, route }) {
               height: 50,
               width: 240,
               margin: 8,
-              fontSize: 18,
+              fontSize: 12,
               paddingLeft: 20,
               borderRadius: 10,
               elevation: 5,
@@ -271,6 +271,7 @@ export default function EditProfile({ navigation, route }) {
               margin: 8,
               fontSize: 12,
               borderRadius: 10,
+              paddingLeft: 20,
               elevation: 5,
             }]}
             value={date}
@@ -288,7 +289,7 @@ export default function EditProfile({ navigation, route }) {
               width: 240,
               margin: 8,
               marginBottom: '10%',
-              fontSize: 18,
+              fontSize: 12,
               paddingLeft: 20,
               borderRadius: 10,
               elevation: 5,

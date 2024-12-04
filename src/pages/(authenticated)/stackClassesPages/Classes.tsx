@@ -305,11 +305,11 @@ export default function Classes({ navigation }) {
               setEditedTurma({ ...editedTurma, educationLevel: value }); // Atualizando o estado com o valor selecionado
             }}
             items={[
-              { label: '1° série', value: '1° série' },
-              { label: '2° série', value: '2° série' },
-              { label: '3° série', value: '3° série' },
-              { label: '4° série', value: '4° série' },
-              { label: '5° série', value: '5° série' },
+              { label: "1° série Ensino Fundamental", value: "1° série Ensino Fundamental" },
+              { label: "2° série Ensino Fundamental", value: "2° série Ensino Fundamental" },
+              { label: "3° série Ensino Fundamental", value: "3° série Ensino Fundamental" },
+              { label: "4° série Ensino Fundamental", value: "4° série Ensino Fundamental" },
+              { label: "5° série Ensino Fundamental", value: "5° série Ensino Fundamental" },
             ]}
             style={{
               inputIOS: {
