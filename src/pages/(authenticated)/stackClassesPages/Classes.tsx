@@ -273,23 +273,23 @@ export default function Classes({ navigation }) {
                 backgroundColor: theme.inputBackground || "#D2DFDA",
                 color: theme.color || "#000",
                 height: 50,
-                width: 255,
+                width: 240,
                 margin: 8,
                 fontSize: 18,
-                paddingLeft: 20,
                 borderRadius: 10,
                 elevation: 2,
+                alignSelf:'center'
               },
               inputAndroid: {
                 backgroundColor: theme.inputBackground || "#D2DFDA",
                 color: theme.color || "#000",
                 height: 50,
-                width: 255,
+                width: 240,
                 margin: 8,
                 fontSize: 18,
-                paddingLeft: 20,
                 borderRadius: 10,
                 elevation: 2,
+                alignSelf:'center'
               }
             }}
             placeholder={{
@@ -316,23 +316,23 @@ export default function Classes({ navigation }) {
                 backgroundColor: theme.inputBackground || "#D2DFDA",
                 color: theme.color || "#000",
                 height: 50,
-                width: 255,
+                width: 240,
                 margin: 8,
                 fontSize: 18,
-                paddingLeft: 20,
                 borderRadius: 10,
                 elevation: 2,
+                alignSelf:'center'
               },
               inputAndroid: {
                 backgroundColor: theme.inputBackground || "#D2DFDA",
                 color: theme.color || "#000",
                 height: 50,
-                width: 255,
+                width: 240,
                 margin: 8,
                 fontSize: 18,
-                paddingLeft: 20,
                 borderRadius: 10,
                 elevation: 2,
+                alignSelf:'center'
               }
             }}
             placeholder={{
@@ -437,6 +437,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 5,
     alignItems: "center",
+    textAlign:'center',
+    justifyContent:'center',
   },
   editTitle: {
     fontSize: 18,
