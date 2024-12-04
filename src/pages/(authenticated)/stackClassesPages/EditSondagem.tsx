@@ -30,7 +30,7 @@ const Title = styled.Text`
   text-align: center;
   padding-top: 12%;
   color: ${(props) => props.theme.color};
-  bottom:10%;
+  bottom:20%;
 `;
 
 interface Sondagem {
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   list: {
     marginBottom: 90,
     marginTop: 40,
-    bottom:20
+    bottom:30
 
   },
   text: {
