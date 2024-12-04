@@ -10,9 +10,11 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { createUserWithEmailAndPassword, 
+import {
+  createUserWithEmailAndPassword,
   sendEmailVerification,
-  signOut,} from "firebase/auth"; // Importando a função de Auth
+  signOut,
+} from "firebase/auth"; // Importando a função de Auth
 import { auth } from '../../../../firebase'; // Importando a configuração do auth
 import { getFirestore, doc, setDoc } from "firebase/firestore"; // Importando funções do Firestore
 
@@ -46,8 +48,18 @@ export default function Sign({ navigation }) {
   const [isValidCpf, setIsValidCpf] = useState(true); // Estado para validar o CPF
 
   const formatUsername = (text) => {
-    return text
-      .toUpperCase() // Garante que todo o texto estará em minúsculas
+    const names = text.split(" ");  // Divide o texto em partes (nomes)
+    const formattedNames = names.map((name, index) => {
+      if (index === 0) {
+        // Capitaliza a primeira letra do primeiro nome
+        return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+      } else {
+        // Mantém os outros nomes como o usuário digitar
+        return name;
+      }
+    });
+  
+    return formattedNames.join(" ");  // Junta os nomes novamente
   };
 
   const formatEmail = (text) => {
@@ -57,7 +69,7 @@ export default function Sign({ navigation }) {
 
   const firestore = getFirestore(); // Obtendo a instância do Firestore
 
-  
+
 
   // Função de cadastro
   const handleSignUp = async () => {
@@ -99,7 +111,7 @@ export default function Sign({ navigation }) {
       });
 
       Alert.alert('Cadastro realizado com sucesso',
-      'Um e-mail de verificação foi enviado. Verifique sua caixa de entrada.', [
+        'Um e-mail de verificação foi enviado. Verifique sua caixa de entrada.', [
         {
           text: "OK",
           onPress: () => navigation.navigate("Login"), // Navega para a página de Login
@@ -140,14 +152,12 @@ export default function Sign({ navigation }) {
           <TextInput
             style={styles.input}
             value={username}
-
             onChangeText={(text) => setUsername(formatUsername(text))}
-
             placeholder="Nome de usuário"
             placeholderTextColor={"rgba(255,255,255,0.6)"}
           />
 
-         
+
 
           <TextInput
             style={styles.input}

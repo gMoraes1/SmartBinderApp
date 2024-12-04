@@ -1,22 +1,21 @@
-// tema.tsx
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { StyleSheet, Text, View, useColorScheme } from 'react-native';
 import styled from 'styled-components/native';
-import { Checkbox, CheckboxIOSProps } from 'react-native-paper';
+import { Checkbox } from 'react-native-paper';
 import Globais from '../../../components/GlobalConsts/global'; // Importa o arquivo de variáveis globais
-import CheckboxIOS from 'react-native-paper/lib/typescript/components/Checkbox/CheckboxIOS';
+import BackBtn from '../../../components/Buttons/BackBtn';
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
   width: 100%;
   padding: 16px;
   height: 100%;
+  align-items: center;
 `;
 
 const Title = styled.Text`
   font-size: 32px;
-  width: 100%;
   font-weight: 600;
   text-align: center;
   padding: 12%;
@@ -29,7 +28,6 @@ const Theme = styled.View`
   align-items: flex-start;
   justify-content: flex-start;
   width: 100%;
-  padding-horizontal: 20px;
   background-color: ${(props) => props.theme.inputBackground};
   border-radius: 10px;
   padding: 10px;
@@ -42,7 +40,7 @@ const ThemeText = styled.Text`
   color: ${(props) => props.theme.color};
 `;
 
-export default function ThemeSettings() {
+export default function ThemeSettings({navigation}) {
   const [isCheck1, setIsCheck1] = useState(true); // Padrão
   const [isCheck2, setIsCheck2] = useState(false); // Claro
   const [isCheck3, setIsCheck3] = useState(false); // Escuro
@@ -71,36 +69,34 @@ export default function ThemeSettings() {
 
   return (
     <Container>
+      <StatusBar style="auto" />
+      <View style={styles.header}>
+        <BackBtn onPress={() => navigation.goBack()} />
+      </View>
       <Title>Configurações de Tema</Title>
       <Theme>
         <View style={styles.AlignView}>
           <Text style={styles.themeText}>Padrão:</Text>
-          <View style={styles.alignCheck}>
-            <Checkbox
-              status={isCheck1 ? 'checked' : 'unchecked'}
-              onPress={handleCheck1}  // Chama a função que define qual checkbox selecionar
-            />
-          </View>
+          <Checkbox
+            status={isCheck1 ? 'checked' : 'unchecked'}
+            onPress={handleCheck1} // Chama a função que define qual checkbox selecionar
+          />
         </View>
 
         <View style={styles.AlignView}>
           <Text style={styles.themeText}>Claro:</Text>
-          <View style={styles.alignCheck}>
-            <Checkbox
-              status={isCheck2 ? 'checked' : 'unchecked'}
-              onPress={handleCheck2}  // Chama a função que define qual checkbox selecionar
-            />
-          </View>
+          <Checkbox
+            status={isCheck2 ? 'checked' : 'unchecked'}
+            onPress={handleCheck2} // Chama a função que define qual checkbox selecionar
+          />
         </View>
 
         <View style={styles.AlignView}>
           <Text style={styles.themeText}>Escuro:</Text>
-          <View style={styles.alignCheck}>
-            <Checkbox
-              status={isCheck3 ? 'checked' : 'unchecked'}
-              onPress={handleCheck3}  // Chama a função que define qual checkbox selecionar
-            />
-          </View>
+          <Checkbox
+            status={isCheck3 ? 'checked' : 'unchecked'}
+            onPress={handleCheck3} // Chama a função que define qual checkbox selecionar
+          />
         </View>
       </Theme>
     </Container>
@@ -121,10 +117,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10, // Espaçamento entre os itens
+    width: '100%', // Certificando-se de que o container ocupe 100% da largura
+    justifyContent: 'space-between', // Para alinhar texto e checkbox de maneira mais eficiente
   },
-
-  alignCheck: {
-    position: 'absolute',
-    left: '26%', // Garante o alinhamento do checkbox em relação ao texto
+  header: {
+    top: "5.2%",
+    left:'4.3%',
+    position:'absolute',
   },
 });

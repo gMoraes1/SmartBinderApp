@@ -1,22 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import * as XLSX from 'xlsx';
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
-import styled from 'styled-components/native';
-import { StyleSheet, Text, View } from 'react-native';
-import Input from '../../../components/Input/Input';
-import Btn from '../../../components/Buttons/Btn';
+import React, { useEffect, useState } from "react";
+import * as XLSX from "xlsx";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import styled from "styled-components/native";
+import { StyleSheet, Text, View } from "react-native";
+import Input from "../../../components/Input/Input";
+import Btn from "../../../components/Buttons/Btn";
 import BackBtn from "../../../components/Buttons/BackBtn";
-import { auth, db } from '../../../../firebase';
-import { collection, doc, onSnapshot, orderBy, query, where } from 'firebase/firestore';
+import { auth, db } from "../../../../firebase";
+import {
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  query,
+  where,
+  orderBy,
+} from "firebase/firestore";
+import { StatusBar } from "expo-status-bar";
 
-// Definição da interface para os dados dos alunos
 interface StudentData {
   id: string;
   nomeAluno: string;
   nascimentoAluno: string;
   rmAluno: string;
-  turmaId: string; // Adiciona turmaId para associar o aluno à turma
+  turmaId: string;
 }
 
 interface ClassData {
@@ -25,6 +33,23 @@ interface ClassData {
   periodoTurma: string;
   educationLevel: string;
   school: string;
+}
+
+interface SondagemData {
+  id: string;
+  nomeSondagem: string;
+  periodoInicial: string;
+  periodoFinal: string;
+  turmaRef: any;
+}
+
+interface ObservationData {
+  id: string;
+  alunoRef: any;
+  sondagemRef: any;
+  obs: string;
+  status: string;
+  qntFaltas: number;
 }
 
 const Container = styled.View`
@@ -43,75 +68,74 @@ const Title = styled.Text`
 `;
 
 export default function ExportDoc({ navigation, route }) {
-  const [namefile, setFilename] = useState('');
+  const [namefile, setFilename] = useState("");
   const [dadosPerfil, setDadosPerfil] = useState(null);
   const [students, setStudents] = useState<StudentData[]>([]);
   const [turmas, setTurmas] = useState<ClassData[]>([]);
-  const turmaId = route.params?.turmaId; // Obtendo turmaId diretamente de route.params
+  const [sondagens, setSondagens] = useState<SondagemData[]>([]);
+  const [observations, setObservations] = useState<ObservationData[]>([]);
+  const turmaId = route.params?.turmaId;
 
-  // Carrega a turma selecionada
+  // Puxar dados do professor e turma
   useEffect(() => {
-    if (!turmaId) {
-      console.error("turmaId não encontrado");
-      return;
-    }
+    if (turmaId) {
+      const turmaRef = doc(db, "tblTurma", turmaId);
 
-    const unsubscribe = onSnapshot(
-      doc(db, "tblTurma", turmaId), // Acesso direto ao documento da turma pela referência
-      (docSnapshot) => {
-        if (docSnapshot.exists()) {
-          const data = docSnapshot.data();
-          setTurmas([ // Alteração para setar turmas como um array
-            {
-              id: docSnapshot.id,
-              nomeTurma: data.nomeTurma,
-              periodoTurma: data.periodoTurma,
-              educationLevel: data.educationLevel,
-              school: data.school,
-            },
-          ]);
-        } else {
-          console.error("Turma não encontrada.");
+      getDoc(turmaRef).then((docSnap) => {
+        if (docSnap.exists()) {
+          const turmaData = docSnap.data();
+          setTurmas([{
+            id: docSnap.id,
+            nomeTurma: turmaData.nomeTurma,
+            school: turmaData.school,
+            periodoTurma: turmaData.periodoTurma,
+            educationLevel: turmaData.educationLevel,
+          }]);
         }
-      }
-    );
+      });
 
-    return () => unsubscribe();
+      const perfilRef = doc(db, "tblProfessor", auth.currentUser?.uid);
+      getDoc(perfilRef).then((docSnap) => {
+        if (docSnap.exists()) {
+          setDadosPerfil(docSnap.data());
+        }
+      });
+    }
   }, [turmaId]);
 
+  // Puxar todas as sondagens (1° Bimestre, 2° Bimestre, etc.)
   useEffect(() => {
-    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
-      if (user) {
-        // Busca os dados do perfil do Firestore usando o uid do usuário autenticado
-        const userRef = doc(db, "tblProfessor", user.uid);
-        const unsubscribe = onSnapshot(userRef, (docSnapshot) => {
-          if (docSnapshot.exists()) {
-            setDadosPerfil(docSnapshot.data()); // Carrega os dados do usuário no estado
-          } else {
-            setDadosPerfil(null); // Caso o perfil não exista no Firestore
+    const unsubscribeSondagens = onSnapshot(
+      collection(db, "tblSondagem"),
+      (querySnapshot) => {
+        const sondagensList: SondagemData[] = [];
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (["1° Bimestre", "2° Bimestre", "3° Bimestre", "4° Bimestre"].includes(data.nomeSondagem)) {
+            sondagensList.push({
+              id: docSnap.id,
+              nomeSondagem: data.nomeSondagem,
+              periodoInicial: data.periodoInicial,
+              periodoFinal: data.periodoFinal,
+              turmaRef: data.turmaRef,
+            });
           }
         });
-
-        // Cleanup do listener de perfil
-        return () => unsubscribe();
-      } else {
-        setDadosPerfil(null); // Caso o usuário não esteja logado
+        setSondagens(sondagensList);
       }
-    });
+    );
+    return () => unsubscribeSondagens();
+  }, []);
 
-    // Cleanup do listener de autenticação
-    return () => unsubscribeAuth();
-  }, []); // Esse useEffect só executa uma vez após o componente ser montado
-
-  // Carrega os alunos da turma selecionada
+  // Puxar todos os alunos dessa turma
   useEffect(() => {
     if (!turmaId) return;
 
     const unsubscribe = onSnapshot(
       query(
         collection(db, "tblAluno"),
-        where("turmaRef", "==", doc(db, "tblTurma", turmaId)), // Verifique se o filtro é feito pela turmaRef
-        orderBy("nomeAluno") // Ordenando pela propriedade nomeAluno
+        where("turmaRef", "==", doc(db, "tblTurma", turmaId)),
+        orderBy("nomeAluno")
       ),
       (querySnapshot) => {
         const studentList: StudentData[] = [];
@@ -122,95 +146,139 @@ export default function ExportDoc({ navigation, route }) {
             nomeAluno: data.nomeAluno,
             nascimentoAluno: data.nascimentoAluno,
             rmAluno: data.rmAluno,
-            turmaId: data.turmaRef.id, // Atribuindo a turmaId para cada aluno
+            turmaId: data.turmaRef.id,
           });
         });
-
-        setStudents(studentList); // Atualiza a lista de alunos
+        setStudents(studentList);
       }
     );
 
     return () => unsubscribe();
   }, [turmaId]);
 
+  // Puxar todas as observações
+  useEffect(() => {
+    const unsubscribeObservations = onSnapshot(
+      collection(db, "tblObsSondagem"),
+      (querySnapshot) => {
+        const observationsList: ObservationData[] = [];
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          observationsList.push({
+            id: docSnap.id,
+            alunoRef: data.alunoRef,
+            sondagemRef: data.sondagemRef,
+            obs: data.obs,
+            status: data.status, // Garantindo que o status está sendo puxado
+            qntFaltas: data.qntFaltas,
+          });
+        });
+        setObservations(observationsList);
+      }
+    );
 
+    return () => unsubscribeObservations();
+  }, []);
 
-  // Gera o arquivo Excel com os dados dos alunos
   const generateExcel = () => {
-    if (students.length === 0) {
-      console.error('Nenhum aluno encontrado para esta turma');
-      return;
-    }
-
-    const wb = XLSX.utils.book_new(); // Criação de uma nova planilha Excel
-
-    // Filtrando alunos pela turma
-    const filteredStudents = students.filter(student => student.turmaId === turmaId);
-
-    // Verificando se há alunos para a turma
-    if (filteredStudents.length === 0) {
-      console.error('Nenhum aluno encontrado para esta turma');
-      return;
-    }
-
-    // Cabeçalho da planilha
-    const header = ['Nome do Aluno', 'RM', '1° Bimestre', '2° Bimestre', '3° Bimestre', '4° Bimestre'];
-
-    // Criar a linha para o nome da turma e nome do professor
-    const turmaInfo = [
-      [`Professor: ${dadosPerfil?.nomeProfessor}`], // Nome do professor
-      [`Turma: ${turmas[0]?.school}`], // Nome da turma
-      [`Turma: ${turmas[0]?.nomeTurma}`], // Nome da turma
+    const wb = XLSX.utils.book_new();
+  
+    const filteredStudents = students.filter((student) => student.turmaId === turmaId);
+  
+    const header = [
+      "Nome do Aluno",
+      "RM",
+      "1° Bimestre - Status",
+      "1° Bimestre - Faltas",
+      "2° Bimestre - Status",
+      "2° Bimestre - Faltas",
+      "3° Bimestre - Status",
+      "3° Bimestre - Faltas",
+      "4° Bimestre - Status",
+      "4° Bimestre - Faltas",
     ];
+  
+    const turmaInfo = [
+      [`Nome da escola: ${turmas[0]?.school || ""}`],
+      [`Professor: ${dadosPerfil?.nomeProfessor || ""}`],
+      [`Turma: ${turmas[0]?.nomeTurma || ""}`],
+    ];
+  
+    // Ordenar as sondagens por bimestre
+    const orderedSondagens = sondagens.sort((a, b) => {
+      const bimestreOrder = {
+        "1° Bimestre": 1,
+        "2° Bimestre": 2,
+        "3° Bimestre": 3,
+        "4° Bimestre": 4,
+      };
+      return bimestreOrder[a.nomeSondagem] - bimestreOrder[b.nomeSondagem];
+    });
+  
+    const studentsData = filteredStudents.map((student) => {
+      // Inicializar os dados de todos os bimestres como arrays vazias
+      const bimestersData = orderedSondagens.map(() => ["", ""]); // ["status", "faltas"]
+  
+      // Preencher os dados corretos para cada bimestre
+      orderedSondagens.forEach((sondagem, index) => {
+        const observation = observations.find(
+          (obs) => obs.sondagemRef.id === sondagem.id && obs.alunoRef.id === student.id
+        );
+        if (observation) {
 
-    // Dados dos alunos
-    const studentsData = filteredStudents.map(student => [
-      student.nomeAluno,
-      student.rmAluno,
-      '', '', '', '' // Campos para as notas (que podem ser preenchidos depois)
-    ]);
-
-    // Adicionando as informações da turma e do professor ao Excel
+          bimestersData[index] = [
+            observation.status || "", // Status (pode ser vazio se não houver)
+            String(observation.qntFaltas || ""), // Faltas (pode ser vazio se não houver)
+          ];
+        }
+      });
+  
+      // Retornar os dados do aluno, excluindo qualquer dado vazio
+      return [
+        student.nomeAluno,
+        student.rmAluno,
+        ...bimestersData.flat().filter(value => value !== ""), // Filtra valores vazios
+      ];
+    });
+  
     const ws = XLSX.utils.aoa_to_sheet([
-      ...turmaInfo,  // Linhas com nome da turma e nome do professor
-      [], // Linha vazia para separação
-      header, // Cabeçalho
-      ...studentsData // Dados dos alunos
+      ...turmaInfo,
+      [],
+      header,
+      ...studentsData,
     ]);
-
-    // Adiciona a planilha ao arquivo Excel
-    XLSX.utils.book_append_sheet(wb, ws, 'Alunos');
-
-    // Converte o arquivo para base64
-    const base64 = XLSX.write(wb, { type: 'base64' });
-
-    // Caminho do arquivo
+  
+    // Ajustar largura das colunas para evitar excesso de espaçamento
+    ws['!cols'] = Array(header.length).fill({ wch: 20 }); // Largura uniforme
+  
+    XLSX.utils.book_append_sheet(wb, ws, "Alunos");
+  
+    const base64 = XLSX.write(wb, { type: "base64" });
+  
     const filename = FileSystem.documentDirectory + `${namefile}.xlsx`;
-
-    // Salva o arquivo no sistema de arquivos
+  
     FileSystem.writeAsStringAsync(filename, base64, {
       encoding: FileSystem.EncodingType.Base64,
     }).then(() => {
-      // Compartilha o arquivo gerado
       Sharing.shareAsync(filename);
     });
   };
+  
+  
 
 
 
   return (
     <Container>
+      <StatusBar style="auto" />
+
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
       </View>
       <Title>Sondagens</Title>
 
       <View style={styles.BtnView}>
-        <Input
-          text="Nome do Arquivo"
-          onChangeText={setFilename}
-          value={namefile}
-        />
+        <Input text="Nome do Arquivo" onChangeText={setFilename} value={namefile} />
       </View>
 
       <View style={styles.BtnView}>
@@ -224,7 +292,9 @@ export default function ExportDoc({ navigation, route }) {
       <View style={styles.BtnView}>
         <Btn
           onPress={() =>
-            navigation.navigate('EditSondagem', { turmaId: route.params.turmaId })
+            navigation.navigate("EditSondagem", {
+              turmaId: route.params.turmaId,
+            })
           }
           texto="Editar Sondagens"
         />
@@ -236,17 +306,17 @@ export default function ExportDoc({ navigation, route }) {
 const styles = StyleSheet.create({
   BtnView: {
     marginTop: 20,
-    width: '90%',
-    alignItems: 'center',
+    width: "90%",
+    alignItems: "center",
   },
 
   header: {
-    right: '41%',
-    top: '4.7%',
+    right: "41%",
+    top: "4.7%",
   },
 
   studentList: {
     marginTop: 20,
-    width: '90%',
+    width: "90%",
   },
 });

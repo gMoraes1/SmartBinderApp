@@ -23,6 +23,7 @@ import LtBtn from "../../../components/Buttons/LittleBtn";
 import DeleteBtn from "../../../components/Buttons/DeleteBtn";
 import RNPickerSelect from 'react-native-picker-select';
 import Input from "../../../components/Input/Input";
+import { StatusBar } from "expo-status-bar";
 
 interface ClassData {
   id: string;
@@ -80,59 +81,59 @@ export default function Classes({ navigation }) {
 
   // Função para deletar alunos e sondagens associadas à turma
   // Função para deletar dados associados (alunos, sondagens e observações)
-async function deleteAssociatedData(turmaId: string) {
-  try {
-    // Deletar alunos associados à turma
-    const alunosQuery = query(
-      collection(db, "tblAluno"),
-      where("turmaRef", "==", doc(db, "tblTurma", turmaId)) // Consultando alunos com a referência da turma
-    );
-    const alunosSnapshot = await getDocs(alunosQuery);
-    if (alunosSnapshot.empty) {
-      console.log("Nenhum aluno encontrado para esta turma.");
-    } else {
-      const alunoDeletePromises = alunosSnapshot.docs.map(async (docSnap) => {
-        // Deletar observações (tblObsSondagem) associadas ao aluno
-        const observacoesQuery = query(
-          collection(db, "tblObsSondagem"),
-          where("alunoRef", "==", doc(db, "tblAluno", docSnap.id)) // Consultando observações associadas ao aluno
-        );
-        const observacoesSnapshot = await getDocs(observacoesQuery);
-        if (!observacoesSnapshot.empty) {
-          const observacaoDeletePromises = observacoesSnapshot.docs.map((obsSnap) =>
-            deleteDoc(doc(db, "tblObsSondagem", obsSnap.id))
-          );
-          await Promise.all(observacaoDeletePromises);
-          console.log("Observações deletadas com sucesso.");
-        }
-
-        // Deletar o aluno
-        await deleteDoc(doc(db, "tblAluno", docSnap.id));
-        console.log("Aluno deletado com sucesso.");
-      });
-      await Promise.all(alunoDeletePromises);
-    }
-
-    // Deletar sondagens associadas à turma
-    const sondagensQuery = query(
-      collection(db, "tblSondagem"),
-      where("turmaRef", "==", doc(db, "tblTurma", turmaId)) // Consultando sondagens com a referência da turma
-    );
-    const sondagensSnapshot = await getDocs(sondagensQuery);
-    if (sondagensSnapshot.empty) {
-      console.log("Nenhuma sondagem encontrada para esta turma.");
-    } else {
-      const sondagemDeletePromises = sondagensSnapshot.docs.map((docSnap) =>
-        deleteDoc(doc(db, "tblSondagem", docSnap.id))
+  async function deleteAssociatedData(turmaId: string) {
+    try {
+      // Deletar alunos associados à turma
+      const alunosQuery = query(
+        collection(db, "tblAluno"),
+        where("turmaRef", "==", doc(db, "tblTurma", turmaId)) // Consultando alunos com a referência da turma
       );
-      await Promise.all(sondagemDeletePromises);
-      console.log("Sondagens deletadas com sucesso.");
+      const alunosSnapshot = await getDocs(alunosQuery);
+      if (alunosSnapshot.empty) {
+        console.log("Nenhum aluno encontrado para esta turma.");
+      } else {
+        const alunoDeletePromises = alunosSnapshot.docs.map(async (docSnap) => {
+          // Deletar observações (tblObsSondagem) associadas ao aluno
+          const observacoesQuery = query(
+            collection(db, "tblObsSondagem"),
+            where("alunoRef", "==", doc(db, "tblAluno", docSnap.id)) // Consultando observações associadas ao aluno
+          );
+          const observacoesSnapshot = await getDocs(observacoesQuery);
+          if (!observacoesSnapshot.empty) {
+            const observacaoDeletePromises = observacoesSnapshot.docs.map((obsSnap) =>
+              deleteDoc(doc(db, "tblObsSondagem", obsSnap.id))
+            );
+            await Promise.all(observacaoDeletePromises);
+            console.log("Observações deletadas com sucesso.");
+          }
+
+          // Deletar o aluno
+          await deleteDoc(doc(db, "tblAluno", docSnap.id));
+          console.log("Aluno deletado com sucesso.");
+        });
+        await Promise.all(alunoDeletePromises);
+      }
+
+      // Deletar sondagens associadas à turma
+      const sondagensQuery = query(
+        collection(db, "tblSondagem"),
+        where("turmaRef", "==", doc(db, "tblTurma", turmaId)) // Consultando sondagens com a referência da turma
+      );
+      const sondagensSnapshot = await getDocs(sondagensQuery);
+      if (sondagensSnapshot.empty) {
+        console.log("Nenhuma sondagem encontrada para esta turma.");
+      } else {
+        const sondagemDeletePromises = sondagensSnapshot.docs.map((docSnap) =>
+          deleteDoc(doc(db, "tblSondagem", docSnap.id))
+        );
+        await Promise.all(sondagemDeletePromises);
+        console.log("Sondagens deletadas com sucesso.");
+      }
+    } catch (error) {
+      console.error("Erro ao deletar dados relacionados:", error);
+      throw new Error("Erro ao deletar dados relacionados.");
     }
-  } catch (error) {
-    console.error("Erro ao deletar dados relacionados:", error);
-    throw new Error("Erro ao deletar dados relacionados.");
   }
-}
 
 
   // Função de exclusão da turma com confirmação em duas etapas
@@ -204,6 +205,8 @@ async function deleteAssociatedData(turmaId: string) {
 
   return (
     <Container>
+      <StatusBar style="auto" />
+
       <Title>Turmas</Title>
 
       <FlatList
@@ -270,23 +273,23 @@ async function deleteAssociatedData(turmaId: string) {
                 backgroundColor: theme.inputBackground || "#D2DFDA",
                 color: theme.color || "#000",
                 height: 50,
-                width: 255,
+                width: 240,
                 margin: 8,
                 fontSize: 18,
-                paddingLeft: 20,
                 borderRadius: 10,
-                elevation: 3,
+                elevation: 2,
+                alignSelf:'center'
               },
               inputAndroid: {
                 backgroundColor: theme.inputBackground || "#D2DFDA",
                 color: theme.color || "#000",
                 height: 50,
-                width: 255,
+                width: 240,
                 margin: 8,
                 fontSize: 18,
-                paddingLeft: 20,
                 borderRadius: 10,
-                elevation: 3,
+                elevation: 2,
+                alignSelf:'center'
               }
             }}
             placeholder={{
@@ -302,34 +305,34 @@ async function deleteAssociatedData(turmaId: string) {
               setEditedTurma({ ...editedTurma, educationLevel: value }); // Atualizando o estado com o valor selecionado
             }}
             items={[
-              { label: '1° série', value: '1° série' },
-              { label: '2° série', value: '2° série' },
-              { label: '3° série', value: '3° série' },
-              { label: '4° série', value: '4° série' },
-              { label: '5° série', value: '5° série' },
+              { label: "1° série Ensino Fundamental", value: "1° série Ensino Fundamental" },
+              { label: "2° série Ensino Fundamental", value: "2° série Ensino Fundamental" },
+              { label: "3° série Ensino Fundamental", value: "3° série Ensino Fundamental" },
+              { label: "4° série Ensino Fundamental", value: "4° série Ensino Fundamental" },
+              { label: "5° série Ensino Fundamental", value: "5° série Ensino Fundamental" },
             ]}
             style={{
               inputIOS: {
                 backgroundColor: theme.inputBackground || "#D2DFDA",
                 color: theme.color || "#000",
                 height: 50,
-                width: 255,
+                width: 240,
                 margin: 8,
                 fontSize: 18,
-                paddingLeft: 20,
                 borderRadius: 10,
-                elevation: 3,
+                elevation: 2,
+                alignSelf:'center'
               },
               inputAndroid: {
                 backgroundColor: theme.inputBackground || "#D2DFDA",
                 color: theme.color || "#000",
                 height: 50,
-                width: 255,
+                width: 240,
                 margin: 8,
                 fontSize: 18,
-                paddingLeft: 20,
                 borderRadius: 10,
-                elevation: 3,
+                elevation: 2,
+                alignSelf:'center'
               }
             }}
             placeholder={{
@@ -365,7 +368,7 @@ async function deleteAssociatedData(turmaId: string) {
 const styles = StyleSheet.create({
   list: {
     marginBottom: 30,
-    marginTop: 40,
+    marginTop: 30,
   },
   classItem: {
     flexDirection: "column",
@@ -422,7 +425,7 @@ const styles = StyleSheet.create({
   Buttons: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-evenly",
+    justifyContent: "center",
   },
   editContainer: {
     position: "absolute",
@@ -434,6 +437,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 5,
     alignItems: "center",
+    textAlign:'center',
+    justifyContent:'center',
   },
   editTitle: {
     fontSize: 18,

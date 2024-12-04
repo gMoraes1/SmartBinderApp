@@ -19,6 +19,7 @@ const Container = styled.View`
   width: 100%;
   height: 100%;
   align-items: center;
+  justify-content:center;
 `;
 
 const Title = styled.Text`
@@ -47,8 +48,8 @@ const ProfileView = styled.SafeAreaView`
 
 const IconPencil = styled.TouchableOpacity`
   position: relative;
-  bottom: 26%;
-  left: 20%;
+  bottom: 24%;
+  left: 24%;
   background-color: ${(props) => props.theme.backgroundIconStyle};
   border-radius: 100px;
   padding: 12px;
@@ -96,15 +97,31 @@ export default function EditProfile({ navigation, route }) {
   }, []); // Esse useEffect só executa uma vez após o componente ser montado
 
   const formatUsername = (text) => {
-    return text.toUpperCase(); // Garante que o nome seja em maiúsculas
+    const names = text.split(" ");  // Divide o texto em partes (nomes)
+    const formattedNames = names.map((name, index) => {
+      if (index === 0) {
+        // Capitaliza a primeira letra do primeiro nome
+        return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+      } else {
+        // Mantém os outros nomes como o usuário digitar
+        return name;
+      }
+    });
+
+    return formattedNames.join(" ");  // Junta os nomes novamente
   };
 
+
   const pickImage = async () => {
-    // Mostra um alerta com duas opções para o usuário escolher
+    // Mostra um alerta com várias opções para o usuário escolher
     Alert.alert(
       "Escolher imagem",
       "Escolha uma opção",
       [
+        {
+          text: "Cancelar",
+          style: "cancel",  // Adiciona a opção de cancelar
+        },
         {
           text: "Galeria",
           onPress: async () => {
@@ -118,17 +135,6 @@ export default function EditProfile({ navigation, route }) {
             if (!result.canceled) {
               const imageUri = result.assets[0].uri;
               setImage(imageUri); // Armazena a URI da imagem selecionada
-
-              try {
-                // Converte a imagem para base64
-                const base64Image = await FileSystem.readAsStringAsync(imageUri, {
-                  encoding: FileSystem.EncodingType.Base64,
-                });
-                setImage(base64Image); // Atualiza a imagem com o conteúdo base64
-              } catch (error) {
-                console.error("Erro ao converter imagem para base64: ", error);
-                Alert.alert("Erro", "Ocorreu um erro ao converter a imagem.");
-              }
             }
           }
         },
@@ -144,49 +150,16 @@ export default function EditProfile({ navigation, route }) {
             if (!result.canceled) {
               const imageUri = result.assets[0].uri;
               setImage(imageUri); // Armazena a URI da imagem tirada
-
-              try {
-                // Converte a imagem para base64
-                const base64Image = await FileSystem.readAsStringAsync(imageUri, {
-                  encoding: FileSystem.EncodingType.Base64,
-                });
-                setImage(base64Image); // Atualiza a imagem com o conteúdo base64
-              } catch (error) {
-                console.error("Erro ao converter imagem para base64: ", error);
-                Alert.alert("Erro", "Ocorreu um erro ao converter a imagem.");
-              }
             }
           }
         },
-        {
-          text: "Padrão",
-          onPress: async () => {
-            try {
-              // Carregar a imagem de assets usando Asset.fromModule
-              const asset = Asset.fromModule(defaultProfileImageUri);
-              await asset.downloadAsync(); // Certifique-se de que o recurso foi carregado no dispositivo
-
-              const fileUri = asset.localUri || asset.uri; // Garantir que estamos usando o caminho local
-
-              if (fileUri) {
-                // Converte a imagem para base64 usando o caminho local
-                const base64Image = await FileSystem.readAsStringAsync(fileUri, {
-                  encoding: FileSystem.EncodingType.Base64,
-                });
-                setImage(base64Image); // Atualiza a imagem para a imagem padrão convertida para base64
-              } else {
-                console.error("Erro: URI local não encontrada para a imagem padrão.");
-                Alert.alert("Erro", "Não foi possível carregar a imagem padrão.");
-              }
-            } catch (error) {
-              console.error("Erro ao converter imagem padrão para base64: ", error);
-              Alert.alert("Erro", "Ocorreu um erro ao definir a imagem padrão.");
-            }
-          }
-        }
       ]
     );
   };
+
+
+
+
 
 
   // Função para validar o CPF
@@ -260,84 +233,91 @@ export default function EditProfile({ navigation, route }) {
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.navigate("Profile")} />
       </View>
-      <Title>Editar Perfil</Title>
-      <View style={styles.imageBlock}>
-        <Image
-          style={styles.image}
-          source={image ? { uri: `data:image/jpeg;base64,${image}` } : image || defaultProfileImage}
-        />
-        <IconPencil onPress={pickImage}>
-          <Ionicons name="camera" size={26} color={theme.colorIconStyle} />
-        </IconPencil>
-      </View>
-      <View style={styles.alignInput}>
-        <Input
-          text="Nome"
-          value={username}
-          onChangeText={(text) => setUsername(formatUsername(text))}
-          placeholder={'Nome Completo'}
-        />
-        <TextInputMask
-          type={'cpf'}
-          style={[!isValidCpf && styles.invalidInput, {
-            backgroundColor: theme.inputBackground || "#D2DFDA",
-            color: theme.color || "#000",
-            height: 50,
-            width: 255,
-            margin: 8,
-            fontSize: 18,
-            paddingLeft: 20,
-            borderRadius: 10,
-            elevation: 5,
-          }]}
-          value={cpf}
-          onChangeText={handleCpfChange}
-          placeholder={'CPF'}
-          placeholderTextColor={theme.placeholderColor}
-        />
-        {!isValidCpf && (
-          <Feather style={styles.errorIcon} name="x-circle" color={'#ff0000'} size={26} />
-        )}
-        <TextInputMask
-          type={'datetime'}
-          options={{ format: 'DD/MM/YYYY' }}
-          style={[{
-            backgroundColor: theme.inputBackground || "#D2DFDA",
-            color: theme.color || "#000",
-            height: 50,
-            width: 255,
-            margin: 8,
-            fontSize: 18,
-            paddingLeft: 20,
-            borderRadius: 10,
-            elevation: 5,
-          }]}
-          value={date}
-          onChangeText={setDate}
-          placeholder={'Data de Nascimento'}
-          placeholderTextColor={theme.placeholderColor}
-        />
-        <TextInputMask
-          type={'cel-phone'}
-          options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
-          style={[{
-            backgroundColor: theme.inputBackground || "#D2DFDA",
-            color: theme.color || "#000",
-            height: 50,
-            width: 255,
-            margin: 8,
-            marginBottom: '10%',
-            fontSize: 18,
-            paddingLeft: 20,
-            borderRadius: 10,
-            elevation: 5,
-          }]}
-          value={telefone}
-          onChangeText={setTelefone}
-          placeholder={'Número de Telefone'}
-          placeholderTextColor={theme.placeholderColor}
-        />
-        <Btn onPress={updateProfile} disabled={!isValidCpf} />
+      <View style={styles.AlignAll}>
+        <Title>Editar Perfil</Title>
+        <View style={styles.imageBlock}>
+          <Image
+            style={styles.image}
+            source={image ? { uri: image } : defaultProfileImage}
+          />
+          <IconPencil onPress={pickImage}>
+            <Ionicons name="camera" size={26} color={theme.colorIconStyle} />
+          </IconPencil>
+        </View>
+        <View style={styles.alignInput}>
+          <Input
+            text="Nome"
+            value={username}
+            onChangeText={(text) => setUsername(formatUsername(text))}
+            placeholder={'Nome Completo'}
+          />
+
+
+
+          <TextInputMask
+            type={'cpf'}
+            style={[!isValidCpf && styles.invalidInput, {
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 240,
+              margin: 8,
+              fontSize: 12,
+              paddingLeft: 20,
+              borderRadius: 10,
+              elevation: 5,
+            }]}
+            value={cpf}
+            onChangeText={handleCpfChange}
+            placeholder={'CPF'}
+            placeholderTextColor={theme.placeholderColor}
+          />
+          {!isValidCpf && (
+            <Feather style={styles.errorIcon} name="x-circle" color={'#ff0000'} size={26} />
+          )}
+
+
+          <TextInputMask
+            type={'datetime'}
+            options={{ format: 'DD/MM/YYYY' }}
+            style={[{
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 240,
+              margin: 8,
+              fontSize: 12,
+              borderRadius: 10,
+              paddingLeft: 20,
+              elevation: 5,
+            }]}
+            value={date}
+            onChangeText={setDate}
+            placeholder={'Data de Nascimento'}
+            placeholderTextColor={theme.placeholderColor}
+          />
+          <TextInputMask
+            type={'cel-phone'}
+            options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
+            style={[{
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 240,
+              margin: 8,
+              marginBottom: '10%',
+              fontSize: 12,
+              paddingLeft: 20,
+              borderRadius: 10,
+              elevation: 5,
+            }]}
+            value={telefone}
+            onChangeText={setTelefone}
+            placeholder={'Número de Telefone'}
+            placeholderTextColor={theme.placeholderColor}
+          />
+          <Btn onPress={updateProfile} disabled={!isValidCpf} />
+        </View>
       </View>
     </Container>
   );
@@ -349,6 +329,11 @@ const styles = StyleSheet.create({
     height: 180,
     borderRadius: 115,
   },
+
+  AlignAll: {
+    position: 'absolute',
+  },
+
   alignInput: {
     bottom: '6%',
     justifyContent: "center",
@@ -361,8 +346,9 @@ const styles = StyleSheet.create({
     bottom: '2%',
   },
   header: {
-    right: '41%',
-    top: '4.7%',
+    position: 'absolute',
+    top: '5%',
+    left: '4%',
   },
   invalidInput: {
     borderColor: '#ff0000',
@@ -370,7 +356,8 @@ const styles = StyleSheet.create({
   },
   errorIcon: {
     position: 'absolute',
-    left: '58%',
-    top: '25.3%',
+    right: "10%",
+    top: '28.3%'
   },
+
 });

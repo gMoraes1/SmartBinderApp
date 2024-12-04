@@ -4,8 +4,8 @@ import { StyleSheet, Text, View, TouchableOpacity, Alert, FlatList, TextInput } 
 import { Calendar, DateData, LocaleConfig } from 'react-native-calendars';
 import { Feather } from "@expo/vector-icons";
 import { ptBR } from '../../../utils/localecalendarConfig';
-import styled from 'styled-components/native';
-import { db , auth  } from '../../../../firebase';
+import styled, { useTheme } from 'styled-components/native';
+import { db, auth } from '../../../../firebase';
 import { deleteDoc, doc, collection, getDocs, addDoc } from 'firebase/firestore';
 import BackBtn from '../../../components/Buttons/BackBtn';
 import Input from '../../../components/Input/Input';
@@ -31,6 +31,7 @@ const Title = styled.Text`
 `;
 
 export default function Calendars({ navigation }) {
+    const theme = useTheme();
     const [day, setDay] = useState<DateData>();
     const [description, setDescription] = useState("");
 
@@ -42,40 +43,42 @@ export default function Calendars({ navigation }) {
     const isDisabled = !dataCompleta || !description; // Desativa o botão se algum campo estiver vazio
 
     // Função para salvar o evento no Firestore
-    const handleAddEvento = async () =>{    
+    const handleAddEvento = async () => {
         try {
             //verificando se o usuario esta autenticado
             const user = auth.currentUser;
-            if(!user){
+            if (!user) {
                 console.error("usuario não autenticado!");
                 Alert.alert("Erro", "Você precisa estar logado para criar um evento.")
                 return;
             }
             //Referencia do usuario na coleção'users (referencia  ao documento do usuario)
-            const userRef = doc(db, 'users',user.uid); //criação de referencia ao documentodo usuario
+            const userRef = doc(db, 'users', user.uid); //criação de referencia ao documentodo usuario
             // Obtendo a referência da coleção 'tblCalendario' para adicionar um novo evento
             const calendarCollectionRef = collection(db, 'tblCalendario');
-             // Adicionando os dados do Calendario à coleção 'tblCalendario', associando o documento do usuário ao campo 'userRef'
-             await addDoc(calendarCollectionRef,{
+            // Adicionando os dados do Calendario à coleção 'tblCalendario', associando o documento do usuário ao campo 'userRef'
+            await addDoc(calendarCollectionRef, {
                 dataCalendario: dataCompleta,
                 descricaoCalendario: description,
                 userRef: userRef,  // A referência ao documento do usuário
-             });
-             // Navegar de volta para O CALENDARIO de turmas, passando os dados dO EVENTO
-             navigation.navigate("Calendars",{
+            });
+            // Navegar de volta para O CALENDARIO de turmas, passando os dados dO EVENTO
+            navigation.navigate("Calendars", {
                 calendarData: {
-                descricaoCalendario: description,
-                dataCalendario: dataCompleta,
-            },
-             });
-            }catch (error){
-                console.error("Erro ao adicionar um evento: ", error);
-                Alert.alert("Erro", "Ocorreu um erro ao adicionar um evento. Tente novamente.");
-            }
-        };
+                    descricaoCalendario: description,
+                    dataCalendario: dataCompleta,
+                },
+            });
+        } catch (error) {
+            console.error("Erro ao adicionar um evento: ", error);
+            Alert.alert("Erro", "Ocorreu um erro ao adicionar um evento. Tente novamente.");
+        }
+    };
 
     return (
         <Container contentContainerStyle={{ alignItems: 'center', height: '100%' }}>
+            <StatusBar style="auto" />
+
             <View style={styles.header}>
                 <BackBtn onPress={() => navigation.navigate("Calendars")} />
             </View>
@@ -118,14 +121,19 @@ export default function Calendars({ navigation }) {
                     </Text>
                 )}
             />
-        
 
-            <View style={styles.inputView}>
-                <TextInput style={styles.textInput} onChangeText={() => { }} value={dataCompleta} />
-                <Input style={styles.input} text="Descrição do Evento" onChangeText={setDescription} value={description} />
-            </View>
-            <View style={styles.cadastrarView}>
-                <Cadastrar onPress={handleAddEvento} disabled={isDisabled} />
+            <View style={styles.alignView}>
+                <View style={styles.inputView}>
+                    <TextInput 
+                    style={{
+                      color:theme.color  
+                    }} 
+                    onChangeText={() => { }} value={dataCompleta} />
+                    <Input text="Descrição do Evento" onChangeText={setDescription} value={description} />
+                </View>
+                <View style={styles.cadastrarView}>
+                    <Cadastrar onPress={handleAddEvento} disabled={isDisabled} />
+                </View>
             </View>
         </Container>
     );
@@ -136,17 +144,19 @@ const styles = StyleSheet.create({
         borderWidth: 0.5,
         borderBottomWidth: 0.8,
         backgroundColor: 'transparent',
-        top: '16%',
+        top: '24%',
         width: '100%'
     },
+
+    alignView: {
+        position: 'absolute',
+        bottom:'20%',
+    },
+
     inputView: {
-        top: '12%',
         justifyContent: 'center',
         textAlign: 'center',
         alignItems: 'center',
-    },
-    input: {
-        
     },
     textInput: {
         fontSize: 20,
@@ -157,15 +167,16 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         alignItems: 'center',
         top: '11%',
-        marginTop: 30
+        marginTop: '3%',
     },
     alignAll: {
         textAlign: 'center',
         alignItems: 'center',
     },
     header: {
-        right: '41%',
+        left: '4%',
         top: '5%',
+        position:'absolute'
     },
     monthHeader: {
         fontSize: 22,

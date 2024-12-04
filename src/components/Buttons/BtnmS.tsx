@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 100,
     alignSelf: "center",
-    
+    margin:10
   },
   textButton: {
     color: "white",

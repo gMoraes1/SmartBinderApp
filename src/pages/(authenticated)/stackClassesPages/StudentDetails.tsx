@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AutoGrowingTextInput } from 'react-native-autogrow-textinput'
 import Btn from "../../../components/Buttons/Btn";
 import BackBtn from "../../../components/Buttons/BackBtn";
+import { StatusBar } from "expo-status-bar";
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -31,6 +32,8 @@ export default function StudentDetails({ navigation }) {
 
     return (
         <Container>
+            <StatusBar style="auto" />
+
             <View style={styles.header}>
                 <BackBtn onPress={() => navigation.goBack()} />
             </View>

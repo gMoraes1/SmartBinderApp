@@ -7,7 +7,7 @@ import {
   Alert,
   Text,
 } from "react-native";
-import styled from "styled-components/native";
+import styled, { useTheme } from "styled-components/native";
 import {
   collection,
   onSnapshot,
@@ -24,6 +24,8 @@ import DeleteBtn from "../../../components/Buttons/DeleteBtn";
 import LtBtn from "../../../components/Buttons/LittleBtn";
 import BackBtn from "../../../components/Buttons/BackBtn";
 import Input from "../../../components/Input/Input";
+import { StatusBar } from "expo-status-bar";
+import { TextInputMask } from "react-native-masked-text";
 
 interface StudentData {
   id: string;
@@ -37,17 +39,20 @@ const Container = styled.View`
   width: 100%;
   padding: 16px;
   height: 100%;
+  justify-content:center;
+  
 `;
 
 const Title = styled.Text`
   font-size: 32px;
   font-weight: 600;
   text-align: center;
-  padding-top: 12%;
   color: ${(props) => props.theme.color};
+  top:30;
 `;
 
 export default function ListStudents({ navigation, route }) {
+  const theme = useTheme()
   const [students, setStudents] = useState<StudentData[]>([]);
   const [editedStudent, setEditedStudent] = useState<StudentData | null>(null);
   const [searchText, setSearchText] = useState("");
@@ -187,8 +192,30 @@ export default function ListStudents({ navigation, route }) {
     });
   };
 
+  const formatUsername = (text) => {
+    const names = text.split(" ");  // Divide o texto em partes (nomes)
+    const formattedNames = names.map((name, index) => {
+      if (index === 0) {
+        // Capitaliza a primeira letra do primeiro nome
+        return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+      } else {
+        // Mantém os outros nomes como o usuário digitar
+        return name;
+      }
+    });
+
+    return formattedNames.join(" ");  // Junta os nomes novamente
+  };
+
+  const handleSearchChange = (text) => {
+    const formattedText = formatUsername(text); // Chamando a função formatUsername
+    setSearchText(formattedText);
+  };
+
   return (
     <Container>
+      <StatusBar style="auto" />
+
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
       </View>
@@ -199,7 +226,7 @@ export default function ListStudents({ navigation, route }) {
         <Input
           text="Buscar Aluno"
           value={searchText}
-          onChangeText={(text) => setSearchText(text)}
+          onChangeText={handleSearchChange}
           placeholder="Digite o nome ou inicial"
         />
         <LtBtn onPress={handleSearch}>Buscar</LtBtn>
@@ -246,12 +273,29 @@ export default function ListStudents({ navigation, route }) {
               setEditedStudent({ ...editedStudent, nomeAluno: value })
             }
           />
-          <Input
-            text="Nascimento"
+
+
+          <TextInputMask
+            type={'datetime'}
+            options={{ format: 'DD/MM/YYYY' }}
+            style={[{
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 240,
+              margin: 8,
+              fontSize: 12,
+              borderRadius: 10,
+              paddingLeft: 20,
+              elevation: 5,
+              alignSelf: 'center',
+            }]}
             value={editedStudent.nascimentoAluno}
             onChangeText={(value) =>
               setEditedStudent({ ...editedStudent, nascimentoAluno: value })
             }
+            placeholder={'Data de Nascimento'}
+            placeholderTextColor={theme.placeholderColor}
           />
           <Input
             text="RM"
@@ -281,20 +325,26 @@ export default function ListStudents({ navigation, route }) {
 
 const styles = StyleSheet.create({
   header: {
-    top: "2.8%",
+    top: "3%",
+
   },
   list: {
-    marginBottom: 20,
+    marginBottom: 90,
+    marginTop: 40,
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 16,
+    justifyContent: "center",
+
+    marginBottom: '5%',
+    top: 45
   },
   studentItem: {
     flexDirection: "column",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    alignItems: 'center',
+    textAlign: "left",
     padding: 15,
     marginVertical: 8,
     borderWidth: 2,
@@ -304,8 +354,9 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   studentInfo: {
-    alignItems: "flex-start",
     marginBottom: 10,
+    position: 'relative',
+    right: '15%',
   },
   textData: {
     color: "black",
@@ -341,6 +392,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 5,
     zIndex: 10,
+
   },
   editTitle: {
     fontSize: 20,
@@ -351,7 +403,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  buttonsContainer:{
+  buttonsContainer: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-evenly",
