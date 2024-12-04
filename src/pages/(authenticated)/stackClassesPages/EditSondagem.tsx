@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList, Alert } from 'react-native';
-import styled from 'styled-components/native';
+import styled, { useTheme } from 'styled-components/native';
 import {
   collection,
   query,
@@ -16,6 +16,7 @@ import Btnms from '../../../components/Buttons/BtnmS';
 import BackBtn from "../../../components/Buttons/BackBtn";
 import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
+import { TextInputMask } from 'react-native-masked-text';
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -41,6 +42,7 @@ interface Sondagem {
 }
 
 export default function EditSondagem({ route }) {
+  const theme = useTheme()
   const navigation = useNavigation();
   const turmaId = route?.params?.turmaId;
 
@@ -138,9 +140,6 @@ export default function EditSondagem({ route }) {
 
       {editedSondagem && (
         <View style={styles.editContainer}>
-          <View style={styles.header}>
-            <BackBtn onPress={() => navigation.goBack()} />
-          </View>
           <Text style={styles.editTitle}>Editar Sondagem</Text>
           <Input
             text="Nome da Sondagem"
@@ -149,21 +148,51 @@ export default function EditSondagem({ route }) {
               setEditedSondagem({ ...editedSondagem, nomeSondagem: value })
             }
           />
-          <Input
-            text="Período Inicial"
+
+          <TextInputMask
+            type={'datetime'}
+            options={{ format: 'DD/MM/YYYY' }}
+            style={[{
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 240,
+              margin: 8,
+              fontSize: 12,
+              borderRadius: 10,
+              paddingLeft: 20,
+              elevation: 5,
+              alignSelf:'center',
+            }]}
             value={editedSondagem.periodoInicial}
             onChangeText={(value) =>
               setEditedSondagem({ ...editedSondagem, periodoInicial: value })
             }
+            placeholder={'Periodo Inicial'}
+            placeholderTextColor={theme.placeholderColor}
           />
-          <Input
+
+          <TextInputMask
             type={'datetime'}
             options={{ format: 'DD/MM/YYYY' }}
-            text="Período Final"
+            style={[{
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 240,
+              margin: 8,
+              fontSize: 12,
+              borderRadius: 10,
+              paddingLeft: 20,
+              elevation: 5,
+              alignSelf:'center',
+            }]}
             value={editedSondagem.periodoFinal}
             onChangeText={(value) =>
               setEditedSondagem({ ...editedSondagem, periodoFinal: value })
             }
+            placeholder={'Periodo Final'}
+            placeholderTextColor={theme.placeholderColor}
           />
           <View style={styles.btnGroup}>
             <Btnms
@@ -191,10 +220,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   list: {
-    marginBottom: 90,
+    marginBottom: 80,
     marginTop: 40,
-    bottom:30
-
+    bottom: 30,
   },
   text: {
     fontSize: 16,
@@ -215,6 +243,8 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 8,
     elevation: 5,
+    justifyContent:'center',
+    alignItems:'center',
   },
   editTitle: {
     fontSize: 18,

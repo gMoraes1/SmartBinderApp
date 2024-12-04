@@ -144,13 +144,13 @@ const styles = StyleSheet.create({
         borderWidth: 0.5,
         borderBottomWidth: 0.8,
         backgroundColor: 'transparent',
-        top: '16%',
+        top: '24%',
         width: '100%'
     },
 
     alignView: {
         position: 'absolute',
-        bottom:'24%',
+        bottom:'20%',
     },
 
     inputView: {
