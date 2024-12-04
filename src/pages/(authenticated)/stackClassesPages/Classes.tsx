@@ -365,7 +365,7 @@ async function deleteAssociatedData(turmaId: string) {
 const styles = StyleSheet.create({
   list: {
     marginBottom: 30,
-    marginTop: 40,
+    marginTop: 30,
   },
   classItem: {
     flexDirection: "column",
