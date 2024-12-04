@@ -142,7 +142,7 @@ export default function StatusSondagem({ route }) {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Editar Dados</Text>
             <Input
-              text="Observação"
+              text="Status do aluno"
               value={editingItem?.status}
               onChangeText={(value) =>
                 setEditingItem({ ...editingItem, status: value })
@@ -156,7 +156,7 @@ export default function StatusSondagem({ route }) {
               }
             />
             <Input
-              text="Status"
+              text="Observação"
               value={editingItem?.obs}
               onChangeText={(value) =>
                 setEditingItem({ ...editingItem, obs: value })
