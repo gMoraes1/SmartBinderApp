@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   studentInfo: {
     marginBottom: 10,
     position:'relative',
-    right:'26%',
+    right:'15%',
   },
   textData: {
     color: "black",

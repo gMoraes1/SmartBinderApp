@@ -191,10 +191,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   list: {
-    marginBottom: 90,
+    marginBottom: 80,
     marginTop: 40,
-    bottom:30
-
+    bottom:30,
   },
   text: {
     fontSize: 16,

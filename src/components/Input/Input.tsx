@@ -7,7 +7,7 @@ const StyleInput = styled.TextInput`
   width: 240px;
   height: 50px;
   margin: 12px;
-  font-size: 18px;
+  font-size: 12px;
   padding-left: 20px;
   border-radius: 2px;
   elevation: 8;
