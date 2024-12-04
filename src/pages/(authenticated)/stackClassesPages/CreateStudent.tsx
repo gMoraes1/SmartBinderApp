@@ -13,10 +13,11 @@ import {
   where,
 } from "firebase/firestore";
 import BackBtn from "../../../components/Buttons/BackBtn";
-import styled from "styled-components/native";
+import styled, { useTheme } from "styled-components/native";
 import Btn from "../../../components/Buttons/Btn";
 import Input from "../../../components/Input/Input";
 import { StatusBar } from "expo-status-bar";
+import { TextInputMask } from "react-native-masked-text";
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -34,6 +35,7 @@ const Title = styled.Text`
 `;
 
 export default function CreateStudent({ navigation, route }) {
+  const theme = useTheme()
   const { turmaId } = route.params; // Obtendo a turmaId passada da tela anterior
 
   // Definir os estados para os campos de entrada
@@ -116,11 +118,25 @@ export default function CreateStudent({ navigation, route }) {
             onChangeText={setNomeAluno}
           />
 
-          <Input
-            text="Data de Nascimento"
+          <TextInputMask
+            type={'datetime'}
+            options={{ format: 'DD/MM/YYYY' }}
+            style={[{
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 240,
+              margin: 8,
+              fontSize: 12,
+              borderRadius: 10,
+              paddingLeft: 20,
+              elevation: 5,
+              alignSelf: 'center',
+            }]}
             value={nascimentoAluno}
             onChangeText={setNascimentoAluno}
-            keyboardType="numeric"
+            placeholder={'Data de Nascimento'}
+            placeholderTextColor={theme.placeholderColor}
           />
 
           <Input

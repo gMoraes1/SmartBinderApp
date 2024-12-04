@@ -7,7 +7,7 @@ import {
   Alert,
   Text,
 } from "react-native";
-import styled from "styled-components/native";
+import styled, { useTheme } from "styled-components/native";
 import {
   collection,
   onSnapshot,
@@ -25,6 +25,7 @@ import LtBtn from "../../../components/Buttons/LittleBtn";
 import BackBtn from "../../../components/Buttons/BackBtn";
 import Input from "../../../components/Input/Input";
 import { StatusBar } from "expo-status-bar";
+import { TextInputMask } from "react-native-masked-text";
 
 interface StudentData {
   id: string;
@@ -51,6 +52,7 @@ const Title = styled.Text`
 `;
 
 export default function ListStudents({ navigation, route }) {
+  const theme = useTheme()
   const [students, setStudents] = useState<StudentData[]>([]);
   const [editedStudent, setEditedStudent] = useState<StudentData | null>(null);
   const [searchText, setSearchText] = useState("");
@@ -251,12 +253,29 @@ export default function ListStudents({ navigation, route }) {
               setEditedStudent({ ...editedStudent, nomeAluno: value })
             }
           />
-          <Input
-            text="Nascimento"
+         
+
+          <TextInputMask
+            type={'datetime'}
+            options={{ format: 'DD/MM/YYYY' }}
+            style={[{
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 240,
+              margin: 8,
+              fontSize: 12,
+              borderRadius: 10,
+              paddingLeft: 20,
+              elevation: 5,
+              alignSelf: 'center',
+            }]}
             value={editedStudent.nascimentoAluno}
             onChangeText={(value) =>
               setEditedStudent({ ...editedStudent, nascimentoAluno: value })
             }
+            placeholder={'Data de Nascimento'}
+            placeholderTextColor={theme.placeholderColor}
           />
           <Input
             text="RM"
@@ -287,7 +306,7 @@ export default function ListStudents({ navigation, route }) {
 const styles = StyleSheet.create({
   header: {
     top: "3%",
-    
+
   },
   list: {
     marginBottom: 90,
@@ -298,14 +317,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
 
-    marginBottom:'5%',
-    top:45
+    marginBottom: '5%',
+    top: 45
   },
   studentItem: {
     flexDirection: "column",
     justifyContent: "center",
-    alignItems:'center',
-    textAlign:"left",
+    alignItems: 'center',
+    textAlign: "left",
     padding: 15,
     marginVertical: 8,
     borderWidth: 2,
@@ -316,8 +335,8 @@ const styles = StyleSheet.create({
   },
   studentInfo: {
     marginBottom: 10,
-    position:'relative',
-    right:'15%',
+    position: 'relative',
+    right: '15%',
   },
   textData: {
     color: "black",
@@ -353,7 +372,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 5,
     zIndex: 10,
-    
+
   },
   editTitle: {
     fontSize: 20,
