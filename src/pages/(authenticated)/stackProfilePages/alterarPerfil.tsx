@@ -119,7 +119,7 @@ export default function EditProfile({ navigation, route }) {
               aspect: [4, 3],
               quality: 0.6,
             });
-  
+
             if (!result.canceled) {
               const imageUri = result.assets[0].uri;
               setImage(imageUri); // Armazena a URI da imagem selecionada
@@ -134,7 +134,7 @@ export default function EditProfile({ navigation, route }) {
               aspect: [4, 3],
               quality: 0.6,
             });
-  
+
             if (!result.canceled) {
               const imageUri = result.assets[0].uri;
               setImage(imageUri); // Armazena a URI da imagem tirada
@@ -144,10 +144,10 @@ export default function EditProfile({ navigation, route }) {
       ]
     );
   };
-  
-  
-  
-  
+
+
+
+
 
 
   // Função para validar o CPF
@@ -217,10 +217,10 @@ export default function EditProfile({ navigation, route }) {
 
   return (
     <Container>
-      <StatusBar style="auto"/>
-        <View style={styles.header}>
-          <BackBtn onPress={() => navigation.navigate("Profile")} />
-        </View>
+      <StatusBar style="auto" />
+      <View style={styles.header}>
+        <BackBtn onPress={() => navigation.navigate("Profile")} />
+      </View>
       <View style={styles.AlignAll}>
         <Title>Editar Perfil</Title>
         <View style={styles.imageBlock}>
@@ -313,8 +313,8 @@ const styles = StyleSheet.create({
     borderRadius: 115,
   },
 
-  AlignAll:{
-    position:'absolute',
+  AlignAll: {
+    position: 'absolute',
   },
 
   alignInput: {
@@ -329,9 +329,9 @@ const styles = StyleSheet.create({
     bottom: '2%',
   },
   header: {
-    position:'absolute',
-    top:'5%',
-    left:'4%',
+    position: 'absolute',
+    top: '5%',
+    left: '4%',
   },
   invalidInput: {
     borderColor: '#ff0000',

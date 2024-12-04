@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native
 import { db, auth } from '../../../../firebase';
 import { deleteDoc, doc, collection, query, where, orderBy, onSnapshot, getDocs } from 'firebase/firestore'; // Correção aqui
 import styled from 'styled-components/native';
+import { StatusBar } from 'expo-status-bar';
 
 // Defina o tipo correto para os eventos
 type Event = {
@@ -46,7 +47,7 @@ export default function Calendars({ navigation }) {
         where('userRef', '==', doc(db, 'users', auth.currentUser?.uid)),
         orderBy('dataCalendario', 'desc')
       );
-      
+
       const querySnapshot = await getDocs(q); // Buscar todos os eventos
 
       querySnapshot.forEach((docSnap) => {
@@ -96,6 +97,8 @@ export default function Calendars({ navigation }) {
 
   return (
     <Container>
+      <StatusBar style="auto" />
+
       <View style={styles.itensView}>
         {eventos.length > 0 ? (
           <FlatList
@@ -135,7 +138,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#6939E9",
     borderRadius: 30,
     position: "absolute",
-    top:'78.7%',
+    top: '78.7%',
     right: '6%',
     alignItems: "center",
     justifyContent: "center",
@@ -147,7 +150,7 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     color: "white",
     textAlign: "center",
-    top:-2
+    top: -2
   },
   itensView: {
     flex: 1,

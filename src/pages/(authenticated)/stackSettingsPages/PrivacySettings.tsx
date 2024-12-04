@@ -4,7 +4,8 @@ import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
 const PrivacySettings = () => {
   return (
     <View style={styles.container}>
-       <Text style={styles.title}>Configurações de Privacidade</Text>
+      <StatusBar style="auto" />
+      <Text style={styles.title}>Configurações de Privacidade</Text>
     </View>
   );
 };
@@ -16,11 +17,11 @@ const styles = StyleSheet.create({
 
   },
 
-  title:{
-    fontSize:32,
-    fontWeight:"600",
-    justifyContent:"center",
-    textAlign:"center",
-    paddingTop:"12%",
+  title: {
+    fontSize: 32,
+    fontWeight: "600",
+    justifyContent: "center",
+    textAlign: "center",
+    paddingTop: "12%",
   },
 });
