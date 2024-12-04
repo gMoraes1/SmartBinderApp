@@ -30,7 +30,7 @@ const Title = styled.Text`
   text-align: center;
   padding-top: 12%;
   color: ${(props) => props.theme.color};
-  bottom:10%;
+  bottom:20%;
 `;
 
 interface Sondagem {
@@ -124,6 +124,7 @@ export default function EditSondagem({ route }) {
       <FlatList
         data={sondagens}
         keyExtractor={(item) => item.id}
+        style={styles.list}
         renderItem={({ item }) => (
           <View style={styles.item}>
             <Text style={styles.text}>{item.nomeSondagem}</Text>
@@ -182,12 +183,18 @@ const styles = StyleSheet.create({
   item: {
     marginVertical: 10,
     top: '10%',
-    padding: 15,
+    padding: 20,
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
-    height: 110,
-    width: '90%',
+    height: 130,
+    width: '95%',
     alignSelf: 'center',
+  },
+  list: {
+    marginBottom: 90,
+    marginTop: 40,
+    bottom:30
+
   },
   text: {
     fontSize: 16,
