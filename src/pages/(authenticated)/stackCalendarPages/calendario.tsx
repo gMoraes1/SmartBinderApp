@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native';
 import { db, auth } from '../../../../firebase';
-import { deleteDoc, doc, collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
+import { deleteDoc, doc, collection, query, where, orderBy, onSnapshot, getDocs } from 'firebase/firestore'; // Correção aqui
 import styled from 'styled-components/native';
 
 // Defina o tipo correto para os eventos
@@ -20,15 +20,54 @@ const Container = styled.View`
 export default function Calendars({ navigation }) {
   const [eventos, setEventos] = useState<Event[]>([]);
 
+  // Função para excluir um evento
   async function deleteEvento(id: string) {
     try {
       await deleteDoc(doc(db, 'tblCalendario', id));
+      // Remove o evento excluído do estado imediatamente para evitar duplicação
+      setEventos((prevEventos) => prevEventos.filter((evento) => evento.id !== id));
     } catch (error) {
       console.error("Erro ao deletar:", error);
     }
   }
 
+  // Função para verificar se a data do evento já passou
+  function checkEventDate(eventDate: string): boolean {
+    const currentDate = new Date();
+    const eventDateObj = new Date(eventDate); // Certifique-se de que a data do evento está sendo convertida corretamente
+    return eventDateObj < currentDate;
+  }
+
+  // Função para buscar e deletar eventos expirados
+  async function checkAndDeleteExpiredEvents() {
+    try {
+      const q = query(
+        collection(db, 'tblCalendario'),
+        where('userRef', '==', doc(db, 'users', auth.currentUser?.uid)),
+        orderBy('dataCalendario', 'desc')
+      );
+      
+      const querySnapshot = await getDocs(q); // Buscar todos os eventos
+
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const eventDate = data.dataCalendario;
+
+        // Verifica se o evento tem uma data anterior à data atual
+        if (checkEventDate(eventDate)) {
+          // Exclui o evento se a data for anterior
+          deleteEvento(docSnap.id);
+        }
+      });
+    } catch (error) {
+      console.error("Erro ao buscar ou deletar eventos expirados:", error);
+    }
+  }
+
   useEffect(() => {
+    // Verifica e deleta eventos expirados ao carregar o componente
+    checkAndDeleteExpiredEvents();
+
     const unsubscribe = onSnapshot(
       query(
         collection(db, 'tblCalendario'),
@@ -53,7 +92,7 @@ export default function Calendars({ navigation }) {
     );
 
     return () => unsubscribe(); // Limpa a inscrição quando o componente for desmontado
-  }, []); // O useEffect só é executado uma vez quando o componente é montado
+  }, []); // O useEffect agora verifica a exclusão e a atualização uma vez quando o componente é montado
 
   return (
     <Container>
