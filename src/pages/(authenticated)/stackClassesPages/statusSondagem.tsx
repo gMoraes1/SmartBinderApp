@@ -14,6 +14,9 @@ const Container = styled.View`
   width: 100%;
   height: 100%;
   padding: 16px;
+  justify-content:center;   
+  
+ 
 `;
 
 const Title = styled.Text`
@@ -21,6 +24,8 @@ const Title = styled.Text`
   font-weight: 600;
   text-align: center;
   color: ${(props) => props.theme.color};
+  margin-bottom:-8%; 
+   
 `;
 
 interface ObsSondagem {
@@ -37,7 +42,7 @@ interface ObsSondagem {
 export default function StatusSondagem({ route }) {
   const navigation = useNavigation();
   const { turmaId, alunoId } = route.params; // Pegando turmaId e alunoId dos parâmetros da rota
-  
+
   const [obsSondagens, setObsSondagens] = useState<ObsSondagem[]>([]);
   const [editingItem, setEditingItem] = useState<ObsSondagem | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -64,13 +69,13 @@ export default function StatusSondagem({ route }) {
         const nomeSondagem = sondagemDoc.exists() ? (sondagemDoc.data() as { nomeSondagem: string }).nomeSondagem : 'Sem nome';
         const periodoInicial = sondagemDoc.exists() ? (sondagemDoc.data() as { periodoInicial: string }).periodoInicial : 'Sem nome';
         const periodoFinal = sondagemDoc.exists() ? (sondagemDoc.data() as { periodoFinal: string }).periodoFinal : 'Sem nome';
-        
+
         lista.push({
           id: docSnap.id,
           status: data.status,
           qntFaltas: data.qntFaltas,
           obs: data.obs,
-         
+
           sondagemRef, // Incluindo a referência
           nomeSondagem, // Armazenando o nome da sondagem
           periodoInicial, // Armazenando o periodo inicial
@@ -99,7 +104,7 @@ export default function StatusSondagem({ route }) {
           status: editingItem.status,
           qntFaltas: editingItem.qntFaltas,
           obs: editingItem.obs,
-          
+
         });
         Alert.alert('Sucesso', 'Dados atualizados com sucesso!');
         setEditingItem(null); // Fecha o modal
@@ -122,6 +127,7 @@ export default function StatusSondagem({ route }) {
       <FlatList
         data={obsSondagens}
         keyExtractor={(item) => item.id}
+        style={styles.list}
         renderItem={({ item }) => (
           <View style={styles.item}>
             <Text style={styles.text}>{item.nomeSondagem}: {item.periodoInicial} __{item.periodoFinal}</Text>
@@ -176,7 +182,13 @@ export default function StatusSondagem({ route }) {
 
 const styles = StyleSheet.create({
   header: {
-    marginBottom: 20,
+    top: '4%',
+    marginBottom:'10%'
+
+  },
+  list: {
+    marginBottom: 90,
+    marginTop: 40,
   },
   item: {
     marginVertical: 10,

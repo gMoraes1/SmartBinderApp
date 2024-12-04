@@ -38,6 +38,7 @@ const Container = styled.View`
   padding: 16px;
   height: 100%;
   justify-content:center;
+  
 `;
 
 const Title = styled.Text`
@@ -45,6 +46,7 @@ const Title = styled.Text`
   font-weight: 600;
   text-align: center;
   color: ${(props) => props.theme.color};
+  top:30;
 `;
 
 export default function ListStudents({ navigation, route }) {
@@ -281,7 +283,7 @@ export default function ListStudents({ navigation, route }) {
 
 const styles = StyleSheet.create({
   header: {
-    top: "2.8%",
+    top: "4%",
     
   },
   list: {
@@ -292,7 +294,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom:'-8%'
+    marginBottom:'5%',
+    top:45
   },
   studentItem: {
     flexDirection: "column",
