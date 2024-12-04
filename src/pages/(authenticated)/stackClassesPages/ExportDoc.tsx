@@ -17,6 +17,7 @@ import {
   where,
   orderBy,
 } from "firebase/firestore";
+import { StatusBar } from "expo-status-bar";
 
 interface StudentData {
   id: string;
@@ -224,6 +225,7 @@ export default function ExportDoc({ navigation, route }) {
           (obs) => obs.sondagemRef.id === sondagem.id && obs.alunoRef.id === student.id
         );
         if (observation) {
+
           bimestersData[index] = [
             observation.status || "", // Status (pode ser vazio se não houver)
             String(observation.qntFaltas || ""), // Faltas (pode ser vazio se não houver)
@@ -268,6 +270,8 @@ export default function ExportDoc({ navigation, route }) {
 
   return (
     <Container>
+      <StatusBar style="auto" />
+
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
       </View>

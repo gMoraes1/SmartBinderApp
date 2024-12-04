@@ -92,6 +92,7 @@ export default function Profile({ navigation }) {
 
   return (
     <Container>
+      <StatusBar style="auto" />
       <ProfileView>
         <Title>Perfil</Title>
         <View style={styles.imageBlock}>
@@ -145,6 +146,6 @@ const styles = StyleSheet.create({
   textBlock: {
     justifyContent: "center",
     alignItems: "center",
-    marginTop:'7.5%',
+    marginTop: '7.5%',
   },
 });

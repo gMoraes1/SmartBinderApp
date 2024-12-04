@@ -16,6 +16,7 @@ import BackBtn from "../../../components/Buttons/BackBtn";
 import styled from "styled-components/native";
 import Btn from "../../../components/Buttons/Btn";
 import Input from "../../../components/Input/Input";
+import { StatusBar } from "expo-status-bar";
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -99,12 +100,14 @@ export default function CreateStudent({ navigation, route }) {
 
   return (
     <Container>
+      <StatusBar style="auto" />
+
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
       </View>
 
       <Title>Cadastrar Aluno</Title>
-      
+
       <View style={styles.containerButtons}>
         <View style={styles.containerInput}>
           <Input

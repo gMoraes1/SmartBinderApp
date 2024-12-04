@@ -71,6 +71,8 @@ export default function ThemeSettings() {
 
   return (
     <Container>
+      <StatusBar style="auto" />
+
       <Title>Configurações de Tema</Title>
       <Theme>
         <View style={styles.AlignView}>
