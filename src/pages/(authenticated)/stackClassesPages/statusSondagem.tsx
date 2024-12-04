@@ -185,7 +185,7 @@ export default function StatusSondagem({ route }) {
 
 const styles = StyleSheet.create({
   header: {
-    top: '4%',
+    top: '3%',
     marginBottom:'10%'
 
   },

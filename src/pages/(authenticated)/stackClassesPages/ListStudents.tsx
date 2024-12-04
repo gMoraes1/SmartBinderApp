@@ -286,7 +286,7 @@ export default function ListStudents({ navigation, route }) {
 
 const styles = StyleSheet.create({
   header: {
-    top: "4%",
+    top: "3%",
     
   },
   list: {
