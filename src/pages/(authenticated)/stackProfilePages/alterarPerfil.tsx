@@ -107,10 +107,10 @@ export default function EditProfile({ navigation, route }) {
         return name;
       }
     });
-  
+
     return formattedNames.join(" ");  // Junta os nomes novamente
   };
-  
+
 
   const pickImage = async () => {
     // Mostra um alerta com várias opções para o usuário escolher
@@ -238,7 +238,7 @@ export default function EditProfile({ navigation, route }) {
         <View style={styles.imageBlock}>
           <Image
             style={styles.image}
-            source={image ? { uri: `data:image/jpeg;base64,${image}` } : image || defaultProfileImage}
+            source={image ? { uri: image } : defaultProfileImage}
           />
           <IconPencil onPress={pickImage}>
             <Ionicons name="camera" size={26} color={theme.colorIconStyle} />

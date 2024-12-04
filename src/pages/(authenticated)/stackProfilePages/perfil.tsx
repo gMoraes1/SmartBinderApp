@@ -97,10 +97,19 @@ export default function Profile({ navigation }) {
         <Title>Perfil</Title>
         <View style={styles.imageBlock}>
           {dadosPerfil && dadosPerfil.imagemPerfil ? (
-            <Image
-              style={styles.image}
-              source={{ uri: `data:image/jpeg;base64,${dadosPerfil.imagemPerfil}` }} // A imagem em base64
-            />
+            dadosPerfil.imagemPerfil.startsWith("data:image") ? (
+              // Se for base64
+              <Image
+                style={styles.image}
+                source={{ uri: dadosPerfil.imagemPerfil }} // Aqui estamos tratando a imagem como base64
+              />
+            ) : (
+              // Se for URL do Firebase Storage
+              <Image
+                style={styles.image}
+                source={{ uri: dadosPerfil.imagemPerfil }} // Aqui estamos tratando a imagem como URL
+              />
+            )
           ) : (
             <Image
               style={styles.image}
