@@ -269,8 +269,7 @@ export default function EditProfile({ navigation, route }) {
               height: 50,
               width: 240,
               margin: 8,
-              fontSize: 18,
-              paddingLeft: 20,
+              fontSize: 12,
               borderRadius: 10,
               elevation: 5,
             }]}
