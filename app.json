@@ -15,34 +15,42 @@
     "ios": {
       "supportsTablet": true
     },
-  "android": {
-  "package": "com.mycompany.myapp",
-  "intentFilters": [
-    {
-      "action": "VIEW",
-      "data": [
+    "android": {
+      "package": "com.mycompany.myapp",
+      "intentFilters": [
         {
-          "scheme": "https",
-          "host": "myapp.com",
-          "pathPrefix": "/"
-        },
-        {
-          "scheme": "myapp"
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "https",
+              "host": "myapp.com",
+              "pathPrefix": "/"
+            },
+            {
+              "scheme": "myapp"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
-      ],
-      "category": [
-        "BROWSABLE",
-        "DEFAULT"
       ]
-    }
-  ]
-},
+    },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-secure-store",
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "c474e617-cfe7-4f3f-b883-9f54829ec168"
+      }
+    }
   }
 }
