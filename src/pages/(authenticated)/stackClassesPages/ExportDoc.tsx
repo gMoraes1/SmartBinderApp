@@ -35,6 +35,7 @@ interface ClassData {
 interface SondagemData {
   id: string;
   nomeSondagem: string;
+  periodo: string; // Adicionando o campo 'periodo' para ordenar as sondagens
 }
 
 interface ObservationData {
@@ -107,9 +108,20 @@ export default function ExportDoc({ navigation, route }) {
           sondagensList.push({
             id: docSnap.id,
             nomeSondagem: data.nomeSondagem,
+            periodo: data.periodo || "1° Bimestre", // Assume periodo exists, default to "1° Bimestre"
           });
         }
       });
+
+      // Ordenar as sondagens pela ordem do período (1° Bimestre, 2° Bimestre, etc.)
+      const periodoOrder = {
+        "1° Bimestre": 1,
+        "2° Bimestre": 2,
+        "3° Bimestre": 3,
+        "4° Bimestre": 4,
+      };
+
+      sondagensList.sort((a, b) => periodoOrder[a.periodo] - periodoOrder[b.periodo]);
       setSondagens(sondagensList);
     });
 
@@ -181,23 +193,12 @@ export default function ExportDoc({ navigation, route }) {
       [`Turma: ${turmas[0]?.nomeTurma || ""}`],
     ];
 
-    // Sorting Sondagens by order
-    const orderedSondagens = sondagens.sort((a, b) => {
-      const bimestreOrder = {
-        "1° Bimestre": 1,
-        "2° Bimestre": 2,
-        "3° Bimestre": 3,
-        "4° Bimestre": 4,
-      };
-      return bimestreOrder[a.nomeSondagem] - bimestreOrder[b.nomeSondagem];
-    });
-
     // Preparing the students' data
     const studentsData = filteredStudents.map((student) => {
-      const bimestersData = orderedSondagens.map(() => ["", ""]);
+      const bimestersData = sondagens.map(() => ["", ""]);
 
       // Filling the data for each bimestre
-      orderedSondagens.forEach((sondagem, index) => {
+      sondagens.forEach((sondagem, index) => {
         const observation = observations.find(
           (obs) => obs.sondagemRef.id === sondagem.id && obs.alunoRef.id === student.id
         );
