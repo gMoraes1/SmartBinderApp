@@ -3,7 +3,7 @@ import * as XLSX from "xlsx";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import styled from "styled-components/native";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Input from "../../../components/Input/Input";
 import Btn from "../../../components/Buttons/Btn";
 import BackBtn from "../../../components/Buttons/BackBtn";
@@ -22,7 +22,6 @@ import { StatusBar } from "expo-status-bar";
 interface StudentData {
   id: string;
   nomeAluno: string;
-  nascimentoAluno: string;
   rmAluno: string;
   turmaId: string;
 }
@@ -30,24 +29,18 @@ interface StudentData {
 interface ClassData {
   id: string;
   nomeTurma: string;
-  periodoTurma: string;
-  educationLevel: string;
   school: string;
 }
 
 interface SondagemData {
   id: string;
   nomeSondagem: string;
-  periodoInicial: string;
-  periodoFinal: string;
-  turmaRef: any;
 }
 
 interface ObservationData {
   id: string;
   alunoRef: any;
   sondagemRef: any;
-  obs: string;
   status: string;
   qntFaltas: number;
 }
@@ -76,24 +69,24 @@ export default function ExportDoc({ navigation, route }) {
   const [observations, setObservations] = useState<ObservationData[]>([]);
   const turmaId = route.params?.turmaId;
 
-  // Puxar dados do professor e turma
   useEffect(() => {
     if (turmaId) {
+      // Fetch the Turma data
       const turmaRef = doc(db, "tblTurma", turmaId);
-
       getDoc(turmaRef).then((docSnap) => {
         if (docSnap.exists()) {
           const turmaData = docSnap.data();
-          setTurmas([{
-            id: docSnap.id,
-            nomeTurma: turmaData.nomeTurma,
-            school: turmaData.school,
-            periodoTurma: turmaData.periodoTurma,
-            educationLevel: turmaData.educationLevel,
-          }]);
+          setTurmas([
+            {
+              id: docSnap.id,
+              nomeTurma: turmaData.nomeTurma,
+              school: turmaData.school,
+            },
+          ]);
         }
       });
 
+      // Fetch the professor data
       const perfilRef = doc(db, "tblProfessor", auth.currentUser?.uid);
       getDoc(perfilRef).then((docSnap) => {
         if (docSnap.exists()) {
@@ -103,34 +96,28 @@ export default function ExportDoc({ navigation, route }) {
     }
   }, [turmaId]);
 
-  // Puxar todas as sondagens (1° Bimestre, 2° Bimestre, etc.)
   useEffect(() => {
-    const unsubscribeSondagens = onSnapshot(
-      collection(db, "tblSondagem"),
-      (querySnapshot) => {
-        const sondagensList: SondagemData[] = [];
-        querySnapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          if (["1° Bimestre", "2° Bimestre", "3° Bimestre", "4° Bimestre"].includes(data.nomeSondagem)) {
-            sondagensList.push({
-              id: docSnap.id,
-              nomeSondagem: data.nomeSondagem,
-              periodoInicial: data.periodoInicial,
-              periodoFinal: data.periodoFinal,
-              turmaRef: data.turmaRef,
-            });
-          }
-        });
-        setSondagens(sondagensList);
-      }
-    );
+    // Fetch all Sondagens
+    const unsubscribeSondagens = onSnapshot(collection(db, "tblSondagem"), (querySnapshot) => {
+      const sondagensList: SondagemData[] = [];
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        // Only add sondagens that belong to the current turma
+        if (data.turmaRef.id === turmaId) {
+          sondagensList.push({
+            id: docSnap.id,
+            nomeSondagem: data.nomeSondagem,
+          });
+        }
+      });
+      setSondagens(sondagensList);
+    });
+
     return () => unsubscribeSondagens();
-  }, []);
+  }, [turmaId]);
 
-  // Puxar todos os alunos dessa turma
   useEffect(() => {
-    if (!turmaId) return;
-
+    // Fetch all students in the current turma
     const unsubscribe = onSnapshot(
       query(
         collection(db, "tblAluno"),
@@ -144,7 +131,6 @@ export default function ExportDoc({ navigation, route }) {
           studentList.push({
             id: docSnap.id,
             nomeAluno: data.nomeAluno,
-            nascimentoAluno: data.nascimentoAluno,
             rmAluno: data.rmAluno,
             turmaId: data.turmaRef.id,
           });
@@ -152,59 +138,50 @@ export default function ExportDoc({ navigation, route }) {
         setStudents(studentList);
       }
     );
-
     return () => unsubscribe();
   }, [turmaId]);
 
-  // Puxar todas as observações
   useEffect(() => {
-    const unsubscribeObservations = onSnapshot(
-      collection(db, "tblObsSondagem"),
-      (querySnapshot) => {
-        const observationsList: ObservationData[] = [];
-        querySnapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          observationsList.push({
-            id: docSnap.id,
-            alunoRef: data.alunoRef,
-            sondagemRef: data.sondagemRef,
-            obs: data.obs,
-            status: data.status, // Garantindo que o status está sendo puxado
-            qntFaltas: data.qntFaltas,
-          });
+    // Fetch all observations related to the students
+    const unsubscribeObservations = onSnapshot(collection(db, "tblObsSondagem"), (querySnapshot) => {
+      const observationsList: ObservationData[] = [];
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        observationsList.push({
+          id: docSnap.id,
+          alunoRef: data.alunoRef,
+          sondagemRef: data.sondagemRef,
+          status: data.status || "", // Ensure there are no null values for status
+          qntFaltas: data.qntFaltas || 0, // Ensure there are no null values for faltas
         });
-        setObservations(observationsList);
-      }
-    );
+      });
+      setObservations(observationsList);
+    });
 
     return () => unsubscribeObservations();
   }, []);
 
   const generateExcel = () => {
     const wb = XLSX.utils.book_new();
-  
+
     const filteredStudents = students.filter((student) => student.turmaId === turmaId);
-  
+
+    // Header
     const header = [
       "Nome do Aluno",
       "RM",
-      "1° Bimestre - Status",
-      "1° Bimestre - Faltas",
-      "2° Bimestre - Status",
-      "2° Bimestre - Faltas",
-      "3° Bimestre - Status",
-      "3° Bimestre - Faltas",
-      "4° Bimestre - Status",
-      "4° Bimestre - Faltas",
+      ...sondagens.map((sondagem) => `${sondagem.nomeSondagem} - Status`),
+      ...sondagens.map((sondagem) => `${sondagem.nomeSondagem} - Faltas`),
     ];
-  
+
+    // Turma information
     const turmaInfo = [
       [`Nome da escola: ${turmas[0]?.school || ""}`],
       [`Professor: ${dadosPerfil?.nomeProfessor || ""}`],
       [`Turma: ${turmas[0]?.nomeTurma || ""}`],
     ];
-  
-    // Ordenar as sondagens por bimestre
+
+    // Sorting Sondagens by order
     const orderedSondagens = sondagens.sort((a, b) => {
       const bimestreOrder = {
         "1° Bimestre": 1,
@@ -214,89 +191,85 @@ export default function ExportDoc({ navigation, route }) {
       };
       return bimestreOrder[a.nomeSondagem] - bimestreOrder[b.nomeSondagem];
     });
-  
+
+    // Preparing the students' data
     const studentsData = filteredStudents.map((student) => {
-      // Inicializar os dados de todos os bimestres como arrays vazias
-      const bimestersData = orderedSondagens.map(() => ["", ""]); // ["status", "faltas"]
-  
-      // Preencher os dados corretos para cada bimestre
+      const bimestersData = orderedSondagens.map(() => ["", ""]);
+
+      // Filling the data for each bimestre
       orderedSondagens.forEach((sondagem, index) => {
         const observation = observations.find(
           (obs) => obs.sondagemRef.id === sondagem.id && obs.alunoRef.id === student.id
         );
-        if (observation) {
 
+        if (observation) {
           bimestersData[index] = [
-            observation.status || "", // Status (pode ser vazio se não houver)
-            String(observation.qntFaltas || ""), // Faltas (pode ser vazio se não houver)
+            observation.status || "",
+            String(observation.qntFaltas || ""),
           ];
         }
       });
-  
-      // Retornar os dados do aluno, excluindo qualquer dado vazio
-      return [
+
+      const studentRow = [
         student.nomeAluno,
         student.rmAluno,
-        ...bimestersData.flat().filter(value => value !== ""), // Filtra valores vazios
+        ...bimestersData.flat(),
       ];
+
+      return studentRow;
     });
-  
+
+    // Creating the worksheet with the turma and students' data
     const ws = XLSX.utils.aoa_to_sheet([
       ...turmaInfo,
       [],
       header,
       ...studentsData,
     ]);
-  
-    // Ajustar largura das colunas para evitar excesso de espaçamento
-    ws['!cols'] = Array(header.length).fill({ wch: 20 }); // Largura uniforme
-  
+
+    // Adjusting the columns width
+    const colWidths = header.map(() => ({ wch: 20 }));
+    ws["!cols"] = colWidths;
+
+    // Appending the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, "Alunos");
-  
+
+    // Generating the Excel file and sharing it
     const base64 = XLSX.write(wb, { type: "base64" });
-  
     const filename = FileSystem.documentDirectory + `${namefile}.xlsx`;
-  
+
     FileSystem.writeAsStringAsync(filename, base64, {
       encoding: FileSystem.EncodingType.Base64,
     }).then(() => {
       Sharing.shareAsync(filename);
     });
   };
-  
-  
-
-
 
   return (
     <Container>
       <StatusBar style="auto" />
-
       <View style={styles.header}>
         <BackBtn onPress={() => navigation.goBack()} />
       </View>
       <Title>Sondagens</Title>
-
       <View style={styles.BtnView}>
         <Input text="Nome do Arquivo" onChangeText={setFilename} value={namefile} />
       </View>
-
       <View style={styles.BtnView}>
         <Btn onPress={generateExcel} texto="Exportar Excel" />
       </View>
-
       <View style={styles.BtnView}>
-        <Btn onPress={generateExcel} texto="Exportar PDF" />
-      </View>
-
-      <View style={styles.BtnView}>
+        {/* Adicionando o botão de exportar PDF */}
         <Btn
-          onPress={() =>
-            navigation.navigate("EditSondagem", {
-              turmaId: route.params.turmaId,
-            })
-          }
-          texto="Editar Sondagens"
+          onPress={() => console.log("Exportando PDF...")}
+          texto="Exportar PDF"
+        />
+      </View>
+      <View style={styles.BtnView}>
+        {/* Adicionando o botão de editar sondagem */}
+        <Btn
+          onPress={() => navigation.navigate("EditSondagem", { turmaId })}
+          texto="Editar Sondagem"
         />
       </View>
     </Container>
@@ -313,10 +286,5 @@ const styles = StyleSheet.create({
   header: {
     right: "41%",
     top: "4.7%",
-  },
-
-  studentList: {
-    marginTop: 20,
-    width: "90%",
   },
 });
