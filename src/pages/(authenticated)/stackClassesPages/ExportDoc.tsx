@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
+import * as Print from "expo-print";
 import styled from "styled-components/native";
 import { StyleSheet, Text, View } from "react-native";
 import Input from "../../../components/Input/Input";
@@ -73,19 +74,23 @@ export default function ExportDoc({ navigation, route }) {
     const unsubscribeSondagens = onSnapshot(
       query(collection(db, "tblSondagem"), where("turmaRef", "==", doc(db, "tblTurma", turmaId))),
       (querySnapshot) => {
-        const sondagensList = querySnapshot.docs.map((docSnap) => ({
-          id: docSnap.id,
-          ...docSnap.data(),
-        }));
+        const sondagensList = querySnapshot.docs.map((docSnap) => {
+          const data = docSnap.data();
+          return {
+            id: docSnap.id,
+            ...data,
+            periodoInicial: data?.periodoInicial || '',  // Caso a propriedade não exista, atribui uma string vazia
+          };
+        });
 
-        // Ordenar sondagens por periodoInicial
+        // Ordenar sondagens por 'periodoInicial'
         const sortedSondagens = sondagensList.sort((a, b) => {
           const dateA = new Date(a.periodoInicial.split("/").reverse().join("-"));
           const dateB = new Date(b.periodoInicial.split("/").reverse().join("-"));
-          return dateA - dateB;
+          return dateA.getTime() - dateB.getTime();
         });
 
-        setSondagens(sortedSondagens); // Atualiza as sondagens ordenadas
+        setSondagens(sortedSondagens);
       }
     );
 
@@ -133,7 +138,6 @@ export default function ExportDoc({ navigation, route }) {
   // Gerar arquivo Excel
   const generateExcel = () => {
     const wb = XLSX.utils.book_new();
-
     const filteredStudents = students.filter(
       (student) => student.turmaRef.id === turmaId
     );
@@ -193,6 +197,58 @@ export default function ExportDoc({ navigation, route }) {
     });
   };
 
+  // Gerar arquivo PDF
+  const generatePDF = async () => {
+    const filteredStudents = students.filter(
+      (student) => student.turmaRef.id === turmaId
+    );
+
+    const turmaInfo = `
+      <h2>Escola: ${turmas[0]?.school || "Não disponível"}</h2>
+      <h3>Professor: ${dadosPerfil?.nomeProfessor || "Não disponível"}</h3>
+      <h3>Turma: ${turmas[0]?.nomeTurma || "Não disponível"}</h3>
+    `;
+
+    const studentRows = filteredStudents.map((student) => {
+      const studentData = `
+        <h4>Aluno: ${student.nomeAluno} - RM: ${student.rmAluno}</h4>
+        <ul>
+          ${sondagens
+            .map(
+              (sondagem) => `
+                <li>${sondagem.nomeSondagem}: ${observations
+                  .filter(
+                    (obs) =>
+                      obs.sondagemRef.id === sondagem.id &&
+                      obs.alunoRef.id === student.id
+                  )
+                  .map(
+                    (obs) => `Status: ${obs.status}, Faltas: ${obs.qntFaltas}`
+                  )}</li>
+              `
+            )
+            .join("")}
+        </ul>
+      `;
+      return studentData;
+    }).join("");
+
+    const htmlContent = `
+      <html>
+        <body>
+          ${turmaInfo}
+          ${studentRows}
+        </body>
+      </html>
+    `;
+
+    const { uri } = await Print.printToFileAsync({
+      html: htmlContent,
+    });
+
+    Sharing.shareAsync(uri);
+  };
+
   return (
     <Container>
       <View style={styles.header}>
@@ -209,12 +265,7 @@ export default function ExportDoc({ navigation, route }) {
       </View>
 
       <View style={styles.BtnView}>
-        <Btn
-          onPress={() => {
-            // Coloque a lógica para exportar PDF aqui
-          }}
-          texto="Exportar PDF"
-        />
+        <Btn onPress={generatePDF} texto="Exportar PDF" />
       </View>
 
       <View style={styles.BtnView}>
@@ -237,9 +288,10 @@ const styles = StyleSheet.create({
     width: "90%",
     alignItems: "center",
   },
-
   header: {
-    right: "41%",
-    top: "4.7%",
+    width: "100%",
+    height: 50,
+    justifyContent: "flex-start",
+    marginTop: 30,
   },
 });
