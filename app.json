@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "my-app",
-    "slug": "my-app",
+    "name": "SmartBinder",
+    "slug": "SmartBinder",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,10 +13,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mycompany.SmartBinder"
     },
     "android": {
-      "package": "com.mycompany.myapp",
+      "package": "com.mycompany.SmartBinder",
       "intentFilters": [
         {
           "action": "VIEW",
@@ -49,7 +50,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "c474e617-cfe7-4f3f-b883-9f54829ec168"
+        "projectId": "7a525a41-9b98-4e54-ad79-2d73b976c926"
       }
     }
   }

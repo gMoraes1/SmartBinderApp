@@ -6,20 +6,19 @@ import { useEffect, useState } from "react";
 import Input from "../../../components/Input/Input";
 import Btn from "../../../components/Buttons/Btn";
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
-import { db, auth } from "../../../../firebase"; // Importando o Firebase
-import { TextInputMask } from "react-native-masked-text";
-import { Feather } from "@expo/vector-icons"; // Importando o Feather para o ícone de erro
+import { db, auth } from "../../../../firebase";
+import { Feather } from "@expo/vector-icons";
 import BackBtn from "../../../components/Buttons/BackBtn";
-import * as ImagePicker from 'expo-image-picker'; // Importando o ImagePicker
-import * as FileSystem from 'expo-file-system'; // Para manipular arquivos
-import { Asset } from 'expo-asset'; // Importando o Asset
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
+import { Asset } from "expo-asset";
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
   width: 100%;
   height: 100%;
   align-items: center;
-  justify-content:center;
+  justify-content: center;
 `;
 
 const Title = styled.Text`
@@ -55,7 +54,7 @@ const IconPencil = styled.TouchableOpacity`
   padding: 12px;
 `;
 
-const defaultProfileImage = require("../../../../assets/Perfil.jpg"); // Imagem padrão
+const defaultProfileImage = require("../../../../assets/Perfil.jpg");
 
 export default function EditProfile({ navigation, route }) {
   const theme = useTheme();
@@ -63,169 +62,140 @@ export default function EditProfile({ navigation, route }) {
   const [cpf, setCpf] = useState(route.params.cpf || "");
   const [date, setDate] = useState(route.params.nascimentoProfessor || "");
   const [telefone, setTelefone] = useState(route.params.telefone || "");
-  const [isValidCpf, setIsValidCpf] = useState(true); // Estado para validação do CPF
+  const [isValidCpf, setIsValidCpf] = useState(true);
   const [image, setImage] = useState<string | null>(null);
-  const [dadosPerfil, setDadosPerfil] = useState(null); // Initialize with null
-  const defaultProfileImageUri = require("../../../../assets/Perfil.jpg"); // Caminho da imagem na pasta assets
+  const [dadosPerfil, setDadosPerfil] = useState(null);
 
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       if (user) {
-        // Busca os dados do perfil do Firestore usando o uid do usuário autenticado
         const userRef = doc(db, "tblProfessor", user.uid);
         const unsubscribe = onSnapshot(userRef, (docSnapshot) => {
           if (docSnapshot.exists()) {
             const userData = docSnapshot.data();
-            // Definir a imagem de perfil corretamente
             const profileImage = userData.imagemPerfil || defaultProfileImage;
-            setImage(profileImage); // Atualiza a imagem de perfil com a imagem do banco
-            setDadosPerfil(userData); // Carrega os dados do usuário no estado
+            setImage(profileImage);
+            setDadosPerfil(userData);
           } else {
-            setDadosPerfil(null); // Caso o perfil não exista no Firestore
+            setDadosPerfil(null);
           }
         });
-
-        // Cleanup do listener de perfil
         return () => unsubscribe();
       } else {
-        setDadosPerfil(null); // Caso o usuário não esteja logado
+        setDadosPerfil(null);
       }
     });
-
-    // Cleanup do listener de autenticação
     return () => unsubscribeAuth();
-  }, []); // Esse useEffect só executa uma vez após o componente ser montado
+  }, []);
 
   const formatUsername = (text) => {
-    const names = text.split(" ");  // Divide o texto em partes (nomes)
-    const formattedNames = names.map((name, index) => {
-      if (index === 0) {
-        // Capitaliza a primeira letra do primeiro nome
-        return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-      } else {
-        // Mantém os outros nomes como o usuário digitar
-        return name;
-      }
-    });
-
-    return formattedNames.join(" ");  // Junta os nomes novamente
+    const names = text.split(" ");
+    return names
+      .map((name, index) =>
+        index === 0
+          ? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+          : name
+      )
+      .join(" ");
   };
 
+  const handleCpfChange = (text) => {
+    let cleaned = text.replace(/\D/g, "");
+    if (cleaned.length > 11) cleaned = cleaned.slice(0, 11);
+    setCpf(cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4"));
 
-  const pickImage = async () => {
-    // Mostra um alerta com várias opções para o usuário escolher
-    Alert.alert(
-      "Escolher imagem",
-      "Escolha uma opção",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel",  // Adiciona a opção de cancelar
-        },
-        {
-          text: "Galeria",
-          onPress: async () => {
-            let result = await ImagePicker.launchImageLibraryAsync({
-              mediaTypes: ImagePicker.MediaTypeOptions.Images,
-              allowsEditing: true,
-              aspect: [4, 3],
-              quality: 0.6,
-            });
-
-            if (!result.canceled) {
-              const imageUri = result.assets[0].uri;
-              setImage(imageUri); // Armazena a URI da imagem selecionada
-            }
-          }
-        },
-        {
-          text: "Câmera",
-          onPress: async () => {
-            let result = await ImagePicker.launchCameraAsync({
-              allowsEditing: true,
-              aspect: [4, 3],
-              quality: 0.6,
-            });
-
-            if (!result.canceled) {
-              const imageUri = result.assets[0].uri;
-              setImage(imageUri); // Armazena a URI da imagem tirada
-            }
-          }
-        },
-      ]
-    );
-  };
-
-
-
-
-
-
-  // Função para validar o CPF
-  const validateCpf = (cpf) => {
-    const cleanedCpf = cpf.replace(/\D/g, ''); // Remove tudo o que não for número
-    if (cleanedCpf.length == '') return true;
-    if (cleanedCpf.length !== 11) return false;
-
-    let sum = 0;
-    let remainder;
-
-    // Validação do primeiro dígito verificador
-    for (let i = 0; i < 9; i++) {
-      sum += parseInt(cleanedCpf.charAt(i)) * (10 - i);
+    if (cleaned.length === 11) {
+      setIsValidCpf(validateCpf(cleaned));
+    } else {
+      setIsValidCpf(false);
     }
+  };
+
+  const validateCpf = (cpf) => {
+    const cleaned = cpf.replace(/\D/g, "");
+    let sum = 0,
+      remainder;
+
+    for (let i = 0; i < 9; i++) sum += parseInt(cleaned.charAt(i)) * (10 - i);
     remainder = (sum * 10) % 11;
     if (remainder === 10 || remainder === 11) remainder = 0;
-    if (remainder !== parseInt(cleanedCpf.charAt(9))) return false;
+    if (remainder !== parseInt(cleaned.charAt(9))) return false;
 
     sum = 0;
-    // Validação do segundo dígito verificador
-    for (let i = 0; i < 10; i++) {
-      sum += parseInt(cleanedCpf.charAt(i)) * (11 - i);
-    }
+    for (let i = 0; i < 10; i++) sum += parseInt(cleaned.charAt(i)) * (11 - i);
     remainder = (sum * 10) % 11;
     if (remainder === 10 || remainder === 11) remainder = 0;
-    if (remainder !== parseInt(cleanedCpf.charAt(10))) return false;
+    if (remainder !== parseInt(cleaned.charAt(10))) return false;
 
     return true;
   };
 
-  const handleCpfChange = (text) => {
-    setCpf(text);
-    const isValid = validateCpf(text);
-    setIsValidCpf(isValid);
+  const handleDateChange = (text) => {
+    let cleaned = text.replace(/\D/g, "");
+    if (cleaned.length > 8) cleaned = cleaned.slice(0, 8);
+    setDate(cleaned.replace(/(\d{2})(\d{2})(\d{4})/, "$1/$2/$3"));
   };
 
-  // Função para atualizar o perfil
+  const handlePhoneChange = (text) => {
+    let cleaned = text.replace(/\D/g, "");
+    if (cleaned.length > 11) cleaned = cleaned.slice(0, 11);
+    setTelefone(
+      cleaned.replace(/(\d{2})(\d{5})(\d{4})/, "($1)$2-$3")
+    );
+  };
+
+  const pickImage = async () => {
+    Alert.alert("Escolher imagem", "Escolha uma opção", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Galeria",
+        onPress: async () => {
+          let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.6,
+          });
+          if (!result.canceled) setImage(result.assets[0].uri);
+        },
+      },
+      {
+        text: "Câmera",
+        onPress: async () => {
+          let result = await ImagePicker.launchCameraAsync({
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.6,
+          });
+          if (!result.canceled) setImage(result.assets[0].uri);
+        },
+      },
+    ]);
+  };
+
   const updateProfile = async () => {
     const user = auth.currentUser;
     if (!user) {
       Alert.alert("Erro", "Usuário não autenticado.");
       return;
     }
-
     const userRef = doc(db, "tblProfessor", user.uid);
-
     try {
       const updatedData = {
         nomeProfessor: username,
         cpf: cpf,
         nascimentoProfessor: date,
         telefone: telefone,
-        imagemPerfil: image === defaultProfileImage ? defaultProfileImage : image, // Verifica se é a imagem padrão ou não
+        imagemPerfil: image || defaultProfileImage,
       };
-
-      // Atualiza os dados do usuário no Firestore
       await updateDoc(userRef, updatedData);
       Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
-      navigation.navigate("Profile"); // Navega de volta para a tela de perfil
+      navigation.navigate("Profile");
     } catch (error) {
       console.error("Erro ao atualizar perfil: ", error);
       Alert.alert("Erro", "Ocorreu um erro ao atualizar seu perfil.");
     }
   };
-
 
   return (
     <Container>
@@ -246,75 +216,36 @@ export default function EditProfile({ navigation, route }) {
         </View>
         <View style={styles.alignInput}>
           <Input
-            text="Nome"
+            text="Nome Completo"
             value={username}
             onChangeText={(text) => setUsername(formatUsername(text))}
-            placeholder={'Nome Completo'}
+            placeholder="Nome Completo"
           />
-
-
-
-          <TextInputMask
-            type={'cpf'}
-            style={[!isValidCpf && styles.invalidInput, {
-              backgroundColor: theme.inputBackground || "#D2DFDA",
-              color: theme.color || "#000",
-              height: 50,
-              width: 240,
-              margin: 8,
-              fontSize: 12,
-              paddingLeft: 20,
-              borderRadius: 10,
-              elevation: 5,
-            }]}
+          <Input
+            text="CPF"
             value={cpf}
             onChangeText={handleCpfChange}
-            placeholder={'CPF'}
-            placeholderTextColor={theme.placeholderColor}
+            placeholder="000.000.000-00"
           />
           {!isValidCpf && (
-            <Feather style={styles.errorIcon} name="x-circle" color={'#ff0000'} size={26} />
+            <Feather
+              style={styles.errorIcon}
+              name="x-circle"
+              color="#ff0000"
+              size={26}
+            />
           )}
-
-
-          <TextInputMask
-            type={'datetime'}
-            options={{ format: 'DD/MM/YYYY' }}
-            style={[{
-              backgroundColor: theme.inputBackground || "#D2DFDA",
-              color: theme.color || "#000",
-              height: 50,
-              width: 240,
-              margin: 8,
-              fontSize: 12,
-              borderRadius: 10,
-              paddingLeft: 20,
-              elevation: 5,
-            }]}
+          <Input
+            text="Data de Nascimento"
             value={date}
-            onChangeText={setDate}
-            placeholder={'Data de Nascimento'}
-            placeholderTextColor={theme.placeholderColor}
+            onChangeText={handleDateChange}
+            placeholder="DD/MM/AAAA"
           />
-          <TextInputMask
-            type={'cel-phone'}
-            options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
-            style={[{
-              backgroundColor: theme.inputBackground || "#D2DFDA",
-              color: theme.color || "#000",
-              height: 50,
-              width: 240,
-              margin: 8,
-              marginBottom: '10%',
-              fontSize: 12,
-              paddingLeft: 20,
-              borderRadius: 10,
-              elevation: 5,
-            }]}
+          <Input
+            text="Número de Telefone"
             value={telefone}
-            onChangeText={setTelefone}
-            placeholder={'Número de Telefone'}
-            placeholderTextColor={theme.placeholderColor}
+            onChangeText={handlePhoneChange}
+            placeholder="(00)00000-0000"
           />
           <Btn onPress={updateProfile} disabled={!isValidCpf} />
         </View>
@@ -329,35 +260,28 @@ const styles = StyleSheet.create({
     height: 180,
     borderRadius: 115,
   },
-
   AlignAll: {
-    position: 'absolute',
+    position: "absolute",
   },
-
   alignInput: {
-    bottom: '6%',
+    bottom: "6%",
     justifyContent: "center",
     alignItems: "center",
   },
   imageBlock: {
     alignItems: "center",
     justifyContent: "center",
-    position: 'relative',
-    bottom: '2%',
+    position: "relative",
+    bottom: "2%",
   },
   header: {
-    position: 'absolute',
-    top: '5%',
-    left: '4%',
-  },
-  invalidInput: {
-    borderColor: '#ff0000',
-    borderWidth: 1,
+    position: "absolute",
+    top: "5%",
+    left: "4%",
   },
   errorIcon: {
-    position: 'absolute',
+    position: "absolute",
     right: "10%",
-    top: '28.3%'
+    top: "28.3%",
   },
-
 });

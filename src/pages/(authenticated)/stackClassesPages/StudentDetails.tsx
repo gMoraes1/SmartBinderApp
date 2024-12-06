@@ -1,7 +1,6 @@
 import styled, { useTheme } from "styled-components/native";
 import { StyleSheet, TextInput, View } from 'react-native'
 import { useState } from "react";
-import { AutoGrowingTextInput } from 'react-native-autogrow-textinput'
 import Btn from "../../../components/Buttons/Btn";
 import BackBtn from "../../../components/Buttons/BackBtn";
 import { StatusBar } from "expo-status-bar";
@@ -53,7 +52,7 @@ export default function StudentDetails({ navigation }) {
                     onChangeText={setFaltas}
                     value={faltas}
                 />
-                <AutoGrowingTextInput
+                <TextInput
                     style={[{
                         backgroundColor: theme.inputBackground || "#D2DFDA",
                         color: theme.color || "#000",
