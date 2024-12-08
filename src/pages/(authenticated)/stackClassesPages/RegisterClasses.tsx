@@ -8,7 +8,6 @@ import BackBtn from "../../../components/Buttons/BackBtn";
 import Input from "../../../components/Input/Input";
 
 import Btn from "../../../components/Buttons/Btn";
-import RNPickerSelect from "react-native-picker-select";
 import { StatusBar } from "expo-status-bar";
 
 // Definindo o estilo para os componentes
@@ -116,86 +115,14 @@ export default function RegisterClasses({ navigation }) {
         <View style={styles.containerInput}>
           <Input text="Nome da turma" onChangeText={setClassName} />
 
-          <RNPickerSelect
-            onValueChange={setPeriod}
-            items={[
-              { label: "Manhã", value: "manhã" },
-              { label: "Tarde", value: "tarde" },
-              { label: "Noite", value: "noite" },
-            ]}
-            style={{
-              inputIOS: {
-                backgroundColor: theme.inputBackground || "#D2DFDA",
-                color: theme.color || "#000",
-                height: 50,
-                width: 240,
-                margin: 8,
-                fontSize: 12,
-                paddingLeft: 20,
-                borderRadius: 10,
-                elevation: 5,
-                alignSelf: 'center',
-              },
-              inputAndroid: {
-                backgroundColor: theme.inputBackground || "#D2DFDA",
-                color: theme.color || "#000",
-                height: 50,
-                width: 240,
-                margin: 8,
-                fontSize: 12,
-                paddingLeft: 20,
-                borderRadius: 10,
-                elevation: 5,
-                alignSelf: 'center',
-              },
-            }}
-            placeholder={{
-              label: "Escolha um Periodo",
-              value: null,
-              color: theme.placeholderColor,
-            }}
+          <Input
+            onChangeText={setPeriod}
+            text={"Escolha um Periodo"}
           />
 
-          <RNPickerSelect
-            onValueChange={setEducationLevel}
-            items={[
-              { label: "1° série Ensino Fundamental", value: "1° série Ensino Fundamental" },
-              { label: "2° série Ensino Fundamental", value: "2° série Ensino Fundamental" },
-              { label: "3° série Ensino Fundamental", value: "3° série Ensino Fundamental" },
-              { label: "4° série Ensino Fundamental", value: "4° série Ensino Fundamental" },
-              { label: "5° série Ensino Fundamental", value: "5° série Ensino Fundamental" },
-            ]}
-            style={{
-              inputIOS: {
-                backgroundColor: theme.inputBackground || "#D2DFDA",
-                color: theme.color || "#000",
-                height: 50,
-                width: 240,
-                margin: 8,
-                fontSize: 12,
-                paddingLeft: 20,
-                borderRadius: 10,
-                elevation: 5,
-                alignSelf: 'center',
-              },
-              inputAndroid: {
-                backgroundColor: theme.inputBackground || "#D2DFDA",
-                color: theme.color || "#000",
-                height: 50,
-                width: 240,
-                margin: 8,
-                fontSize: 12,
-                paddingLeft: 20,
-                borderRadius: 10,
-                elevation: 5,
-                alignSelf: 'center',
-              },
-            }}
-            placeholder={{
-              label: "Escolha uma Série",
-              value: null,
-              color: theme.placeholderColor,
-            }}
+          <Input
+            onChangeText={setEducationLevel}
+            text={"Escolha uma Série"}
           />
 
           <Input text="Escola" onChangeText={setSchool} />

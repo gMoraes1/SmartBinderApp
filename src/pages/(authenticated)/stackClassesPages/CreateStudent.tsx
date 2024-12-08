@@ -17,7 +17,6 @@ import styled, { useTheme } from "styled-components/native";
 import Btn from "../../../components/Buttons/Btn";
 import Input from "../../../components/Input/Input";
 import { StatusBar } from "expo-status-bar";
-import { TextInputMask } from "react-native-masked-text";
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -121,6 +120,12 @@ export default function CreateStudent({ navigation, route }) {
     }
   };
 
+  const handleDateChange = (text) => {
+    let cleaned = text.replace(/\D/g, "");
+    if (cleaned.length > 8) cleaned = cleaned.slice(0, 8);
+    setNascimentoAluno(cleaned.replace(/(\d{2})(\d{2})(\d{4})/, "$1/$2/$3"));
+  };
+
   return (
     <Container>
       <StatusBar style="auto" />
@@ -139,23 +144,9 @@ export default function CreateStudent({ navigation, route }) {
             onChangeText={handleNomeAlunoChange}
           />
 
-          <TextInputMask
-            type={'datetime'}
-            options={{ format: 'DD/MM/YYYY' }}
-            style={[{
-              backgroundColor: theme.inputBackground || "#D2DFDA",
-              color: theme.color || "#000",
-              height: 50,
-              width: 240,
-              margin: 8,
-              fontSize: 12,
-              borderRadius: 10,
-              paddingLeft: 20,
-              elevation: 5,
-              alignSelf: 'center',
-            }]}
-            value={nascimentoAluno}
-            onChangeText={setNascimentoAluno}
+          <Input
+            text={nascimentoAluno}
+            onChangeText={handleDateChange}
             placeholder={'Data de Nascimento'}
             placeholderTextColor={theme.placeholderColor}
           />
