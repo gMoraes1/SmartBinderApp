@@ -21,6 +21,7 @@ import {
 import { db, auth } from "../../../../firebase"; // Ajuste para seu caminho do Firebase
 import LtBtn from "../../../components/Buttons/LittleBtn";
 import DeleteBtn from "../../../components/Buttons/DeleteBtn";
+import RNPickerSelect from 'react-native-picker-select';
 import Input from "../../../components/Input/Input";
 import { StatusBar } from "expo-status-bar";
 
@@ -257,25 +258,88 @@ export default function Classes({ navigation }) {
               setEditedTurma({ ...editedTurma, nomeTurma: value })
             }
           />
-          <Input
+          <RNPickerSelect
             value={editedTurma.periodoTurma} // Passando o valor atual da turma
-            onChangeText={(value) => {
+            onValueChange={(value) => {
               setEditedTurma({ ...editedTurma, periodoTurma: value }); // Atualizando o estado com o valor selecionado
             }}
-
-            text={
-              'Escolha um Período'
-            }
+            items={[
+              { label: 'Manhã', value: 'manhã' },
+              { label: 'Tarde', value: 'tarde' },
+              { label: 'Noite', value: 'noite' },
+            ]}
+            style={{
+              inputIOS: {
+                backgroundColor: theme.inputBackground || "#D2DFDA",
+                color: theme.color || "#000",
+                height: 50,
+                width: 240,
+                margin: 8,
+                fontSize: 18,
+                borderRadius: 10,
+                elevation: 2,
+                alignSelf:'center'
+              },
+              inputAndroid: {
+                backgroundColor: theme.inputBackground || "#D2DFDA",
+                color: theme.color || "#000",
+                height: 50,
+                width: 240,
+                margin: 8,
+                fontSize: 18,
+                borderRadius: 10,
+                elevation: 2,
+                alignSelf:'center'
+              }
+            }}
+            placeholder={{
+              label: 'Escolha um Período',
+              value: null,
+              color: theme.placeholderColor,
+            }}
           />
 
-          <Input
+          <RNPickerSelect
             value={editedTurma.educationLevel} // Passando o valor atual do nível escolar
-            onChangeText={(value) => {
+            onValueChange={(value) => {
               setEditedTurma({ ...editedTurma, educationLevel: value }); // Atualizando o estado com o valor selecionado
             }}
-            text={
-              'Escolha uma Série'
-            }
+            items={[
+              { label: "1° série Ensino Fundamental", value: "1° série Ensino Fundamental" },
+              { label: "2° série Ensino Fundamental", value: "2° série Ensino Fundamental" },
+              { label: "3° série Ensino Fundamental", value: "3° série Ensino Fundamental" },
+              { label: "4° série Ensino Fundamental", value: "4° série Ensino Fundamental" },
+              { label: "5° série Ensino Fundamental", value: "5° série Ensino Fundamental" },
+            ]}
+            style={{
+              inputIOS: {
+                backgroundColor: theme.inputBackground || "#D2DFDA",
+                color: theme.color || "#000",
+                height: 50,
+                width: 240,
+                margin: 8,
+                fontSize: 18,
+                borderRadius: 10,
+                elevation: 2,
+                alignSelf:'center'
+              },
+              inputAndroid: {
+                backgroundColor: theme.inputBackground || "#D2DFDA",
+                color: theme.color || "#000",
+                height: 50,
+                width: 240,
+                margin: 8,
+                fontSize: 18,
+                borderRadius: 10,
+                elevation: 2,
+                alignSelf:'center'
+              }
+            }}
+            placeholder={{
+              label: 'Escolha uma Série',
+              value: null,
+              color: theme.placeholderColor,
+            }}
           />
 
           <Input
@@ -373,8 +437,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 5,
     alignItems: "center",
-    textAlign: 'center',
-    justifyContent: 'center',
+    textAlign:'center',
+    justifyContent:'center',
   },
   editTitle: {
     fontSize: 18,

@@ -16,6 +16,8 @@ import Btnms from '../../../components/Buttons/BtnmS';
 import BackBtn from "../../../components/Buttons/BackBtn";
 import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
+import { TextInputMask } from 'react-native-masked-text';
+
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -113,32 +115,6 @@ export default function EditSondagem({ route }) {
     }
   };
 
-  const handleDateChange1 = (text: string) => {
-    // Remove caracteres não numéricos
-    let cleaned = text.replace(/\D/g, "");
-    // Limita a string a no máximo 8 caracteres (DDMMYYYY)
-    if (cleaned.length > 8) cleaned = cleaned.slice(0, 8);
-    // Formata para DD/MM/YYYY
-    const formatted = cleaned.replace(/(\d{2})(\d{2})(\d{4})/, "$1/$2/$3");
-    // Atualiza o estado
-    setEditedSondagem((prev) =>
-      prev ? { ...prev, periodoInicial: formatted } : null
-    );
-  };
-  
-  const handleDateChange2 = (text: string) => {
-    // Remove caracteres não numéricos
-    let cleaned = text.replace(/\D/g, "");
-    // Limita a string a no máximo 8 caracteres (DDMMYYYY)
-    if (cleaned.length > 8) cleaned = cleaned.slice(0, 8);
-    // Formata para DD/MM/YYYY
-    const formatted = cleaned.replace(/(\d{2})(\d{2})(\d{4})/, "$1/$2/$3");
-    // Atualiza o estado
-    setEditedSondagem((prev) =>
-      prev ? { ...prev, periodoFinal: formatted } : null
-    );
-  };
-
   return (
     <Container>
       <StatusBar style="auto" />
@@ -174,18 +150,48 @@ export default function EditSondagem({ route }) {
             }
           />
 
-          <Input
-          
-            text={editedSondagem.periodoInicial}
-            onChangeText={handleDateChange1}
+          <TextInputMask
+            type={'datetime'}
+            options={{ format: 'DD/MM/YYYY' }}
+            style={[{
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 240,
+              margin: 8,
+              fontSize: 12,
+              borderRadius: 10,
+              paddingLeft: 20,
+              elevation: 5,
+              alignSelf:'center',
+            }]}
+            value={editedSondagem.periodoInicial}
+            onChangeText={(value) =>
+              setEditedSondagem({ ...editedSondagem, periodoInicial: value })
+            }
             placeholder={'Periodo Inicial'}
             placeholderTextColor={theme.placeholderColor}
           />
 
-          <Input
-            
-            text={editedSondagem.periodoFinal}
-            onChangeText={handleDateChange2}
+          <TextInputMask
+            type={'datetime'}
+            options={{ format: 'DD/MM/YYYY' }}
+            style={[{
+              backgroundColor: theme.inputBackground || "#D2DFDA",
+              color: theme.color || "#000",
+              height: 50,
+              width: 240,
+              margin: 8,
+              fontSize: 12,
+              borderRadius: 10,
+              paddingLeft: 20,
+              elevation: 5,
+              alignSelf:'center',
+            }]}
+            value={editedSondagem.periodoFinal}
+            onChangeText={(value) =>
+              setEditedSondagem({ ...editedSondagem, periodoFinal: value })
+            }
             placeholder={'Periodo Final'}
             placeholderTextColor={theme.placeholderColor}
           />

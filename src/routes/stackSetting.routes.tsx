@@ -5,22 +5,20 @@ import Configurations from "../pages/(authenticated)/stackSettingsPages/configur
 import ThemeSettings from "../pages/(authenticated)/stackSettingsPages/tema";
 import PrivacySettings from "../pages/(authenticated)/stackSettingsPages/PrivacySettings";
 
-
-
-
 const Stack = createStackNavigator();
 
 function StackSettings() {
-    return (
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }} >
-        <Stack.Screen name="settings" component={Configurations} />
-        <Stack.Screen name="Tema" component={ThemeSettings} />
-        <Stack.Screen name="Privacidade" component={PrivacySettings} />
-      </Stack.Navigator>
-    );
-  }
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name="settings" component={Configurations} />
+      <Stack.Screen name="Tema" component={ThemeSettings} />
+      <Stack.Screen name="Privacidade" component={PrivacySettings} />
+    </Stack.Navigator>
+  );
+}
 
 export default StackSettings;
