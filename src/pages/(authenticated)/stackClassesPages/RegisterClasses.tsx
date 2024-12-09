@@ -64,11 +64,10 @@ export default function RegisterClasses({ navigation }) {
 
       // Criando as sondagens relacionadas à turma
       const sondagens = [
-        { label: "1° série Ensino Fundamental", value: "1° série Ensino Fundamental" },
-        { label: "2° série Ensino Fundamental", value: "2° série Ensino Fundamental" },
-        { label: "3° série Ensino Fundamental", value: "3° série Ensino Fundamental" },
-        { label: "4° série Ensino Fundamental", value: "4° série Ensino Fundamental" },
-        { label: "5° série Ensino Fundamental", value: "5° série Ensino Fundamental" },
+        { nomeSondagem: "1° Bimestre", periodoInicial: "", periodoFinal: "" },
+        { nomeSondagem: "2° Bimestre", periodoInicial: "", periodoFinal: "" },
+        { nomeSondagem: "3° Bimestre", periodoInicial: "", periodoFinal: "" },
+        { nomeSondagem: "4° Bimestre", periodoInicial: "", periodoFinal: "" },
       ];
 
       const sondagemCollectionRef = collection(db, "tblSondagem");
