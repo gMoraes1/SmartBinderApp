@@ -10,8 +10,6 @@ import { db, auth } from "../../../../firebase";
 import { Feather } from "@expo/vector-icons";
 import BackBtn from "../../../components/Buttons/BackBtn";
 import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
-import { Asset } from "expo-asset";
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -31,20 +29,6 @@ const Title = styled.Text`
   bottom: 50px;
 `;
 
-const ProfileView = styled.SafeAreaView`
-  background-color: ${(props) => props.theme.backgroundProfile};
-  width: 90%;
-  height: 80%;
-  padding: 22px;
-  border-radius: 20px;
-  border: solid gray 0.5px;
-  position: relative;
-  top: 10px;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-`;
-
 const IconPencil = styled.TouchableOpacity`
   position: relative;
   bottom: 24%;
@@ -54,7 +38,6 @@ const IconPencil = styled.TouchableOpacity`
   padding: 12px;
 `;
 
-const defaultProfileImage = require("../../../../assets/Perfil.jpg");
 
 export default function EditProfile({ navigation, route }) {
   const theme = useTheme();
@@ -73,9 +56,15 @@ export default function EditProfile({ navigation, route }) {
         const unsubscribe = onSnapshot(userRef, (docSnapshot) => {
           if (docSnapshot.exists()) {
             const userData = docSnapshot.data();
-            const profileImage = userData.imagemPerfil || defaultProfileImage;
+            const profileImage = userData.imagemPerfil;
             setImage(profileImage);
-            setDadosPerfil(userData);
+            setDadosPerfil(userData); // Aqui você armazena os dados no estado
+
+            // Aqui você pode configurar os campos com os dados do perfil
+            setUsername(userData.nomeProfessor || "");
+            setCpf(userData.cpf || "");
+            setDate(userData.nascimentoProfessor || "");
+            setTelefone(userData.telefone || "");
           } else {
             setDadosPerfil(null);
           }
@@ -87,6 +76,7 @@ export default function EditProfile({ navigation, route }) {
     });
     return () => unsubscribeAuth();
   }, []);
+
 
   const formatUsername = (text) => {
     const names = text.split(" ");
@@ -179,15 +169,19 @@ export default function EditProfile({ navigation, route }) {
       Alert.alert("Erro", "Usuário não autenticado.");
       return;
     }
+
     const userRef = doc(db, "tblProfessor", user.uid);
+
+    // Garantir que imagem tenha um valor definido (ou imagem padrão)
+    const updatedData = {
+      nomeProfessor: username,
+      cpf: cpf,
+      nascimentoProfessor: date,
+      telefone: telefone,
+      imagemPerfil: image || "../../../../assets/Perfil.jpg", // Aqui, se image for undefined, usamos a imagem padrão
+    };
+
     try {
-      const updatedData = {
-        nomeProfessor: username,
-        cpf: cpf,
-        nascimentoProfessor: date,
-        telefone: telefone,
-        imagemPerfil: image || defaultProfileImage,
-      };
       await updateDoc(userRef, updatedData);
       Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
       navigation.navigate("Profile");
@@ -196,6 +190,7 @@ export default function EditProfile({ navigation, route }) {
       Alert.alert("Erro", "Ocorreu um erro ao atualizar seu perfil.");
     }
   };
+
 
   return (
     <Container>
@@ -208,7 +203,7 @@ export default function EditProfile({ navigation, route }) {
         <View style={styles.imageBlock}>
           <Image
             style={styles.image}
-            source={image ? { uri: image } : defaultProfileImage}
+            source={image ? { uri: image } : require("../../../../assets/Perfil.jpg")} // Se a imagem for nula, usa a imagem padrão
           />
           <IconPencil onPress={pickImage}>
             <Ionicons name="camera" size={26} color={theme.colorIconStyle} />
@@ -217,36 +212,29 @@ export default function EditProfile({ navigation, route }) {
         <View style={styles.alignInput}>
           <Input
             text="Nome Completo"
-            value={username}
+            value={dadosPerfil?.nomeProfessor || username}  // Utilizando dadosPerfil para inicializar o campo
             onChangeText={(text) => setUsername(formatUsername(text))}
             placeholder="Nome Completo"
           />
           <Input
             text="CPF"
-            value={cpf}
+            value={dadosPerfil?.cpf || cpf}  // Aqui também
             onChangeText={handleCpfChange}
             placeholder="000.000.000-00"
           />
-          {!isValidCpf && (
-            <Feather
-              style={styles.errorIcon}
-              name="x-circle"
-              color="#ff0000"
-              size={26}
-            />
-          )}
           <Input
             text="Data de Nascimento"
-            value={date}
+            value={dadosPerfil?.nascimentoProfessor || date}  // Usando dadosPerfil
             onChangeText={handleDateChange}
             placeholder="DD/MM/AAAA"
           />
           <Input
             text="Número de Telefone"
-            value={telefone}
+            value={dadosPerfil?.telefone || telefone}  // Preenchendo o campo de telefone
             onChangeText={handlePhoneChange}
             placeholder="(00)00000-0000"
           />
+
           <Btn onPress={updateProfile} disabled={!isValidCpf} />
         </View>
       </View>

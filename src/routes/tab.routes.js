@@ -30,9 +30,11 @@ export default function TabNavigator() {
       <Tab.Navigator screenOptions={{
         headerShown: false,
         tabBarShowLabel:false,
+        tabBarLabel:false,
+        tabBarShowLabel:false,
         tabBarStyle: {
           position: 'absolute',
-          height: 90,
+          height: '8%',
           borderTopWidth: 1,
         },
       }}>
