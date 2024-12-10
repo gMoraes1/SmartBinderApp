@@ -10,14 +10,12 @@ import {
   doc,
 } from 'firebase/firestore';
 import { db } from '../../../../firebase';
-import Input from '../../../components/Input/Input';
+import Input from '../../../components/Input/Input'; // Usando seu componente Input
 import Btnm from '../../../components/Buttons/Btnm';
 import Btnms from '../../../components/Buttons/BtnmS';
 import BackBtn from "../../../components/Buttons/BackBtn";
 import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import { TextInputMask } from 'react-native-masked-text';
-
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -43,7 +41,7 @@ interface Sondagem {
 }
 
 export default function EditSondagem({ route }) {
-  const theme = useTheme()
+  const theme = useTheme();
   const navigation = useNavigation();
   const turmaId = route?.params?.turmaId;
 
@@ -115,6 +113,30 @@ export default function EditSondagem({ route }) {
     }
   };
 
+  // Função para aplicar a máscara de data
+  const handleDateChange = (date: string, field: string) => {
+    // Remove qualquer caractere não numérico
+    const cleaned = date.replace(/\D/g, '');
+    
+    // Limita o número de caracteres a 8, já que são 8 dígitos numéricos no formato DDMMYYYY
+    let limitedDate = cleaned.slice(0, 8);
+  
+    let formatted = limitedDate;
+  
+    // Aplica a máscara de data "DD/MM/YYYY"
+    if (limitedDate.length <= 2) {
+      formatted = limitedDate.replace(/(\d{2})/, '$1');
+    } else if (limitedDate.length <= 4) {
+      formatted = limitedDate.replace(/(\d{2})(\d{2})/, '$1/$2');
+    } else if (limitedDate.length <= 8) {
+      formatted = limitedDate.replace(/(\d{2})(\d{2})(\d{4})/, '$1/$2/$3');
+    }
+  
+    // Atualiza o campo adequado (periodoInicial ou periodoFinal)
+    setEditedSondagem({ ...editedSondagem, [field]: formatted });
+  };
+  
+
   return (
     <Container>
       <StatusBar style="auto" />
@@ -150,51 +172,20 @@ export default function EditSondagem({ route }) {
             }
           />
 
-          <TextInputMask
-            type={'datetime'}
-            options={{ format: 'DD/MM/YYYY' }}
-            style={[{
-              backgroundColor: theme.inputBackground || "#D2DFDA",
-              color: theme.color || "#000",
-              height: 50,
-              width: 240,
-              margin: 8,
-              fontSize: 12,
-              borderRadius: 10,
-              paddingLeft: 20,
-              elevation: 5,
-              alignSelf:'center',
-            }]}
+          <Input
+            text="Período Inicial"
             value={editedSondagem.periodoInicial}
-            onChangeText={(value) =>
-              setEditedSondagem({ ...editedSondagem, periodoInicial: value })
-            }
-            placeholder={'Periodo Inicial'}
-            placeholderTextColor={theme.placeholderColor}
+            onChangeText={(value) => handleDateChange(value, 'periodoInicial')}
+            placeholder="DD/MM/YYYY"
           />
 
-          <TextInputMask
-            type={'datetime'}
-            options={{ format: 'DD/MM/YYYY' }}
-            style={[{
-              backgroundColor: theme.inputBackground || "#D2DFDA",
-              color: theme.color || "#000",
-              height: 50,
-              width: 240,
-              margin: 8,
-              fontSize: 12,
-              borderRadius: 10,
-              paddingLeft: 20,
-              elevation: 5,
-              alignSelf:'center',
-            }]}
+          <Input
+            text="Período Final"
             value={editedSondagem.periodoFinal}
-            onChangeText={(value) =>
-              setEditedSondagem({ ...editedSondagem, periodoFinal: value })
-            }
-            placeholder={'Periodo Final'}
-            placeholderTextColor={theme.placeholderColor}
+            onChangeText={(value) => handleDateChange(value, 'periodoFinal')}
+            placeholder="DD/MM/YYYY"
           />
+
           <View style={styles.btnGroup}>
             <Btnms
               texto={isSaving ? 'Salvando...' : 'Salvar'}
