@@ -1,17 +1,7 @@
 import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-} from "react-native";
+import { View, StyleSheet } from "react-native";
 import { db } from "../../../../firebase";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
+import { addDoc, collection, doc, getDocs, query, where } from "firebase/firestore";
 import BackBtn from "../../../components/Buttons/BackBtn";
 import styled, { useTheme } from "styled-components/native";
 import Btn from "../../../components/Buttons/Btn";
@@ -34,7 +24,7 @@ const Title = styled.Text`
 `;
 
 export default function CreateStudent({ navigation, route }) {
-  const theme = useTheme()
+  const theme = useTheme();
   const { turmaId } = route.params; // Obtendo a turmaId passada da tela anterior
 
   // Definir os estados para os campos de entrada
@@ -43,25 +33,22 @@ export default function CreateStudent({ navigation, route }) {
   const [rmAluno, setRmAluno] = useState("");
 
   const formatUsername = (text) => {
-    const names = text.split(" ");  // Divide o texto em partes (nomes)
+    const names = text.split(" ");
     const formattedNames = names.map((name, index) => {
       if (index === 0) {
-        // Capitaliza a primeira letra do primeiro nome
         return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
       } else {
-        // Mantém os outros nomes como o usuário digitar
         return name;
       }
     });
 
-    return formattedNames.join(" ");  // Junta os nomes novamente
+    return formattedNames.join(" ");
   };
 
   const handleNomeAlunoChange = (text) => {
     const formattedText = formatUsername(text); // Chamando a função formatUsername
     setNomeAluno(formattedText);
   };
-
 
   // Função para criar observações (tblObsSondagem) automaticamente
   const createObservationsForStudent = async (alunoId) => {
@@ -121,9 +108,20 @@ export default function CreateStudent({ navigation, route }) {
   };
 
   const handleDateChange = (text) => {
-    let cleaned = text.replace(/\D/g, "");
+    let cleaned = text.replace(/\D/g, ""); // Remove tudo que não for número
+
+    // Limita a quantidade de caracteres a 8 (DD/MM/AAAA)
     if (cleaned.length > 8) cleaned = cleaned.slice(0, 8);
-    setNascimentoAluno(cleaned.replace(/(\d{2})(\d{2})(\d{4})/, "$1/$2/$3"));
+
+    // Formata a data conforme a máscara DD/MM/AAAA
+    if (cleaned.length >= 6) {
+      cleaned = cleaned.replace(/(\d{2})(\d{2})(\d{4})/, "$1/$2/$3");
+    } else if (cleaned.length >= 4) {
+      cleaned = cleaned.replace(/(\d{2})(\d{2})/, "$1/$2");
+    }
+
+    // Atualiza o estado com a data formatada
+    setNascimentoAluno(cleaned);
   };
 
   return (
@@ -147,8 +145,10 @@ export default function CreateStudent({ navigation, route }) {
           <Input
             text={nascimentoAluno}
             onChangeText={handleDateChange}
-            placeholder={'Data de Nascimento'}
+            placeholder="Data de Nascimento"
             placeholderTextColor={theme.placeholderColor}
+            keyboardType="numeric"
+            maxLength={10} // Limita o comprimento do campo a 10 caracteres
           />
 
           <Input

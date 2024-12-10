@@ -115,12 +115,12 @@ return (
 
         <Input
           onChangeText={setPeriod}
-          text={"Escolha um Periodo"}
+          text={"Digite o Periodo"}
         />
 
         <Input
           onChangeText={setEducationLevel}
-          text={"Escolha uma Série"}
+          text={"Digite a Série"}
         />
 
         <Input text="Escola" onChangeText={setSchool} />
