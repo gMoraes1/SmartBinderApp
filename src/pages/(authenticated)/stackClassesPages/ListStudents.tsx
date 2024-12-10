@@ -212,17 +212,14 @@ export default function ListStudents({ navigation, route }) {
   };
 
   const handleDateChange1 = (text: string) => {
-    // Remove caracteres não numéricos
-    let cleaned = text.replace(/\D/g, "");
-    // Limita a string a no máximo 8 caracteres (DDMMYYYY)
-    if (cleaned.length > 8) cleaned = cleaned.slice(0, 8);
-    // Formata para DD/MM/YYYY
-    const formatted = cleaned.replace(/(\d{2})(\d{2})(\d{4})/, "$1/$2/$3");
-    // Atualiza o estado
+    let cleaned = text.replace(/\D/g, ""); // Remove caracteres não numéricos
+    if (cleaned.length > 8) cleaned = cleaned.slice(0, 8); // Limita a string a no máximo 8 caracteres
+    const formatted = cleaned.replace(/(\d{2})(\d{2})(\d{4})/, "$1/$2/$3"); // Formata como DD/MM/YYYY
     setEditedStudent((prev) =>
-      prev ? { ...prev, periodoInicial: formatted } : null
+      prev ? { ...prev, nascimentoAluno: formatted } : null
     );
   };
+  
 
   return (
     <Container>
@@ -288,11 +285,13 @@ export default function ListStudents({ navigation, route }) {
 
 
           <Input
-            text={editedStudent.nascimentoAluno}
+            text="Data de Nascimento"
+            value={editedStudent?.nascimentoAluno || ""} // Certifique-se de que a data de nascimento está sendo passada
             onChangeText={handleDateChange1}
-            placeholder={'Data de Nascimento'}
+            placeholder="Digite a data de nascimento"
             placeholderTextColor={theme.placeholderColor}
           />
+
           <Input
             text="RM"
             value={editedStudent.rmAluno}
