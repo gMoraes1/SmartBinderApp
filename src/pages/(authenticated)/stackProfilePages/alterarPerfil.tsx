@@ -7,9 +7,9 @@ import Input from "../../../components/Input/Input";
 import Btn from "../../../components/Buttons/Btn";
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db, auth } from "../../../../firebase";
-import { Feather } from "@expo/vector-icons";
 import BackBtn from "../../../components/Buttons/BackBtn";
 import * as ImagePicker from "expo-image-picker";
+import { Feather } from "@expo/vector-icons"; // Importando o Feather para o ícone de erro
 
 const Container = styled.View`
   background-color: ${(props) => props.theme.background};
@@ -38,17 +38,18 @@ const IconPencil = styled.TouchableOpacity`
   padding: 12px;
 `;
 
-
 export default function EditProfile({ navigation, route }) {
   const theme = useTheme();
-  const [username, setUsername] = useState(route.params.nomeProfessor || "");
-  const [cpf, setCpf] = useState(route.params.cpf || "");
-  const [date, setDate] = useState(route.params.nascimentoProfessor || "");
-  const [telefone, setTelefone] = useState(route.params.telefone || "");
-  const [isValidCpf, setIsValidCpf] = useState(true);
+  const [username, setUsername] = useState("");  
+  const [cpf, setCpf] = useState("");  
+  const [date, setDate] = useState("");  
+  const [telefone, setTelefone] = useState("");  
   const [image, setImage] = useState<string | null>(null);
+  const [isValidCpf, setIsValidCpf] = useState(true);
+
   const [dadosPerfil, setDadosPerfil] = useState(null);
 
+  // Carregar dados do Firebase e inicializar os estados
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -56,15 +57,15 @@ export default function EditProfile({ navigation, route }) {
         const unsubscribe = onSnapshot(userRef, (docSnapshot) => {
           if (docSnapshot.exists()) {
             const userData = docSnapshot.data();
-            const profileImage = userData.imagemPerfil;
-            setImage(profileImage);
-            setDadosPerfil(userData); // Aqui você armazena os dados no estado
-
-            // Aqui você pode configurar os campos com os dados do perfil
-            setUsername(userData.nomeProfessor || "");
-            setCpf(userData.cpf || "");
-            setDate(userData.nascimentoProfessor || "");
-            setTelefone(userData.telefone || "");
+            setDadosPerfil(userData); // Armazena os dados completos
+            // Inicializa o estado com os dados do Firebase apenas uma vez
+            if (!username && !cpf && !date && !telefone) {
+              setUsername(userData.nomeProfessor || "");
+              setCpf(userData.cpf || "");
+              setDate(userData.nascimentoProfessor || "");
+              setTelefone(userData.telefone || "");
+              setImage(userData.imagemPerfil || "../../../../assets/Perfil.jpg");
+            }
           } else {
             setDadosPerfil(null);
           }
@@ -77,7 +78,6 @@ export default function EditProfile({ navigation, route }) {
     return () => unsubscribeAuth();
   }, []);
 
-
   const formatUsername = (text) => {
     const names = text.split(" ");
     return names
@@ -89,18 +89,7 @@ export default function EditProfile({ navigation, route }) {
       .join(" ");
   };
 
-  const handleCpfChange = (text) => {
-    let cleaned = text.replace(/\D/g, "");
-    if (cleaned.length > 11) cleaned = cleaned.slice(0, 11);
-    setCpf(cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4"));
-
-    if (cleaned.length === 11) {
-      setIsValidCpf(validateCpf(cleaned));
-    } else {
-      setIsValidCpf(false);
-    }
-  };
-
+  // Função para validar o CPF
   const validateCpf = (cpf) => {
     const cleaned = cpf.replace(/\D/g, "");
     let sum = 0,
@@ -118,6 +107,18 @@ export default function EditProfile({ navigation, route }) {
     if (remainder !== parseInt(cleaned.charAt(10))) return false;
 
     return true;
+  };
+
+  const handleCpfChange = (text) => {
+    let cleaned = text.replace(/\D/g, "");
+    if (cleaned.length > 11) cleaned = cleaned.slice(0, 11);
+    setCpf(cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4"));
+
+    if (cleaned.length === 11) {
+      setIsValidCpf(validateCpf(cleaned));
+    } else {
+      setIsValidCpf(false);
+    }
   };
 
   const handleDateChange = (text) => {
@@ -172,14 +173,20 @@ export default function EditProfile({ navigation, route }) {
 
     const userRef = doc(db, "tblProfessor", user.uid);
 
-    // Garantir que imagem tenha um valor definido (ou imagem padrão)
+    // Preenche os dados atualizados
     const updatedData = {
-      nomeProfessor: username,
-      cpf: cpf,
-      nascimentoProfessor: date,
-      telefone: telefone,
-      imagemPerfil: image || "../../../../assets/Perfil.jpg", // Aqui, se image for undefined, usamos a imagem padrão
+      nomeProfessor: username.trim(),
+      cpf: cpf.trim(),
+      nascimentoProfessor: date.trim(),
+      telefone: telefone.trim(),
+      imagemPerfil: image || dadosPerfil?.imagemPerfil || "../../../../assets/Perfil.jpg",
     };
+
+    // Verificar se os campos obrigatórios estão preenchidos
+    if (!updatedData.nomeProfessor || !updatedData.cpf || !updatedData.nascimentoProfessor || !updatedData.telefone) {
+      Alert.alert("Erro", "Preencha todos os campos!");
+      return;
+    }
 
     try {
       await updateDoc(userRef, updatedData);
@@ -190,7 +197,6 @@ export default function EditProfile({ navigation, route }) {
       Alert.alert("Erro", "Ocorreu um erro ao atualizar seu perfil.");
     }
   };
-
 
   return (
     <Container>
@@ -203,7 +209,7 @@ export default function EditProfile({ navigation, route }) {
         <View style={styles.imageBlock}>
           <Image
             style={styles.image}
-            source={image ? { uri: image } : require("../../../../assets/Perfil.jpg")} // Se a imagem for nula, usa a imagem padrão
+            source={image ? { uri: image } : require("../../../../assets/Perfil.jpg")}
           />
           <IconPencil onPress={pickImage}>
             <Ionicons name="camera" size={26} color={theme.colorIconStyle} />
@@ -212,64 +218,70 @@ export default function EditProfile({ navigation, route }) {
         <View style={styles.alignInput}>
           <Input
             text="Nome Completo"
-            value={dadosPerfil?.nomeProfessor || username}  // Utilizando dadosPerfil para inicializar o campo
+            value={username} // Utilizando o valor diretamente do estado
             onChangeText={(text) => setUsername(formatUsername(text))}
             placeholder="Nome Completo"
           />
-          <Input
-            text="CPF"
-            value={dadosPerfil?.cpf || cpf}  // Aqui também
-            onChangeText={handleCpfChange}
-            placeholder="000.000.000-00"
-          />
+          <View style={styles.inputWrapper}>
+            <Input
+              text="CPF"
+              value={cpf} // Utilizando o valor diretamente do estado
+              onChangeText={handleCpfChange}
+              placeholder="000.000.000-00"
+            />
+            {!isValidCpf && (
+              <Feather style={styles.errorIcon} name="x-circle" color={'#ff0000'} size={26} />
+            )}
+          </View>
           <Input
             text="Data de Nascimento"
-            value={dadosPerfil?.nascimentoProfessor || date}  // Usando dadosPerfil
+            value={date} // Utilizando o valor diretamente do estado
             onChangeText={handleDateChange}
-            placeholder="DD/MM/AAAA"
+            placeholder="DD/MM/YYYY"
           />
           <Input
-            text="Número de Telefone"
-            value={dadosPerfil?.telefone || telefone}  // Preenchendo o campo de telefone
+            text="Telefone"
+            value={telefone} // Utilizando o valor diretamente do estado
             onChangeText={handlePhoneChange}
-            placeholder="(00)00000-0000"
+            placeholder="(00) 00000-0000"
           />
-
-          <Btn onPress={updateProfile} disabled={!isValidCpf} />
         </View>
+        <Btn text="Atualizar" onPress={updateProfile} />
       </View>
     </Container>
   );
 }
 
 const styles = StyleSheet.create({
-  image: {
-    width: 180,
-    height: 180,
-    borderRadius: 115,
-  },
-  AlignAll: {
+  header: {
     position: "absolute",
-  },
-  alignInput: {
-    bottom: "6%",
-    justifyContent: "center",
-    alignItems: "center",
+    top: 40,
+    left: 10,
+    zIndex: 1,
   },
   imageBlock: {
     alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    bottom: "2%",
   },
-  header: {
-    position: "absolute",
-    top: "5%",
-    left: "4%",
+  image: {
+    width: 180,
+    height: 180,
+    borderRadius: 100,
+  },
+  AlignAll: {
+    alignItems: "center",
+    bottom:'4%'
+  },
+  alignInput: {
+    bottom:'4%'
+  },
+  inputWrapper: {
+    position:'relative'
   },
   errorIcon: {
-    position: "absolute",
-    right: "10%",
-    top: "28.3%",
+    position:'absolute',
+    top:'34%',
+    right:'9%',
+    zIndex:30,
+
   },
 });
